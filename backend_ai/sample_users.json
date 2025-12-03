@@ -1,0 +1,128 @@
+[
+  {
+    "id": "user_seeker_001",
+    "email": "seeker1@test.com",
+    "password": "seeker123",
+    "role": "careseeker",
+    "name": "Nguyễn Văn An",
+    "phone": "0901234567",
+    "address": "123 Lê Lợi, Quận 1, TP.HCM",
+    "avatar": "https://ui-avatars.com/api/?name=Nguyen+Van+An&background=68C2E8&color=fff",
+    "created_at": "2024-01-15T08:00:00Z"
+  },
+  {
+    "id": "user_seeker_002",
+    "email": "seeker2@test.com",
+    "password": "seeker123",
+    "role": "careseeker",
+    "name": "Trần Thị Bình",
+    "phone": "0902345678",
+    "address": "456 Nguyễn Huệ, Quận 1, TP.HCM",
+    "avatar": "https://ui-avatars.com/api/?name=Tran+Thi+Binh&background=E91E63&color=fff",
+    "created_at": "2024-02-20T10:30:00Z"
+  },
+  {
+    "id": "user_giver_001",
+    "email": "caregiver1@test.com",
+    "password": "giver123",
+    "role": "caregiver",
+    "name": "Trần Văn Nam",
+    "phone": "0911234567",
+    "address": "123 Đường ABC, Quận 1, TP.HCM",
+    "avatar": "https://ui-avatars.com/api/?name=Tran+Van+Nam&background=4CAF50&color=fff",
+    "created_at": "2024-01-10T07:00:00Z",
+    "caregiver_profile": {
+      "age": 35,
+      "gender": "male",
+      "experience_years": 8,
+      "rating": 4.8,
+      "total_reviews": 156,
+      "hourly_rate": 50000,
+      "specializations": [
+        "Chăm sóc người già",
+        "Vật lý trị liệu",
+        "Chế độ ăn dinh dưỡng"
+      ],
+      "certificates": [
+        "Chứng chỉ điều dưỡng viên",
+        "Chứng chỉ sơ cấp cứu"
+      ],
+      "languages": [
+        "Tiếng Việt",
+        "Tiếng Anh"
+      ],
+      "bio": "Tôi có 8 năm kinh nghiệm chăm sóc người cao tuổi với sự tận tâm và chu đáo.",
+      "is_verified": true,
+      "is_available": true
+    }
+  },
+  {
+    "id": "user_giver_002",
+    "email": "caregiver2@test.com",
+    "password": "giver123",
+    "role": "caregiver",
+    "name": "Nguyễn Thị Mai",
+    "phone": "0912345678",
+    "address": "456 Đường XYZ, Quận 2, TP.HCM",
+    "avatar": "https://ui-avatars.com/api/?name=Nguyen+Thi+Mai&background=9C27B0&color=fff",
+    "created_at": "2024-01-12T09:15:00Z",
+    "caregiver_profile": {
+      "age": 28,
+      "gender": "female",
+      "experience_years": 5,
+      "rating": 4.5,
+      "total_reviews": 89,
+      "hourly_rate": 45000,
+      "specializations": [
+        "Chăm sóc người già",
+        "Massage trị liệu"
+      ],
+      "certificates": [
+        "Chứng chỉ điều dưỡng viên"
+      ],
+      "languages": [
+        "Tiếng Việt"
+      ],
+      "bio": "Nhiệt tình, chu đáo, có kinh nghiệm chăm sóc người cao tuổi.",
+      "is_verified": true,
+      "is_available": true
+    }
+  },
+  {
+    "id": "user_giver_003",
+    "email": "caregiver3@test.com",
+    "password": "giver123",
+    "role": "caregiver",
+    "name": "Phạm Văn Hùng",
+    "phone": "0923456789",
+    "address": "789 Đường DEF, Quận 3, TP.HCM",
+    "avatar": "https://ui-avatars.com/api/?name=Pham+Van+Hung&background=FF9800&color=fff",
+    "created_at": "2024-01-08T06:30:00Z",
+    "caregiver_profile": {
+      "age": 42,
+      "gender": "male",
+      "experience_years": 12,
+      "rating": 4.9,
+      "total_reviews": 234,
+      "hourly_rate": 60000,
+      "specializations": [
+        "Chăm sóc người già",
+        "Vật lý trị liệu",
+        "Y tá"
+      ],
+      "certificates": [
+        "Bằng điều dưỡng",
+        "Chứng chỉ vật lý trị liệu",
+        "Chứng chỉ sơ cấp cứu"
+      ],
+      "languages": [
+        "Tiếng Việt",
+        "Tiếng Anh",
+        "Tiếng Pháp"
+      ],
+      "bio": "Với hơn 12 năm kinh nghiệm, tôi cam kết mang đến dịch vụ chăm sóc chất lượng cao nhất.",
+      "is_verified": true,
+      "is_available": true
+    }
+  }
+]
