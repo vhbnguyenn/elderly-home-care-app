@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
-import { useAuth } from "@/contexts/AuthContext";
 import {
   useErrorNotification,
   useSuccessNotification,
@@ -28,7 +27,6 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { showSuccessTooltip } = useSuccessNotification();
   const { showErrorTooltip } = useErrorNotification();
-  const { login } = useAuth();
 
   // Validate password
   const validatePassword = () => {
@@ -63,27 +61,22 @@ export default function RegisterScreen() {
     setIsLoading(true);
 
     try {
-      // Call real API to register user
+      // Gọi API mockapi tạo user
       const newUser = {
         email: formData.email,
         password: formData.password,
         role: formData.userType === "care-seeker" ? "Care Seeker" : "Caregiver",
         fullName: "",
+        status: formData.userType === "caregiver" ? "pending" : "approved",
       };
 
-      const result = await AuthService.register(newUser);
+      await AuthService.register(newUser);
 
-      // If successful, show message and redirect to login
       showSuccessTooltip("🎉 Đăng ký thành công! Vui lòng đăng nhập.");
-      
-      setTimeout(() => {
-        router.replace("/login");
-      }, 1500);
-      
+      router.replace("/login");
     } catch (err: any) {
-      console.error("Register error:", err);
-      const errorMsg = err?.message || err?.response?.data?.message || "Có lỗi xảy ra khi đăng ký!";
-      showErrorTooltip(errorMsg);
+      console.error("Register error:", err.response || err.message);
+      showErrorTooltip("Có lỗi xảy ra khi đăng ký!");
     } finally {
       setIsLoading(false);
     }

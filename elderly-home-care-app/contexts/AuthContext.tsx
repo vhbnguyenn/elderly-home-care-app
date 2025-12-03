@@ -12,7 +12,6 @@ interface User {
   avatar?: string;
   hasCompletedProfile?: boolean;
   role: "Caregiver" | "Care Seeker" | "Admin" | string;
-  status?: "pending" | "approved" | "rejected";
 }
 
 interface AuthContextType {
@@ -21,7 +20,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
   updateProfile: (profile: Partial<User>) => void;
-  switchRole: (role: "Caregiver" | "Care Seeker") => void; // 👈 NEW
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,21 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatar: res.avatar,
         hasCompletedProfile: res.hasCompletedProfile ?? false,
         role: res.role ?? "Care Seeker",
-        status: res.status, // Load status from API
       };
-
-      // If user is Caregiver and has status, load it into profileStore
-      if (userData.role === "Caregiver" && userData.status) {
-        const { setProfileStatus } = require("@/data/profileStore");
-        // Map API status to profileStore status
-        if (userData.status === "approved") {
-          setProfileStatus(userData.id, "approved");
-        } else if (userData.status === "rejected") {
-          setProfileStatus(userData.id, "rejected", "Hồ sơ không đáp ứng yêu cầu");
-        } else {
-          setProfileStatus(userData.id, "pending");
-        }
-      }
 
       setUser(userData);
       return userData; // ✅ trả về luôn user
@@ -72,9 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    // Call logout API to clear session
-    AuthService.logout().catch(err => console.error("Logout error:", err));
-    
     setUser(null);
     NavigationHelper.goToLogin();
   };
@@ -86,15 +67,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 🔥 NEW: Switch role for testing
-  const switchRole = (role: "Caregiver" | "Care Seeker") => {
-    if (user) {
-      const updatedUser = { ...user, role };
-      setUser(updatedUser);
-      console.log(`🔄 Switched role to: ${role}`);
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -103,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         updateProfile,
-        switchRole, // 👈 Add to context
       }}
     >
       {children}
