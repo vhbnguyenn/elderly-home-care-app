@@ -92,6 +92,5 @@ export const AuthService = {
   isAuthenticated: async () => {
     const token = await AsyncStorage.getItem("auth_token");
     return !!token;
->>>>>>> 86aa479 (feat: Integrate login and register API with production backend)
   },
 };
