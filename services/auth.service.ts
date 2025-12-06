@@ -8,12 +8,20 @@ export const AuthService = {
   // Login: Call real API
   login: async (email: string, password: string) => {
     try {
+      console.log("[Auth] Attempting login:", email);
+      
       const response = await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.LOGIN, {
         email,
         password,
       });
 
-      const { token, refreshToken, user } = response.data;
+      console.log("[Auth] Login response:", response.data);
+
+      // Handle different response formats
+      const data = response.data;
+      const token = data.token || data.accessToken;
+      const refreshToken = data.refreshToken;
+      const user = data.user || data.data || data;
 
       // Save tokens to AsyncStorage
       if (token) {
@@ -29,8 +37,11 @@ export const AuthService = {
       console.log("[Auth] Login successful:", user);
       return user;
     } catch (error: any) {
-      console.error("[Auth] Login failed:", error.message);
-      return null;
+      console.error("[Auth] Login failed:", error.response?.data || error.message);
+      
+      // Return error object with message for better error handling
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Đăng nhập thất bại";
+      throw new Error(errorMessage);
     }
   },
 
@@ -45,8 +56,11 @@ export const AuthService = {
       console.log("[Auth] Register successful:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("[Auth] Register failed:", error.message);
-      throw error;
+      console.error("[Auth] Register failed:", error.response?.data || error.message);
+      
+      // Return error object with message for better error handling
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Đăng ký thất bại";
+      throw new Error(errorMessage);
     }
   },
 
