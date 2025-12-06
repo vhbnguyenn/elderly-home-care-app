@@ -1,16 +1,20 @@
+import {
+    useErrorNotification,
+    useSuccessNotification,
+} from '@/contexts/NotificationContext';
+import { AuthService } from '@/services/auth.service';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 const steps = [
@@ -68,6 +72,9 @@ export default function RegisterFlowScreen() {
     role: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { showSuccessTooltip } = useSuccessNotification();
+  const { showErrorTooltip } = useErrorNotification();
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
@@ -76,17 +83,17 @@ export default function RegisterFlowScreen() {
     const value = formData[currentStepData.field as keyof typeof formData];
     
     if (!value) {
-      Alert.alert('Thông báo', 'Vui lòng điền thông tin');
+      showErrorTooltip('Vui lòng điền thông tin');
       return;
     }
 
     if (currentStepData.field === 'email' && !value.includes('@')) {
-      Alert.alert('Thông báo', 'Email không hợp lệ');
+      showErrorTooltip('Email không hợp lệ');
       return;
     }
 
     if (currentStepData.field === 'password' && value.length < 6) {
-      Alert.alert('Thông báo', 'Mật khẩu phải có ít nhất 6 ký tự');
+      showErrorTooltip('Mật khẩu phải có ít nhất 6 ký tự');
       return;
     }
 
@@ -105,17 +112,34 @@ export default function RegisterFlowScreen() {
     }
   };
 
-  const handleRegister = () => {
-    Alert.alert(
-      'Đăng ký thành công!',
-      'Tài khoản của bạn đã được tạo',
-      [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/login'),
-        },
-      ]
-    );
+  const handleRegister = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Call real API to register user
+      const userData = {
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        phone: formData.phone,
+        role: formData.role === 'careseeker' ? 'Care Seeker' : 'Caregiver',
+      };
+
+      await AuthService.register(userData);
+
+      showSuccessTooltip('🎉 Đăng ký thành công! Vui lòng đăng nhập.');
+      
+      setTimeout(() => {
+        router.replace('/login');
+      }, 1500);
+      
+    } catch (err: any) {
+      console.error('Register error:', err);
+      const errorMsg = err?.message || err?.response?.data?.message || 'Có lỗi xảy ra khi đăng ký!';
+      showErrorTooltip(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOptionSelect = (value: string) => {
@@ -192,11 +216,11 @@ export default function RegisterFlowScreen() {
                 setFormData({ ...formData, [currentStepData.field]: text })
               }
               keyboardType={currentStepData.keyboardType}
-              secureTextEntry={currentStepData.secureTextEntry && !showPassword}
+              secureTextEntry={currentStepData.field === 'password' && !showPassword}
               autoFocus
-              autoCapitalize="none"
+              autoCapitalize={currentStepData.field === 'email' ? 'none' : 'words'}
             />
-            {currentStepData.secureTextEntry && (
+            {currentStepData.field === 'password' && (
               <TouchableOpacity
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}

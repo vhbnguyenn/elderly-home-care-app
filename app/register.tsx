@@ -2,18 +2,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  useErrorNotification,
-  useSuccessNotification,
+    useErrorNotification,
+    useSuccessNotification,
 } from "@/contexts/NotificationContext";
 import { AuthService } from "@/services/auth.service";
 
@@ -26,6 +26,8 @@ export default function RegisterScreen() {
   });
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { showSuccessTooltip } = useSuccessNotification();
   const { showErrorTooltip } = useErrorNotification();
   const { login } = useAuth();
@@ -127,37 +129,63 @@ export default function RegisterScreen() {
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              textContentType="emailAddress"
             />
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText style={styles.label}>Mật khẩu *</ThemedText>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              value={formData.password}
-              onChangeText={(text) => {
-                setFormData({ ...formData, password: text });
-                if (passwordError) setPasswordError("");
-              }}
-              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
-              placeholderTextColor="#999"
-              secureTextEntry
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[styles.input, passwordError ? styles.inputError : null]}
+                value={formData.password}
+                onChangeText={(text) => {
+                  setFormData({ ...formData, password: text });
+                  if (passwordError) setPasswordError("");
+                }}
+                placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                placeholderTextColor="#999"
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={22}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.inputGroup}>
             <ThemedText style={styles.label}>Xác nhận mật khẩu *</ThemedText>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              value={formData.confirmPassword}
-              onChangeText={(text) => {
-                setFormData({ ...formData, confirmPassword: text });
-                if (passwordError) setPasswordError("");
-              }}
-              placeholder="Nhập lại mật khẩu"
-              placeholderTextColor="#999"
-              secureTextEntry
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[styles.input, passwordError ? styles.inputError : null]}
+                value={formData.confirmPassword}
+                onChangeText={(text) => {
+                  setFormData({ ...formData, confirmPassword: text });
+                  if (passwordError) setPasswordError("");
+                }}
+                placeholder="Nhập lại mật khẩu"
+                placeholderTextColor="#999"
+                secureTextEntry={!showConfirmPassword}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Ionicons
+                  name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                  size={22}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
             {passwordError ? (
               <ThemedText style={styles.errorText}>{passwordError}</ThemedText>
             ) : null}
@@ -248,6 +276,9 @@ const styles = StyleSheet.create({
   },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 16, fontWeight: "600", color: "#2c3e50", marginBottom: 8 },
+  passwordContainer: {
+    position: "relative",
+  },
   input: {
     borderWidth: 1,
     borderColor: "#dee2e6",
@@ -255,6 +286,11 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: "#fff",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: 12,
   },
   inputError: { borderColor: "#dc3545", backgroundColor: "#fff5f5" },
   errorText: { fontSize: 12, color: "#dc3545", marginTop: 4 },

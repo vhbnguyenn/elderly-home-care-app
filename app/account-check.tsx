@@ -3,11 +3,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Image,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function AccountCheckScreen() {
@@ -72,7 +72,7 @@ export default function AccountCheckScreen() {
           {/* Register Button */}
           <TouchableOpacity
             style={styles.registerButton}
-            onPress={() => router.push('/register-flow')}
+            onPress={() => router.push('/register')}
             activeOpacity={0.8}
           >
             <Ionicons name="person-add-outline" size={24} color="#FF5722" />
