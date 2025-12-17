@@ -73,32 +73,104 @@ export default function RegisterFlowScreen() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldError, setFieldError] = useState('');
   const { showSuccessTooltip } = useSuccessNotification();
   const { showErrorTooltip } = useErrorNotification();
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const handleNext = () => {
+  // Validate current field (for real-time validation)
+  const validateCurrentField = (showTooltip = false) => {
     const value = formData[currentStepData.field as keyof typeof formData];
     
     if (!value) {
-      showErrorTooltip('Vui lòng điền thông tin');
-      return;
+      setFieldError('Vui lòng điền thông tin');
+      if (showTooltip) showErrorTooltip('Vui lòng điền thông tin');
+      return false;
     }
 
-    if (currentStepData.field === 'email' && !value.includes('@')) {
-      showErrorTooltip('Email không hợp lệ');
-      return;
+    if (!value.toString().trim()) {
+      setFieldError('Thông tin không được chứa toàn khoảng trắng');
+      if (showTooltip) showErrorTooltip('Thông tin không được chứa toàn khoảng trắng');
+      return false;
     }
 
-    if (currentStepData.field === 'password' && value.length < 6) {
-      showErrorTooltip('Mật khẩu phải có ít nhất 6 ký tự');
+    if (currentStepData.field === 'email') {
+      const emailRegex = /^[a-zA-Z0-9._+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(value)) {
+        setFieldError('Email không hợp lệ');
+        if (showTooltip) showErrorTooltip('Email không hợp lệ');
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'password') {
+      if (value.length < 6) {
+        setFieldError('Mật khẩu phải có ít nhất 6 ký tự');
+        if (showTooltip) showErrorTooltip('Mật khẩu phải có ít nhất 6 ký tự');
+        return false;
+      }
+      if (value.length > 50) {
+        setFieldError('Mật khẩu không được quá 50 ký tự');
+        if (showTooltip) showErrorTooltip('Mật khẩu không được quá 50 ký tự');
+        return false;
+      }
+      if (!/[a-zA-Z]/.test(value)) {
+        setFieldError('Mật khẩu phải chứa ít nhất 1 chữ cái');
+        if (showTooltip) showErrorTooltip('Mật khẩu phải chứa ít nhất 1 chữ cái');
+        return false;
+      }
+      if (!/[0-9]/.test(value)) {
+        setFieldError('Mật khẩu phải chứa ít nhất 1 chữ số');
+        if (showTooltip) showErrorTooltip('Mật khẩu phải chứa ít nhất 1 chữ số');
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'phone') {
+      const phoneRegex = /^[0-9]{10,11}$/;
+      if (!phoneRegex.test(value.replace(/\s/g, ''))) {
+        setFieldError('Số điện thoại không hợp lệ (10-11 chữ số)');
+        if (showTooltip) showErrorTooltip('Số điện thoại không hợp lệ (10-11 chữ số)');
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'fullName') {
+      if (value.length < 2) {
+        setFieldError('Họ tên phải có ít nhất 2 ký tự');
+        if (showTooltip) showErrorTooltip('Họ tên phải có ít nhất 2 ký tự');
+        return false;
+      }
+      if (value.length > 100) {
+        setFieldError('Họ tên không được quá 100 ký tự');
+        if (showTooltip) showErrorTooltip('Họ tên không được quá 100 ký tự');
+        return false;
+      }
+    }
+
+    setFieldError('');
+    return true;
+  };
+
+  // Handle blur event for real-time validation
+  const handleFieldBlur = () => {
+    const value = formData[currentStepData.field as keyof typeof formData];
+    if (value) {
+      validateCurrentField(false);
+    }
+  };
+
+  const handleNext = () => {
+    // Validate with tooltip
+    if (!validateCurrentField(true)) {
       return;
     }
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setFieldError(''); // Clear error when moving to next step
     } else {
       handleRegister();
     }
@@ -135,7 +207,26 @@ export default function RegisterFlowScreen() {
       
     } catch (err: any) {
       console.error('Register error:', err);
-      const errorMsg = err?.message || err?.response?.data?.message || 'Có lỗi xảy ra khi đăng ký!';
+      
+      let errorMsg = 'Đăng ký thất bại';
+      
+      if (err?.response) {
+        const status = err.response.status;
+        if (status === 400) {
+          errorMsg = err.response.data?.message || 'Thông tin không hợp lệ';
+        } else if (status === 409) {
+          errorMsg = 'Email đã được đăng ký. Vui lòng sử dụng email khác';
+        } else if (status >= 500) {
+          errorMsg = 'Lỗi máy chủ. Vui lòng thử lại sau';
+        } else {
+          errorMsg = err.response.data?.message || 'Đăng ký thất bại';
+        }
+      } else if (err?.request) {
+        errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng';
+      } else if (err?.message) {
+        errorMsg = err.message;
+      }
+      
       showErrorTooltip(errorMsg);
     } finally {
       setIsLoading(false);
@@ -206,32 +297,42 @@ export default function RegisterFlowScreen() {
             ))}
           </View>
         ) : (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={currentStepData.placeholder}
-              placeholderTextColor="#999"
-              value={formData[currentStepData.field as keyof typeof formData]}
-              onChangeText={(text) =>
-                setFormData({ ...formData, [currentStepData.field]: text })
-              }
-              keyboardType={currentStepData.keyboardType}
-              secureTextEntry={currentStepData.field === 'password' && !showPassword}
-              autoFocus
-              autoCapitalize={currentStepData.field === 'email' ? 'none' : 'words'}
-            />
-            {currentStepData.field === 'password' && (
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  size={24}
-                  color="#999"
-                />
-              </TouchableOpacity>
-            )}
+          <View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder={currentStepData.placeholder}
+                placeholderTextColor="#999"
+                value={formData[currentStepData.field as keyof typeof formData]}
+                onChangeText={(text) => {
+                  setFormData({ ...formData, [currentStepData.field]: text });
+                  if (fieldError) setFieldError('');
+                }}
+                onBlur={handleFieldBlur}
+                keyboardType={currentStepData.keyboardType}
+                secureTextEntry={currentStepData.field === 'password' && !showPassword}
+                autoFocus
+                autoCapitalize={currentStepData.field === 'email' ? 'none' : 'words'}
+              />
+              {currentStepData.field === 'password' && (
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={24}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+            {fieldError ? (
+              <View style={styles.errorContainer}>
+                <Ionicons name="alert-circle" size={16} color="#FF6B6B" />
+                <Text style={styles.errorText}>{fieldError}</Text>
+              </View>
+            ) : null}
           </View>
         )}
       </View>
@@ -310,6 +411,17 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     fontSize: 18,
     color: '#1A1A1A',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 6,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#FF6B6B',
+    flex: 1,
   },
   eyeButton: {
     position: 'absolute',
