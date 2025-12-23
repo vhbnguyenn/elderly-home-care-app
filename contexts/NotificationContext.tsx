@@ -1,7 +1,7 @@
 import { NotificationBannerProps } from '@/components/ui/NotificationBanner';
 import { SafeNotification } from '@/components/ui/SafeNotification';
 import { Tooltip, TooltipProps } from '@/components/ui/Tooltip';
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 interface NotificationContextType {
   showNotification: (
@@ -165,13 +165,14 @@ export const useSuccessNotification = () => {
 };
 
 export const useErrorNotification = () => {
-  const { showNotification, showTooltip } = useNotification();
+  const { showNotification, showTooltip, hideTooltip } = useNotification();
   
   return {
     showError: (title: string, message?: string, duration?: number) => 
       showNotification(title, message, 'error', duration),
     showErrorTooltip: (message: string, duration?: number) => 
       showTooltip(message, 'error', 'top', duration),
+    hideErrorTooltip: () => hideTooltip(),
   };
 };
 

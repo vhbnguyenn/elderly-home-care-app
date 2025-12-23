@@ -25,11 +25,19 @@ export interface Task {
 }
 
 interface AppointmentScheduleTodayProps {
-  appointments: Appointment[];
+  appointments?: Appointment[];
 }
 
 export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTodayProps) {
   const [expandedAppointment, setExpandedAppointment] = useState<string | null>(null);
+
+  // Check if appointments exists and is array FIRST
+  if (!appointments || !Array.isArray(appointments) || appointments.length === 0) {
+    console.log('AppointmentScheduleToday rendering with no appointments');
+    return null; // Don't render anything if no appointments
+  }
+
+  console.log('AppointmentScheduleToday rendering with appointments:', appointments.length);
 
   const getStatusText = (status: string) => {
     switch (status) {

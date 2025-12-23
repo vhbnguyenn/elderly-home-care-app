@@ -80,6 +80,22 @@ export default function RegisterFlowScreen() {
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
+  // Get helper text for each field
+  const getHelperText = () => {
+    switch (currentStepData.field) {
+      case 'email':
+        return 'VD: example@email.com hoặc name+tag@gmail.com';
+      case 'password':
+        return 'Ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số, 1 ký tự đặc biệt';
+      case 'phone':
+        return 'Nhập số điện thoại 10-11 chữ số';
+      case 'fullName':
+        return 'Nhập họ và tên đầy đủ của bạn';
+      default:
+        return '';
+    }
+  };
+
   // Validate current field (for real-time validation)
   const validateCurrentField = (showTooltip = false) => {
     const value = formData[currentStepData.field as keyof typeof formData];
@@ -97,7 +113,10 @@ export default function RegisterFlowScreen() {
     }
 
     if (currentStepData.field === 'email') {
-      const emailRegex = /^[a-zA-Z0-9._+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+      // RFC 5322 compliant email regex with Gmail alias support
+      const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/;
+      
+      // Simplified: just one error message for all email validation cases
       if (!emailRegex.test(value)) {
         setFieldError('Email không hợp lệ');
         if (showTooltip) showErrorTooltip('Email không hợp lệ');
@@ -106,24 +125,17 @@ export default function RegisterFlowScreen() {
     }
 
     if (currentStepData.field === 'password') {
-      if (value.length < 6) {
-        setFieldError('Mật khẩu phải có ít nhất 6 ký tự');
-        if (showTooltip) showErrorTooltip('Mật khẩu phải có ít nhất 6 ký tự');
-        return false;
-      }
-      if (value.length > 50) {
-        setFieldError('Mật khẩu không được quá 50 ký tự');
-        if (showTooltip) showErrorTooltip('Mật khẩu không được quá 50 ký tự');
-        return false;
-      }
-      if (!/[a-zA-Z]/.test(value)) {
-        setFieldError('Mật khẩu phải chứa ít nhất 1 chữ cái');
-        if (showTooltip) showErrorTooltip('Mật khẩu phải chứa ít nhất 1 chữ cái');
-        return false;
-      }
-      if (!/[0-9]/.test(value)) {
-        setFieldError('Mật khẩu phải chứa ít nhất 1 chữ số');
-        if (showTooltip) showErrorTooltip('Mật khẩu phải chứa ít nhất 1 chữ số');
+      const errorMsg = 'Mật khẩu phải có ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số và 1 ký tự đặc biệt';
+      
+      // Check all password requirements at once
+      if (value.length < 6 || 
+          value.length > 50 ||
+          !/[a-z]/.test(value) ||          // Có chữ thường
+          !/[A-Z]/.test(value) ||          // Có chữ hoa
+          !/[0-9]/.test(value) ||          // Có số
+          !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) {  // Có ký tự đặc biệt
+        setFieldError(errorMsg);
+        if (showTooltip) showErrorTooltip(errorMsg);
         return false;
       }
     }
@@ -190,19 +202,28 @@ export default function RegisterFlowScreen() {
     try {
       // Call real API to register user
       const userData = {
+        name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        fullName: formData.fullName,
+        confirmPassword: formData.password, // Same as password for this flow
         phone: formData.phone,
-        role: formData.role === 'careseeker' ? 'Care Seeker' : 'Caregiver',
+        role: formData.role, // Already in correct format: 'careseeker' or 'caregiver'
       };
+
+      console.log("[Register Flow] Sending data:", userData);
 
       await AuthService.register(userData);
 
-      showSuccessTooltip('🎉 Đăng ký thành công! Vui lòng đăng nhập.');
+      showSuccessTooltip('🎉 Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
       
       setTimeout(() => {
-        router.replace('/login');
+        router.push({
+          pathname: "/verify-code",
+          params: { 
+            email: formData.email,
+            type: "verify-email"
+          }
+        });
       }, 1500);
       
     } catch (err: any) {
@@ -210,21 +231,33 @@ export default function RegisterFlowScreen() {
       
       let errorMsg = 'Đăng ký thất bại';
       
-      if (err?.response) {
+      if (err?.message) {
+        errorMsg = err.message;
+        
+        // Check for specific error messages from backend
+        if (errorMsg.includes("Email đã tồn tại") || errorMsg.includes("Email already exists")) {
+          errorMsg = "Email đã được đăng ký. Vui lòng sử dụng email khác";
+        }
+      } else if (err?.response) {
         const status = err.response.status;
+        const responseData = err.response.data;
+        
         if (status === 400) {
-          errorMsg = err.response.data?.message || 'Thông tin không hợp lệ';
+          // Show specific validation errors if available
+          if (responseData?.errors && Array.isArray(responseData.errors)) {
+            errorMsg = responseData.errors.join(". ");
+          } else {
+            errorMsg = responseData?.message || 'Thông tin không hợp lệ';
+          }
         } else if (status === 409) {
           errorMsg = 'Email đã được đăng ký. Vui lòng sử dụng email khác';
         } else if (status >= 500) {
           errorMsg = 'Lỗi máy chủ. Vui lòng thử lại sau';
         } else {
-          errorMsg = err.response.data?.message || 'Đăng ký thất bại';
+          errorMsg = responseData?.message || 'Đăng ký thất bại';
         }
       } else if (err?.request) {
         errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng';
-      } else if (err?.message) {
-        errorMsg = err.message;
       }
       
       showErrorTooltip(errorMsg);
@@ -305,7 +338,9 @@ export default function RegisterFlowScreen() {
                 placeholderTextColor="#999"
                 value={formData[currentStepData.field as keyof typeof formData]}
                 onChangeText={(text) => {
-                  setFormData({ ...formData, [currentStepData.field]: text });
+                  // Auto-remove whitespace for email field
+                  const cleanedText = currentStepData.field === 'email' ? text.replace(/\s/g, '') : text;
+                  setFormData({ ...formData, [currentStepData.field]: cleanedText });
                   if (fieldError) setFieldError('');
                 }}
                 onBlur={handleFieldBlur}
@@ -328,11 +363,18 @@ export default function RegisterFlowScreen() {
               )}
             </View>
             {fieldError ? (
-              <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle" size={16} color="#FF6B6B" />
-                <Text style={styles.errorText}>{fieldError}</Text>
+              <View style={styles.helperContainer}>
+                <Ionicons name="alert-circle" size={14} color="#FF6B6B" />
+                <Text style={styles.errorHelperText}>{fieldError}</Text>
               </View>
-            ) : null}
+            ) : (
+              getHelperText() && (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color="#999" />
+                  <Text style={styles.helperText}>{getHelperText()}</Text>
+                </View>
+              )
+            )}
           </View>
         )}
       </View>
@@ -412,14 +454,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#1A1A1A',
   },
-  errorContainer: {
+  helperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
     gap: 6,
+    paddingHorizontal: 4,
   },
-  errorText: {
-    fontSize: 14,
+  helperText: {
+    fontSize: 13,
+    color: '#999',
+    flex: 1,
+  },
+  errorHelperText: {
+    fontSize: 13,
     color: '#FF6B6B',
     flex: 1,
   },

@@ -35,82 +35,8 @@ interface HiredCaregiver {
 export default function HiredCaregiversScreen() {
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
 
-  // Mock data
-  const mockCaregivers: HiredCaregiver[] = [
-    {
-      id: '1',
-      name: 'Nguyễn Thị Mai',
-      age: 28,
-      rating: 4.8,
-      totalReviews: 45,
-      specialties: ['Chăm sóc người già', 'Nấu ăn'],
-      elderlyName: 'Bà Nguyễn Thị Lan',
-      startDate: '15/01/2024',
-      endDate: '15/02/2024',
-      totalHours: 160,
-      totalEarnings: 32000000,
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: 'Trần Văn Nam',
-      age: 32,
-      rating: 4.9,
-      totalReviews: 68,
-      specialties: ['Y tế', 'Vật lý trị liệu'],
-      elderlyName: 'Ông Phạm Văn Đức',
-      startDate: '10/01/2024',
-      endDate: '10/03/2024',
-      totalHours: 200,
-      totalEarnings: 36000000,
-      status: 'active',
-    },
-    {
-      id: '3',
-      name: 'Lê Thị Hoa',
-      age: 25,
-      rating: 4.7,
-      totalReviews: 32,
-      specialties: ['Chăm sóc người già', 'Tâm lý'],
-      elderlyName: 'Bà Lê Thị Bình',
-      startDate: '05/12/2023',
-      endDate: '05/01/2024',
-      totalHours: 180,
-      totalEarnings: 39600000,
-      status: 'completed',
-      hasReviewed: true,
-    },
-    {
-      id: '4',
-      name: 'Phạm Văn Đức',
-      age: 30,
-      rating: 4.6,
-      totalReviews: 28,
-      specialties: ['Chăm sóc người già', 'Nấu ăn'],
-      elderlyName: 'Ông Trần Văn Hùng',
-      startDate: '01/11/2023',
-      endDate: '30/11/2023',
-      totalHours: 120,
-      totalEarnings: 22800000,
-      status: 'completed',
-      hasReviewed: false,
-    },
-    {
-      id: '5',
-      name: 'Võ Thị Hương',
-      age: 27,
-      rating: 4.9,
-      totalReviews: 52,
-      specialties: ['Y tế', 'Phục hồi chức năng'],
-      elderlyName: 'Bà Nguyễn Thị Kim',
-      startDate: '20/10/2023',
-      endDate: '20/12/2023',
-      totalHours: 240,
-      totalEarnings: 52800000,
-      status: 'completed',
-      hasReviewed: true,
-    },
-  ];
+  // TODO: Replace with real API data - fetch hired caregivers from booking service
+  const mockCaregivers: HiredCaregiver[] = [];
 
   const filteredCaregivers = mockCaregivers.filter(
     (c) => c.status === activeTab

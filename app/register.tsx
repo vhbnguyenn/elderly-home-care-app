@@ -1,15 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Dimensions,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,134 +26,191 @@ export default function RegisterScreen() {
     email: "",
     password: "",
     confirmPassword: "",
-    userType: "care-seeker",
+    userType: "",
   });
+  const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const { showSuccessTooltip } = useSuccessNotification();
   const { showErrorTooltip } = useErrorNotification();
   const { login } = useAuth();
 
-  const validatePassword = (showTooltip = true) => {
-    if (!formData.password) {
-      setPasswordError("Vui lòng nhập mật khẩu");
-      if (showTooltip) showErrorTooltip("Vui lòng nhập mật khẩu");
+  // Validate email field only
+  const validateEmailField = (showTooltip = false) => {
+    // Check if email is empty
+    if (!formData.email || !formData.email.trim()) {
+      setEmailError("Email không hợp lệ");
+      if (showTooltip) showErrorTooltip("Email không hợp lệ");
       return false;
     }
-    if (formData.password.length < 6) {
-      setPasswordError("Mật khẩu phải có ít nhất 6 ký tự");
-      if (showTooltip) showErrorTooltip("Mật khẩu phải có ít nhất 6 ký tự");
+    
+    // RFC 5322 compliant email regex with Gmail alias support
+    // Supports: letters, numbers, dots, underscores, plus signs, hyphens
+    const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/;
+    
+    if (!emailRegex.test(formData.email)) {
+      setEmailError("Email không hợp lệ");
+      if (showTooltip) showErrorTooltip("Email không hợp lệ");
       return false;
     }
-    if (formData.password.length > 50) {
-      setPasswordError("Mật khẩu không được quá 50 ký tự");
-      if (showTooltip) showErrorTooltip("Mật khẩu không được quá 50 ký tự");
+    
+    setEmailError("");
+    return true;
+  };
+
+  // Validate email on blur (real-time validation)
+  const handleEmailBlur = () => {
+    // Only validate if email has some content (not just whitespace)
+    if (formData.email && formData.email.trim()) {
+      validateEmailField(false);
+    }
+  };
+
+  // Validate password field only
+  const validatePasswordField = (showTooltip = false) => {
+    const errorMsg = "Mật khẩu phải có ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số và 1 ký tự đặc biệt";
+    
+    // Check all password requirements at once
+    if (!formData.password || 
+        formData.password.length < 6 || 
+        formData.password.length > 50 ||
+        !/[a-z]/.test(formData.password) ||          // Có chữ thường
+        !/[A-Z]/.test(formData.password) ||          // Có chữ hoa
+        !/[0-9]/.test(formData.password) ||          // Có số
+        !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)) {  // Có ký tự đặc biệt
+      setPasswordError(errorMsg);
+      if (showTooltip) showErrorTooltip(errorMsg);
       return false;
     }
-    if (!/[a-zA-Z]/.test(formData.password)) {
-      setPasswordError("Mật khẩu phải chứa ít nhất 1 chữ cái");
-      if (showTooltip) showErrorTooltip("Mật khẩu phải chứa ít nhất 1 chữ cái");
-      return false;
-    }
-    if (!/[0-9]/.test(formData.password)) {
-      setPasswordError("Mật khẩu phải chứa ít nhất 1 chữ số");
-      if (showTooltip) showErrorTooltip("Mật khẩu phải chứa ít nhất 1 chữ số");
-      return false;
-    }
-    if (!formData.confirmPassword) {
-      setPasswordError("Vui lòng xác nhận mật khẩu");
-      if (showTooltip) showErrorTooltip("Vui lòng xác nhận mật khẩu");
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setPasswordError("Mật khẩu xác nhận không khớp");
-      if (showTooltip) showErrorTooltip("Mật khẩu xác nhận không khớp");
-      return false;
-    }
+    
     setPasswordError("");
     return true;
+  };
+
+  // Validate confirm password field only
+  const validateConfirmPasswordField = (showTooltip = false) => {
+    const errorMsg = "Mật khẩu xác nhận không khớp. Vui lòng nhập lại chính xác";
+    
+    if (!formData.confirmPassword || formData.password !== formData.confirmPassword) {
+      setConfirmPasswordError(errorMsg);
+      if (showTooltip) showErrorTooltip(errorMsg);
+      return false;
+    }
+    
+    setConfirmPasswordError("");
+    return true;
+  };
+
+  // Validate both password fields (for form submission)
+  const validatePassword = (showTooltip = true) => {
+    const passwordValid = validatePasswordField(showTooltip);
+    const confirmPasswordValid = validateConfirmPasswordField(showTooltip);
+    return passwordValid && confirmPasswordValid;
   };
 
   // Validate password on blur (real-time validation)
   const handlePasswordBlur = () => {
     if (formData.password) {
-      validatePassword(false);
+      validatePasswordField(false);
     }
   };
 
   // Validate confirm password on blur
   const handleConfirmPasswordBlur = () => {
     if (formData.confirmPassword) {
-      validatePassword(false);
+      validateConfirmPasswordField(false);
     }
   };
 
   const handleSubmit = async () => {
-    // Validate email
-    if (!formData.email) {
-      setError("Vui lòng nhập email");
-      showErrorTooltip("Vui lòng nhập email");
+    // Validate all fields
+    const emailValid = validateEmailField(true);
+    const passwordValid = validatePassword(true);
+
+    if (!emailValid || !passwordValid) {
       return;
     }
 
-    if (!formData.email.trim()) {
-      setError("Email không được chứa khoảng trắng");
-      showErrorTooltip("Email không được chứa khoảng trắng");
+    // Check if user type is selected
+    if (!formData.userType) {
+      showErrorTooltip("Vui lòng chọn loại tài khoản");
       return;
     }
 
-    const emailRegex = /^[a-zA-Z0-9._+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Email không hợp lệ");
-      showErrorTooltip("Email không hợp lệ");
-      return;
-    }
-
-    if (!validatePassword()) {
+    // Check if user agreed to terms
+    if (!agreeToTerms) {
+      showErrorTooltip("Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật");
       return;
     }
 
     setIsLoading(true);
-    setError("");
 
     try {
-      const response = await AuthService.register({
+      // Format role to match backend expectation (lowercase)
+      const role = formData.userType === "care-seeker" ? "careseeker" : "caregiver";
+      
+      // Generate a valid name (only letters, spaces, hyphens)
+      // Don't auto-generate name - let user fill in onboarding
+      const registerData = {
         email: formData.email,
         password: formData.password,
-        role: formData.userType,
-      });
+        confirmPassword: formData.confirmPassword,
+        role: role,
+      };
+      
+      console.log("[Register] Sending data:", registerData);
+      
+      const response = await AuthService.register(registerData);
 
-      showSuccessTooltip("Đăng ký thành công!");
+      showSuccessTooltip("Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
 
-      // Auto login after successful registration
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
+      // Navigate to verify code screen for email verification
+      setTimeout(() => {
+        router.push({
+          pathname: "/verify-code",
+          params: { 
+            email: formData.email,
+            type: "verify-email"
+          }
+        });
+      }, 1500);
     } catch (err: any) {
+      console.error("[Register] Error:", err);
       let errorMessage = "Đăng ký thất bại. Vui lòng thử lại.";
       
       if (err?.message) {
         errorMessage = err.message;
+        
+        // Check for specific error messages from backend
+        if (errorMessage.includes("Email đã tồn tại") || errorMessage.includes("Email already exists")) {
+          errorMessage = "Email đã được đăng ký. Vui lòng sử dụng email khác";
+        }
       } else if (err?.response) {
         const status = err.response.status;
+        const responseData = err.response.data;
+        
         if (status === 400) {
-          errorMessage = err.response.data?.message || "Thông tin không hợp lệ";
+          // Show specific validation errors if available
+          if (responseData?.errors && Array.isArray(responseData.errors)) {
+            errorMessage = responseData.errors.join(". ");
+          } else {
+            errorMessage = responseData?.message || "Thông tin không hợp lệ";
+          }
         } else if (status === 409) {
           errorMessage = "Email đã được đăng ký. Vui lòng sử dụng email khác";
         } else if (status >= 500) {
           errorMessage = "Lỗi máy chủ. Vui lòng thử lại sau";
         } else {
-          errorMessage = err.response.data?.message || "Đăng ký thất bại";
+          errorMessage = responseData?.message || "Đăng ký thất bại";
         }
       } else if (err?.request) {
         errorMessage = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng";
       }
       
-      setError(errorMessage);
       showErrorTooltip(errorMessage);
     } finally {
       setIsLoading(false);
@@ -195,14 +252,6 @@ export default function RegisterScreen() {
 
           {/* Form Card */}
           <View style={styles.formCard}>
-            {/* Error message */}
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle" size={20} color="#dc3545" />
-                <ThemedText style={styles.errorText}>{error}</ThemedText>
-              </View>
-            ) : null}
-
             {/* Email Input */}
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>Email *</ThemedText>
@@ -217,9 +266,13 @@ export default function RegisterScreen() {
                   style={styles.input}
                   value={formData.email}
                   onChangeText={(text) => {
-                    setFormData({ ...formData, email: text });
-                    if (error) setError("");
+                    // Remove any whitespace automatically
+                    const cleanedEmail = text.replace(/\s/g, '');
+                    setFormData({ ...formData, email: cleanedEmail });
+                    // Clear error when user is typing
+                    if (emailError) setEmailError("");
                   }}
+                  onBlur={handleEmailBlur}
                   placeholder="Nhập email của bạn"
                   placeholderTextColor="#999"
                   keyboardType="email-address"
@@ -227,6 +280,21 @@ export default function RegisterScreen() {
                   autoComplete="email"
                 />
               </View>
+              {emailError ? (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <ThemedText style={styles.errorHelperText}>
+                    {emailError}
+                  </ThemedText>
+                </View>
+              ) : (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color="#999" />
+                  <ThemedText style={styles.helperText}>
+                    VD: example@email.com hoặc name+tag@gmail.com
+                  </ThemedText>
+                </View>
+              )}
             </View>
 
             {/* Password Input */}
@@ -263,6 +331,21 @@ export default function RegisterScreen() {
                   />
                 </TouchableOpacity>
               </View>
+              {passwordError ? (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <ThemedText style={styles.errorHelperText}>
+                    {passwordError}
+                  </ThemedText>
+                </View>
+              ) : (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color="#999" />
+                  <ThemedText style={styles.helperText}>
+                    Ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số, 1 ký tự đặc biệt
+                  </ThemedText>
+                </View>
+              )}
             </View>
 
             {/* Confirm Password Input */}
@@ -280,7 +363,7 @@ export default function RegisterScreen() {
                   value={formData.confirmPassword}
                   onChangeText={(text) => {
                     setFormData({ ...formData, confirmPassword: text });
-                    if (passwordError) setPasswordError("");
+                    if (confirmPasswordError) setConfirmPasswordError("");
                   }}
                   onBlur={handleConfirmPasswordBlur}
                   placeholder="Nhập lại mật khẩu"
@@ -301,14 +384,21 @@ export default function RegisterScreen() {
                   />
                 </TouchableOpacity>
               </View>
-              {passwordError ? (
-                <View style={styles.passwordErrorContainer}>
-                  <Ionicons name="alert-circle" size={16} color="#dc3545" />
-                  <ThemedText style={styles.passwordErrorText}>
-                    {passwordError}
+              {confirmPasswordError ? (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <ThemedText style={styles.errorHelperText}>
+                    {confirmPasswordError}
                   </ThemedText>
                 </View>
-              ) : null}
+              ) : (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color="#999" />
+                  <ThemedText style={styles.helperText}>
+                    Nhập lại mật khẩu giống ở trên để xác nhận
+                  </ThemedText>
+                </View>
+              )}
             </View>
 
             {/* User Type Selection */}
@@ -381,6 +471,35 @@ export default function RegisterScreen() {
               </View>
             </View>
 
+            {/* Terms and Conditions Checkbox */}
+            <View style={styles.termsContainer}>
+              <TouchableOpacity 
+                style={[styles.checkbox, agreeToTerms && styles.checkboxChecked]}
+                onPress={() => setAgreeToTerms(!agreeToTerms)}
+                activeOpacity={0.7}
+              >
+                {agreeToTerms && (
+                  <Ionicons name="checkmark" size={16} color="#fff" />
+                )}
+              </TouchableOpacity>
+              <ThemedText style={styles.termsText}>
+                Tôi đồng ý với{" "}
+                <ThemedText 
+                  style={styles.termsLink}
+                  onPress={() => router.push("/terms-of-service")}
+                >
+                  Điều khoản sử dụng
+                </ThemedText>
+                {" "}và{" "}
+                <ThemedText 
+                  style={styles.termsLink}
+                  onPress={() => router.push("/privacy-policy")}
+                >
+                  Chính sách bảo mật
+                </ThemedText>
+              </ThemedText>
+            </View>
+
             {/* Submit Button */}
             <TouchableOpacity
               onPress={handleSubmit}
@@ -398,13 +517,6 @@ export default function RegisterScreen() {
                 </ThemedText>
               </LinearGradient>
             </TouchableOpacity>
-
-            {/* Terms Note */}
-            <ThemedText style={styles.note}>
-              Bằng cách đăng ký, bạn đồng ý với{" "}
-              <ThemedText style={styles.noteLink}>Điều khoản sử dụng</ThemedText>{" "}
-              và <ThemedText style={styles.noteLink}>Chính sách bảo mật</ThemedText>
-            </ThemedText>
 
             {/* Login Link */}
             <View style={styles.loginContainer}>
@@ -510,20 +622,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 32,
   },
-  errorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff5f5",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16,
-    gap: 8,
-  },
-  errorText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#dc3545",
-  },
   inputGroup: {
     marginBottom: 20,
   },
@@ -554,15 +652,21 @@ const styles = StyleSheet.create({
   eyeButton: {
     padding: 4,
   },
-  passwordErrorContainer: {
+  helperContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 8,
     gap: 6,
   },
-  passwordErrorText: {
-    fontSize: 13,
+  helperText: {
+    fontSize: 12,
+    color: "#999",
+    flex: 1,
+  },
+  errorHelperText: {
+    fontSize: 12,
     color: "#dc3545",
+    flex: 1,
   },
   radioGroup: {
     gap: 12,
@@ -608,12 +712,42 @@ const styles = StyleSheet.create({
     color: "#FF6B35",
     fontWeight: "600",
   },
+  termsContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginTop: 8,
+    marginBottom: 16,
+    gap: 10,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: "#FF6B35",
+    borderColor: "#FF6B35",
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
+  },
+  termsLink: {
+    color: "#FF6B35",
+    fontWeight: "600",
+  },
   submitButton: {
     height: 56,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
     marginBottom: 16,
   },
   buttonDisabled: {
@@ -623,17 +757,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-  },
-  note: {
-    fontSize: 13,
-    color: "#666",
-    textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  noteLink: {
-    color: "#FF6B35",
-    fontWeight: "600",
   },
   loginContainer: {
     flexDirection: "row",

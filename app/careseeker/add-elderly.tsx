@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    Modal,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,36 +18,8 @@ import { DynamicMedicationList } from '@/components/ui/DynamicMedicationList';
 import { useEmergencyContact } from '@/contexts/EmergencyContactContext';
 import { useErrorNotification, useSuccessNotification } from '@/contexts/NotificationContext';
 
-// Mock families data
-const mockFamilies = [
-  {
-    id: '1',
-    name: 'Gia đình Nguyễn',
-    memberCount: 5,
-    elderlyCount: 2,
-    userRole: 'admin_family',
-    createdAt: '2024-01-15',
-    description: 'Gia đình đa thế hệ với ông bà và con cháu',
-  },
-  {
-    id: '2',
-    name: 'Gia đình Trần',
-    memberCount: 3,
-    elderlyCount: 1,
-    userRole: 'member',
-    createdAt: '2024-02-20',
-    description: 'Gia đình nhỏ gọn, chăm sóc bà nội',
-  },
-  {
-    id: '3',
-    name: 'Gia đình Lê',
-    memberCount: 8,
-    elderlyCount: 3,
-    userRole: 'member',
-    createdAt: '2024-03-10',
-    description: 'Gia đình lớn với nhiều thế hệ',
-  },
-];
+// TODO: Replace with real API data from family service
+const mockFamilies: any[] = [];
 
 interface ElderlyProfile {
   // Thông tin cơ bản
@@ -262,21 +234,25 @@ export default function AddElderlyScreen() {
   };
 
   const handleAddMember = () => {
-    if (!newMemberEmail.trim()) {
+    // Validate email
+    if (!newMemberEmail || !newMemberEmail.trim()) {
       showErrorTooltip('Vui lòng nhập email thành viên');
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newMemberEmail.trim())) {
-      showErrorTooltip('Vui lòng nhập email hợp lệ');
+    // Auto-remove whitespace
+    const cleanEmail = newMemberEmail.replace(/\s/g, '');
+    
+    // RFC 5322 compliant email regex with Gmail alias support
+    const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(cleanEmail)) {
+      showErrorTooltip('Email không hợp lệ');
       return;
     }
 
     const newMember = {
       id: Date.now().toString(),
-      email: newMemberEmail.trim(),
+      email: cleanEmail,
       role: 'member'
     };
 

@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Complaint, ComplaintTab } from '@/types/complaint';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -21,416 +21,19 @@ export default function ComplaintsScreen() {
   const tabs: ComplaintTab[] = [
     {
       id: 'my_complaints',
-      title: 'Bạn khiếu nại',
+      title: 'Báº¡n khiáº¿u náº¡i',
       icon: 'person-outline',
     },
     {
       id: 'complaints_against_me',
-      title: 'Bạn bị khiếu nại',
+      title: 'Báº¡n bá»‹ khiáº¿u náº¡i',
       icon: 'warning-outline',
     },
   ];
 
-  // Mock data
-  const mockComplaints: Complaint[] = [
-    {
-      id: '1',
-      type: 'salary',
-      title: 'Khiếu nại về lương không đúng thỏa thuận',
-      description: 'Người chăm sóc không trả đúng số tiền đã thỏa thuận trong hợp đồng.',
-      complainant: {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        email: 'nguyenvana@email.com',
-        phone: '0123456789',
-        role: 'member',
-      },
-      accused: {
-        id: '2',
-        name: 'Trần Thị B',
-        email: 'tranthib@email.com',
-        phone: '0987654321',
-        role: 'caregiver',
-      },
-      service: {
-        id: '1',
-        name: 'Dịch vụ chăm sóc tại nhà',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '2',
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-01',
-        status: 'active',
-      },
-      evidences: [
-        {
-          id: '1',
-          type: 'image',
-          url: 'https://via.placeholder.com/300x200',
-          filename: 'contract.jpg',
-          uploadedAt: '2024-01-20T10:00:00Z',
-        },
-      ],
-      status: 'pending',
-      priority: 'high',
-      createdAt: '2024-01-20T10:00:00Z',
-      updatedAt: '2024-01-20T10:00:00Z',
-    },
-    {
-      id: '2',
-      type: 'behavior',
-      title: 'Khiếu nại về thái độ phục vụ',
-      description: 'Người chăm sóc có thái độ không tốt với người già.',
-      complainant: {
-        id: '3',
-        name: 'Lê Văn C',
-        email: 'levanc@email.com',
-        phone: '0912345678',
-        role: 'member',
-      },
-      accused: {
-        id: '4',
-        name: 'Phạm Thị D',
-        email: 'phamthid@email.com',
-        phone: '0923456789',
-        role: 'caregiver',
-      },
-      service: {
-        id: '2',
-        name: 'Dịch vụ chăm sóc buổi sáng',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '4',
-          name: 'Phạm Thị D',
-          email: 'phamthid@email.com',
-          phone: '0923456789',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-15',
-        status: 'active',
-      },
-      evidences: [],
-      status: 'processing',
-      priority: 'medium',
-      createdAt: '2024-01-19T14:30:00Z',
-      updatedAt: '2024-01-21T09:15:00Z',
-    },
-    {
-      id: '3',
-      type: 'quality',
-      title: 'Khiếu nại về chất lượng dịch vụ',
-      description: 'Dịch vụ chăm sóc không đạt chất lượng như cam kết.',
-      complainant: {
-        id: '5',
-        name: 'Hoàng Thị E',
-        email: 'hoangthie@email.com',
-        phone: '0934567890',
-        role: 'member',
-      },
-      accused: {
-        id: '6',
-        name: 'Vũ Văn F',
-        email: 'vuvanf@email.com',
-        phone: '0945678901',
-        role: 'caregiver',
-      },
-      service: {
-        id: '3',
-        name: 'Dịch vụ chăm sóc 24/7',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '6',
-          name: 'Vũ Văn F',
-          email: 'vuvanf@email.com',
-          phone: '0945678901',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-10',
-        status: 'active',
-      },
-      evidences: [
-        {
-          id: '3',
-          type: 'image',
-          url: 'https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Quality',
-          filename: 'quality_issue.jpg',
-          uploadedAt: '2024-01-18T16:20:00Z',
-        },
-      ],
-      status: 'received',
-      priority: 'high',
-      createdAt: '2024-01-18T16:20:00Z',
-      updatedAt: '2024-01-19T08:30:00Z',
-    },
-    {
-      id: '4',
-      type: 'schedule',
-      title: 'Khiếu nại về lịch trình làm việc',
-      description: 'Người chăm sóc thường xuyên đến muộn và không tuân thủ lịch trình.',
-      complainant: {
-        id: '7',
-        name: 'Đặng Thị G',
-        email: 'dangthig@email.com',
-        phone: '0956789012',
-        role: 'member',
-      },
-      accused: {
-        id: '8',
-        name: 'Bùi Văn H',
-        email: 'buivanh@email.com',
-        phone: '0967890123',
-        role: 'caregiver',
-      },
-      service: {
-        id: '4',
-        name: 'Dịch vụ chăm sóc buổi chiều',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '8',
-          name: 'Bùi Văn H',
-          email: 'buivanh@email.com',
-          phone: '0967890123',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-05',
-        status: 'active',
-      },
-      evidences: [],
-      status: 'resolved',
-      priority: 'medium',
-      createdAt: '2024-01-16T11:45:00Z',
-      updatedAt: '2024-01-22T14:20:00Z',
-      resolvedAt: '2024-01-22T14:20:00Z',
-      resolution: 'Đã thảo luận với người chăm sóc và cam kết tuân thủ lịch trình.',
-    },
-    {
-      id: '5',
-      type: 'payment',
-      title: 'Khiếu nại về thanh toán',
-      description: 'Có vấn đề với việc thanh toán dịch vụ chăm sóc.',
-      complainant: {
-        id: '9',
-        name: 'Ngô Thị I',
-        email: 'ngothii@email.com',
-        phone: '0978901234',
-        role: 'member',
-      },
-      accused: {
-        id: '10',
-        name: 'Lý Văn K',
-        email: 'lyvank@email.com',
-        phone: '0989012345',
-        role: 'caregiver',
-      },
-      service: {
-        id: '5',
-        name: 'Dịch vụ chăm sóc cuối tuần',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '10',
-          name: 'Lý Văn K',
-          email: 'lyvank@email.com',
-          phone: '0989012345',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-12',
-        status: 'active',
-      },
-      evidences: [
-        {
-          id: '5',
-          type: 'image',
-          url: 'https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Payment',
-          filename: 'payment_receipt.jpg',
-          uploadedAt: '2024-01-17T13:10:00Z',
-        },
-      ],
-      status: 'rejected',
-      priority: 'low',
-      createdAt: '2024-01-17T13:10:00Z',
-      updatedAt: '2024-01-20T10:30:00Z',
-      resolution: 'Khiếu nại không có cơ sở, thanh toán đã được thực hiện đúng.',
-    },
-    {
-      id: '6',
-      type: 'other',
-      title: 'Khiếu nại khác',
-      description: 'Các vấn đề khác liên quan đến dịch vụ chăm sóc.',
-      complainant: {
-        id: '11',
-        name: 'Trịnh Thị L',
-        email: 'trinhthil@email.com',
-        phone: '0990123456',
-        role: 'member',
-      },
-      accused: {
-        id: '12',
-        name: 'Phan Văn M',
-        email: 'phanvanm@email.com',
-        phone: '0901234567',
-        role: 'caregiver',
-      },
-      service: {
-        id: '6',
-        name: 'Dịch vụ chăm sóc đặc biệt',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '12',
-          name: 'Phan Văn M',
-          email: 'phanvanm@email.com',
-          phone: '0901234567',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-08',
-        status: 'active',
-      },
-      evidences: [],
-      status: 'pending',
-      priority: 'urgent',
-      createdAt: '2024-01-21T09:00:00Z',
-      updatedAt: '2024-01-21T09:00:00Z',
-    },
-    // Additional complaints for "Bạn bị khiếu nại" tab (where user ID = '2' is accused)
-    {
-      id: '7',
-      type: 'behavior',
-      title: 'Khiếu nại về thái độ không chuyên nghiệp',
-      description: 'Người chăm sóc có thái độ không tốt và không tuân thủ quy định.',
-      complainant: {
-        id: '13',
-        name: 'Nguyễn Thị N',
-        email: 'nguyenthin@email.com',
-        phone: '0912345678',
-        role: 'member',
-      },
-      accused: {
-        id: '2', // Same as user ID for "Bạn bị khiếu nại" tab
-        name: 'Trần Thị B',
-        email: 'tranthib@email.com',
-        phone: '0987654321',
-        role: 'caregiver',
-      },
-      service: {
-        id: '7',
-        name: 'Dịch vụ chăm sóc buổi tối',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '2',
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-03',
-        status: 'active',
-      },
-      evidences: [
-        {
-          id: '7',
-          type: 'image',
-          url: 'https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Behavior',
-          filename: 'behavior_issue.jpg',
-          uploadedAt: '2024-01-22T14:30:00Z',
-        },
-      ],
-      status: 'received',
-      priority: 'high',
-      createdAt: '2024-01-22T14:30:00Z',
-      updatedAt: '2024-01-23T09:15:00Z',
-    },
-    {
-      id: '8',
-      type: 'quality',
-      title: 'Khiếu nại về chất lượng dịch vụ kém',
-      description: 'Dịch vụ chăm sóc không đạt tiêu chuẩn và thiếu trách nhiệm.',
-      complainant: {
-        id: '14',
-        name: 'Lê Văn O',
-        email: 'levano@email.com',
-        phone: '0923456789',
-        role: 'member',
-      },
-      accused: {
-        id: '2', // Same as user ID for "Bạn bị khiếu nại" tab
-        name: 'Trần Thị B',
-        email: 'tranthib@email.com',
-        phone: '0987654321',
-        role: 'caregiver',
-      },
-      service: {
-        id: '8',
-        name: 'Dịch vụ chăm sóc cuối tuần',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '2',
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-05',
-        status: 'active',
-      },
-      evidences: [],
-      status: 'processing',
-      priority: 'medium',
-      createdAt: '2024-01-23T10:20:00Z',
-      updatedAt: '2024-01-24T08:45:00Z',
-    },
-    {
-      id: '9',
-      type: 'schedule',
-      title: 'Khiếu nại về việc không tuân thủ lịch trình',
-      description: 'Người chăm sóc thường xuyên đến muộn và không báo trước.',
-      complainant: {
-        id: '15',
-        name: 'Phạm Thị P',
-        email: 'phamthip@email.com',
-        phone: '0934567890',
-        role: 'member',
-      },
-      accused: {
-        id: '2', // Same as user ID for "Bạn bị khiếu nại" tab
-        name: 'Trần Thị B',
-        email: 'tranthib@email.com',
-        phone: '0987654321',
-        role: 'caregiver',
-      },
-      service: {
-        id: '9',
-        name: 'Dịch vụ chăm sóc hàng ngày',
-        type: 'caregiver_service',
-        caregiver: {
-          id: '2',
-          name: 'Trần Thị B',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'caregiver',
-        },
-        startDate: '2024-01-07',
-        status: 'active',
-      },
-      evidences: [
-        {
-          id: '9',
-          type: 'image',
-          url: 'https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Schedule',
-          filename: 'schedule_issue.jpg',
-          uploadedAt: '2024-01-24T16:10:00Z',
-        },
-      ],
-      status: 'resolved',
-      priority: 'low',
-      createdAt: '2024-01-24T16:10:00Z',
-      updatedAt: '2024-01-25T11:30:00Z',
-      resolvedAt: '2024-01-25T11:30:00Z',
-      resolution: 'Đã thảo luận và cam kết tuân thủ lịch trình nghiêm ngặt.',
-    },
-  ];
+  // TODO: Replace with real API data from complaint service
+  // For now using empty array until API is ready
+  const mockComplaints: Complaint[] = [];
 
   const getFilteredComplaints = () => {
     let filtered = mockComplaints;
@@ -462,12 +65,12 @@ export default function ComplaintsScreen() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return 'Đang chờ';
-      case 'received': return 'Đã tiếp nhận';
-      case 'processing': return 'Đang xử lí';
-      case 'resolved': return 'Đã xử lí';
-      case 'rejected': return 'Đã từ chối';
-      default: return 'Không xác định';
+      case 'pending': return 'Äang chá»';
+      case 'received': return 'ÄÃ£ tiáº¿p nháº­n';
+      case 'processing': return 'Äang xá»­ lÃ­';
+      case 'resolved': return 'ÄÃ£ xá»­ lÃ­';
+      case 'rejected': return 'ÄÃ£ tá»« chá»‘i';
+      default: return 'KhÃ´ng xÃ¡c Ä‘á»‹nh';
     }
   };
 
@@ -484,13 +87,13 @@ export default function ComplaintsScreen() {
 
   const getTypeText = (type: string) => {
     switch (type) {
-      case 'salary': return 'Lương';
-      case 'behavior': return 'Thái độ';
-      case 'quality': return 'Chất lượng';
-      case 'schedule': return 'Lịch trình';
-      case 'payment': return 'Thanh toán';
-      case 'other': return 'Khác';
-      default: return 'Không xác định';
+      case 'salary': return 'LÆ°Æ¡ng';
+      case 'behavior': return 'ThÃ¡i Ä‘á»™';
+      case 'quality': return 'Cháº¥t lÆ°á»£ng';
+      case 'schedule': return 'Lá»‹ch trÃ¬nh';
+      case 'payment': return 'Thanh toÃ¡n';
+      case 'other': return 'KhÃ¡c';
+      default: return 'KhÃ´ng xÃ¡c Ä‘á»‹nh';
     }
   };
 
@@ -524,7 +127,7 @@ export default function ComplaintsScreen() {
             {item.title}
           </ThemedText>
           <ThemedText style={styles.complaintType}>
-            Loại: {getTypeText(item.type)}
+            Loáº¡i: {getTypeText(item.type)}
           </ThemedText>
           <ThemedText style={styles.complaintDescription} numberOfLines={2}>
             {item.description}
@@ -545,7 +148,7 @@ export default function ComplaintsScreen() {
             {new Date(item.createdAt).toLocaleDateString('vi-VN')}
           </ThemedText>
           <ThemedText style={styles.complaintEvidence}>
-            {item.evidences.length} bằng chứng
+            {item.evidences.length} báº±ng chá»©ng
           </ThemedText>
         </View>
         <Ionicons name="chevron-forward" size={20} color="#6c757d" />
@@ -562,8 +165,8 @@ export default function ComplaintsScreen() {
         </TouchableOpacity>
         
         <View style={styles.headerContent}>
-          <ThemedText style={styles.headerTitle}>Khiếu nại</ThemedText>
-          <ThemedText style={styles.headerSubtitle}>Quản lý khiếu nại và tố cáo</ThemedText>
+          <ThemedText style={styles.headerTitle}>Khiáº¿u náº¡i</ThemedText>
+          <ThemedText style={styles.headerSubtitle}>Quáº£n lÃ½ khiáº¿u náº¡i vÃ  tá»‘ cÃ¡o</ThemedText>
         </View>
 
         <TouchableOpacity style={styles.addButton} onPress={handleCreateComplaint}>
@@ -601,7 +204,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('all')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'all' && styles.statusTabTextActive]}>
-              Tất cả ({getStatusCount('all')})
+              Táº¥t cáº£ ({getStatusCount('all')})
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -609,7 +212,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('pending')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'pending' && styles.statusTabTextActive]}>
-              Đang chờ ({getStatusCount('pending')})
+              Äang chá» ({getStatusCount('pending')})
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -617,7 +220,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('received')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'received' && styles.statusTabTextActive]}>
-              Đã tiếp nhận ({getStatusCount('received')})
+              ÄÃ£ tiáº¿p nháº­n ({getStatusCount('received')})
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -625,7 +228,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('processing')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'processing' && styles.statusTabTextActive]}>
-              Đang xử lí ({getStatusCount('processing')})
+              Äang xá»­ lÃ­ ({getStatusCount('processing')})
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -633,7 +236,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('resolved')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'resolved' && styles.statusTabTextActive]}>
-              Đã xử lí ({getStatusCount('resolved')})
+              ÄÃ£ xá»­ lÃ­ ({getStatusCount('resolved')})
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -641,7 +244,7 @@ export default function ComplaintsScreen() {
             onPress={() => setActiveStatusTab('rejected')}
           >
             <ThemedText style={[styles.statusTabText, activeStatusTab === 'rejected' && styles.statusTabTextActive]}>
-              Đã từ chối ({getStatusCount('rejected')})
+              ÄÃ£ tá»« chá»‘i ({getStatusCount('rejected')})
             </ThemedText>
           </TouchableOpacity>
         </ScrollView>
@@ -657,11 +260,11 @@ export default function ComplaintsScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="document-outline" size={64} color="#6c757d" />
-            <ThemedText style={styles.emptyTitle}>Không có khiếu nại</ThemedText>
+            <ThemedText style={styles.emptyTitle}>KhÃ´ng cÃ³ khiáº¿u náº¡i</ThemedText>
             <ThemedText style={styles.emptySubtitle}>
               {activeTab === 'my_complaints' 
-                ? 'Bạn chưa có khiếu nại nào' 
-                : 'Chưa có khiếu nại nào về bạn'
+                ? 'Báº¡n chÆ°a cÃ³ khiáº¿u náº¡i nÃ o' 
+                : 'ChÆ°a cÃ³ khiáº¿u náº¡i nÃ o vá» báº¡n'
               }
             </ThemedText>
           </View>
