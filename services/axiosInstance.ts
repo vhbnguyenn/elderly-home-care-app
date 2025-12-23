@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import { API_CONFIG, HTTP_STATUS } from "./config/api.config";
 import { router } from "expo-router";
+import { API_CONFIG, HTTP_STATUS } from "./config/api.config";
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -17,12 +17,20 @@ axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     try {
       const token = await AsyncStorage.getItem("auth_token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+      
+      // Debug logging
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+      console.log(`[Token Debug] Token exists: ${!!token}`);
+      if (token) {
+        console.log(`[Token Debug] Token preview: ${token.substring(0, 20)}...`);
       }
       
-      // Log request for debugging
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log(`[Token Debug] Authorization header set`);
+      } else {
+        console.log(`[Token Debug] No token or headers, skipping Authorization`);
+      }
       
       return config;
     } catch (error) {
@@ -46,11 +54,11 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Log error
-    console.error(
-      `[API Error] ${error.response?.status || 'Network Error'} ${originalRequest?.url}`,
-      error.response?.data
-    );
+    // Log error (disabled console.error to hide gray toast)
+    // console.error(
+    //   `[API Error] ${error.response?.status || 'Network Error'} ${originalRequest?.url}`,
+    //   error.response?.data
+    // );
 
     // Handle 401 Unauthorized
     if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {

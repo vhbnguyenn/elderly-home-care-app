@@ -15,20 +15,17 @@ interface ElderlyProfile {
 }
 
 interface ElderlyProfilesProps {
-  profiles: ElderlyProfile[];
+  profiles?: ElderlyProfile[];
 }
 
 export function ElderlyProfiles({ profiles }: ElderlyProfilesProps) {
-  console.log('ElderlyProfiles rendering with profiles:', profiles.length);
-  
-  // Simple fallback for testing
-  if (!profiles || profiles.length === 0) {
-    return (
-      <View style={[styles.container, { backgroundColor: '#f0f0f0', padding: 20 }]}>
-        <ThemedText style={styles.title}>Hồ sơ người già - No data</ThemedText>
-      </View>
-    );
+  // Check if profiles exists and is array FIRST
+  if (!profiles || !Array.isArray(profiles) || profiles.length === 0) {
+    console.log('ElderlyProfiles rendering with no profiles');
+    return null; // Don't render anything - parent will handle empty state
   }
+  
+  console.log('ElderlyProfiles rendering with profiles:', profiles.length);
   
   const handleViewAll = () => {
     router.push('/careseeker/elderly-list');

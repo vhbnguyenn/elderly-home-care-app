@@ -12,33 +12,8 @@ export default function RequestsScreen() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<any>(null);
 
-  // Mock elderly profiles data (same as caregiver-search)
-  const elderlyProfiles = [
-    {
-      id: '1',
-      name: 'Bà Nguyễn Thị Lan',
-      age: 75,
-      currentCaregivers: 1,
-      family: 'Gia đình Nguyễn',
-      healthStatus: 'fair' as const,
-    },
-    {
-      id: '2',
-      name: 'Ông Trần Văn Minh',
-      age: 82,
-      currentCaregivers: 0,
-      family: 'Gia đình Trần',
-      healthStatus: 'poor' as const,
-    },
-    {
-      id: '3',
-      name: 'Bà Lê Thị Hoa',
-      age: 68,
-      currentCaregivers: 2,
-      family: 'Gia đình Lê',
-      healthStatus: 'good' as const,
-    },
-  ];
+  // TODO: Replace with real API data from elderly service
+  const elderlyProfiles: any[] = [];
 
   const handleChatPress = (caregiver: any) => {
     // Navigate to chat with specific caregiver

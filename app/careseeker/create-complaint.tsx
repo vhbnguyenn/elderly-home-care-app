@@ -31,79 +31,9 @@ export default function CreateComplaintScreen() {
   const [showTypeModal, setShowTypeModal] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
 
-  // Mock data
-  const mockServices: ComplaintService[] = [
-    {
-      id: '1',
-      name: 'Dịch vụ chăm sóc tại nhà - Buổi sáng',
-      type: 'caregiver_service',
-      caregiver: {
-        id: '2',
-        name: 'Trần Thị B',
-        email: 'tranthib@email.com',
-        phone: '0987654321',
-        role: 'caregiver',
-      },
-      startDate: '2024-01-01',
-      status: 'active',
-    },
-    {
-      id: '2',
-      name: 'Dịch vụ chăm sóc tại nhà - Buổi chiều',
-      type: 'caregiver_service',
-      caregiver: {
-        id: '3',
-        name: 'Lê Văn C',
-        email: 'levanc@email.com',
-        phone: '0912345678',
-        role: 'caregiver',
-      },
-      startDate: '2024-01-15',
-      status: 'active',
-    },
-    {
-      id: '3',
-      name: 'Dịch vụ chăm sóc 24/7',
-      type: 'caregiver_service',
-      caregiver: {
-        id: '4',
-        name: 'Phạm Thị D',
-        email: 'phamthid@email.com',
-        phone: '0923456789',
-        role: 'caregiver',
-      },
-      startDate: '2024-01-10',
-      status: 'active',
-    },
-    {
-      id: '4',
-      name: 'Dịch vụ chăm sóc cuối tuần',
-      type: 'caregiver_service',
-      caregiver: {
-        id: '5',
-        name: 'Hoàng Văn E',
-        email: 'hoangvane@email.com',
-        phone: '0934567890',
-        role: 'caregiver',
-      },
-      startDate: '2024-01-12',
-      status: 'active',
-    },
-    {
-      id: '5',
-      name: 'Dịch vụ chăm sóc đặc biệt',
-      type: 'caregiver_service',
-      caregiver: {
-        id: '6',
-        name: 'Vũ Thị F',
-        email: 'vuthif@email.com',
-        phone: '0945678901',
-        role: 'caregiver',
-      },
-      startDate: '2024-01-08',
-      status: 'active',
-    },
-  ];
+  // TODO: Replace with real API data from booking service
+  // Get user's active bookings to select from
+  const mockServices: ComplaintService[] = [];
 
   const complaintTypes: { value: ComplaintType; label: string }[] = [
     { value: 'salary', label: 'Lương' },

@@ -17,30 +17,51 @@ export const AuthService = {
 
       console.log("[Auth] Login response:", response.data);
 
-      // Handle different response formats
-      const data = response.data;
-      const token = data.token || data.accessToken;
-      const refreshToken = data.refreshToken;
-      const user = data.user || data.data || data;
+      // Handle different response formats - API returns nested structure
+      const responseData = response.data.data || response.data;
+      const token = responseData.accessToken || responseData.token;
+      const refreshToken = responseData.refreshToken;
+      const user = responseData.user || responseData;
+
+      // Debug logging
+      console.log("[Auth] 🔍 Response data:", responseData);
+      console.log("[Auth] 🔑 Token found:", !!token);
+      console.log("[Auth] 🔄 RefreshToken found:", !!refreshToken);
+      console.log("[Auth] 👤 User data found:", !!user);
+      if (token) {
+        console.log("[Auth] 🔑 Token preview:", token.substring(0, 30) + "...");
+      }
 
       // Save tokens to AsyncStorage
       if (token) {
         await AsyncStorage.setItem("auth_token", token);
+        console.log("[Auth] ✅ Token saved to AsyncStorage");
+      } else {
+        console.log("[Auth] ⚠️ No token to save!");
       }
       if (refreshToken) {
         await AsyncStorage.setItem("refresh_token", refreshToken);
+        console.log("[Auth] ✅ RefreshToken saved to AsyncStorage");
       }
       if (user) {
         await AsyncStorage.setItem("user_data", JSON.stringify(user));
+        console.log("[Auth] ✅ User data saved to AsyncStorage");
       }
 
-      console.log("[Auth] Login successful:", user);
+      console.log("[Auth] Login successful - User object:", user);
+      
+      // Return only the user object, not the entire response with tokens
       return user;
     } catch (error: any) {
-      console.error("[Auth] Login failed:", error.response?.data || error.message);
-      
       // Return error object with message for better error handling
       const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Đăng nhập thất bại";
+      
+      // Only log errors that are NOT email verification issues (to avoid showing black toast)
+      // Disabled console.error to hide gray toast
+      // if (!errorMessage.includes("xác minh") && !errorMessage.includes("verify")) {
+      //   console.error("[Auth] Login failed:", error.response?.data || error.message);
+      // }
+      
       throw new Error(errorMessage);
     }
   },
@@ -56,7 +77,8 @@ export const AuthService = {
       console.log("[Auth] Register successful:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("[Auth] Register failed:", error.response?.data || error.message);
+      // Disabled console.error to hide gray toast
+      // console.error("[Auth] Register failed:", error.response?.data || error.message);
       
       // Return error object with message for better error handling
       const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Đăng ký thất bại";
@@ -69,7 +91,8 @@ export const AuthService = {
     try {
       await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
-      console.error("[Auth] Logout API failed:", error);
+      // Disabled console.error to hide gray toast
+      // console.error("[Auth] Logout API failed:", error);
     } finally {
       // Clear local storage regardless of API result
       await AsyncStorage.multiRemove(["auth_token", "refresh_token", "user_data"]);
@@ -83,7 +106,8 @@ export const AuthService = {
       const userData = await AsyncStorage.getItem("user_data");
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      console.error("[Auth] Get current user failed:", error);
+      // Disabled console.error to hide gray toast
+      // console.error("[Auth] Get current user failed:", error);
       return null;
     }
   },

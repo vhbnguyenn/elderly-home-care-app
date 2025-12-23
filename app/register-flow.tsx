@@ -73,32 +73,116 @@ export default function RegisterFlowScreen() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldError, setFieldError] = useState('');
   const { showSuccessTooltip } = useSuccessNotification();
   const { showErrorTooltip } = useErrorNotification();
 
   const currentStepData = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const handleNext = () => {
+  // Get helper text for each field
+  const getHelperText = () => {
+    switch (currentStepData.field) {
+      case 'email':
+        return 'VD: example@email.com hoặc name+tag@gmail.com';
+      case 'password':
+        return 'Ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số, 1 ký tự đặc biệt';
+      case 'phone':
+        return 'Nhập số điện thoại 10-11 chữ số';
+      case 'fullName':
+        return 'Nhập họ và tên đầy đủ của bạn';
+      default:
+        return '';
+    }
+  };
+
+  // Validate current field (for real-time validation)
+  const validateCurrentField = (showTooltip = false) => {
     const value = formData[currentStepData.field as keyof typeof formData];
     
     if (!value) {
-      showErrorTooltip('Vui lòng điền thông tin');
-      return;
+      setFieldError('Vui lòng điền thông tin');
+      if (showTooltip) showErrorTooltip('Vui lòng điền thông tin');
+      return false;
     }
 
-    if (currentStepData.field === 'email' && !value.includes('@')) {
-      showErrorTooltip('Email không hợp lệ');
-      return;
+    if (!value.toString().trim()) {
+      setFieldError('Thông tin không được chứa toàn khoảng trắng');
+      if (showTooltip) showErrorTooltip('Thông tin không được chứa toàn khoảng trắng');
+      return false;
     }
 
-    if (currentStepData.field === 'password' && value.length < 6) {
-      showErrorTooltip('Mật khẩu phải có ít nhất 6 ký tự');
+    if (currentStepData.field === 'email') {
+      // RFC 5322 compliant email regex with Gmail alias support
+      const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/;
+      
+      // Simplified: just one error message for all email validation cases
+      if (!emailRegex.test(value)) {
+        setFieldError('Email không hợp lệ');
+        if (showTooltip) showErrorTooltip('Email không hợp lệ');
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'password') {
+      const errorMsg = 'Mật khẩu phải có ít nhất 6 ký tự bao gồm: 1 chữ hoa, 1 chữ số và 1 ký tự đặc biệt';
+      
+      // Check all password requirements at once
+      if (value.length < 6 || 
+          value.length > 50 ||
+          !/[a-z]/.test(value) ||          // Có chữ thường
+          !/[A-Z]/.test(value) ||          // Có chữ hoa
+          !/[0-9]/.test(value) ||          // Có số
+          !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) {  // Có ký tự đặc biệt
+        setFieldError(errorMsg);
+        if (showTooltip) showErrorTooltip(errorMsg);
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'phone') {
+      const phoneRegex = /^[0-9]{10,11}$/;
+      if (!phoneRegex.test(value.replace(/\s/g, ''))) {
+        setFieldError('Số điện thoại không hợp lệ (10-11 chữ số)');
+        if (showTooltip) showErrorTooltip('Số điện thoại không hợp lệ (10-11 chữ số)');
+        return false;
+      }
+    }
+
+    if (currentStepData.field === 'fullName') {
+      if (value.length < 2) {
+        setFieldError('Họ tên phải có ít nhất 2 ký tự');
+        if (showTooltip) showErrorTooltip('Họ tên phải có ít nhất 2 ký tự');
+        return false;
+      }
+      if (value.length > 100) {
+        setFieldError('Họ tên không được quá 100 ký tự');
+        if (showTooltip) showErrorTooltip('Họ tên không được quá 100 ký tự');
+        return false;
+      }
+    }
+
+    setFieldError('');
+    return true;
+  };
+
+  // Handle blur event for real-time validation
+  const handleFieldBlur = () => {
+    const value = formData[currentStepData.field as keyof typeof formData];
+    if (value) {
+      validateCurrentField(false);
+    }
+  };
+
+  const handleNext = () => {
+    // Validate with tooltip
+    if (!validateCurrentField(true)) {
       return;
     }
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setFieldError(''); // Clear error when moving to next step
     } else {
       handleRegister();
     }
@@ -118,24 +202,64 @@ export default function RegisterFlowScreen() {
     try {
       // Call real API to register user
       const userData = {
+        name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        fullName: formData.fullName,
+        confirmPassword: formData.password, // Same as password for this flow
         phone: formData.phone,
-        role: formData.role === 'careseeker' ? 'Care Seeker' : 'Caregiver',
+        role: formData.role, // Already in correct format: 'careseeker' or 'caregiver'
       };
+
+      console.log("[Register Flow] Sending data:", userData);
 
       await AuthService.register(userData);
 
-      showSuccessTooltip('🎉 Đăng ký thành công! Vui lòng đăng nhập.');
+      showSuccessTooltip('🎉 Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
       
       setTimeout(() => {
-        router.replace('/login');
+        router.push({
+          pathname: "/verify-code",
+          params: { 
+            email: formData.email,
+            type: "verify-email"
+          }
+        });
       }, 1500);
       
     } catch (err: any) {
       console.error('Register error:', err);
-      const errorMsg = err?.message || err?.response?.data?.message || 'Có lỗi xảy ra khi đăng ký!';
+      
+      let errorMsg = 'Đăng ký thất bại';
+      
+      if (err?.message) {
+        errorMsg = err.message;
+        
+        // Check for specific error messages from backend
+        if (errorMsg.includes("Email đã tồn tại") || errorMsg.includes("Email already exists")) {
+          errorMsg = "Email đã được đăng ký. Vui lòng sử dụng email khác";
+        }
+      } else if (err?.response) {
+        const status = err.response.status;
+        const responseData = err.response.data;
+        
+        if (status === 400) {
+          // Show specific validation errors if available
+          if (responseData?.errors && Array.isArray(responseData.errors)) {
+            errorMsg = responseData.errors.join(". ");
+          } else {
+            errorMsg = responseData?.message || 'Thông tin không hợp lệ';
+          }
+        } else if (status === 409) {
+          errorMsg = 'Email đã được đăng ký. Vui lòng sử dụng email khác';
+        } else if (status >= 500) {
+          errorMsg = 'Lỗi máy chủ. Vui lòng thử lại sau';
+        } else {
+          errorMsg = responseData?.message || 'Đăng ký thất bại';
+        }
+      } else if (err?.request) {
+        errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng';
+      }
+      
       showErrorTooltip(errorMsg);
     } finally {
       setIsLoading(false);
@@ -206,31 +330,50 @@ export default function RegisterFlowScreen() {
             ))}
           </View>
         ) : (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={currentStepData.placeholder}
-              placeholderTextColor="#999"
-              value={formData[currentStepData.field as keyof typeof formData]}
-              onChangeText={(text) =>
-                setFormData({ ...formData, [currentStepData.field]: text })
-              }
-              keyboardType={currentStepData.keyboardType}
-              secureTextEntry={currentStepData.field === 'password' && !showPassword}
-              autoFocus
-              autoCapitalize={currentStepData.field === 'email' ? 'none' : 'words'}
-            />
-            {currentStepData.field === 'password' && (
-              <TouchableOpacity
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  size={24}
-                  color="#999"
-                />
-              </TouchableOpacity>
+          <View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder={currentStepData.placeholder}
+                placeholderTextColor="#999"
+                value={formData[currentStepData.field as keyof typeof formData]}
+                onChangeText={(text) => {
+                  // Auto-remove whitespace for email field
+                  const cleanedText = currentStepData.field === 'email' ? text.replace(/\s/g, '') : text;
+                  setFormData({ ...formData, [currentStepData.field]: cleanedText });
+                  if (fieldError) setFieldError('');
+                }}
+                onBlur={handleFieldBlur}
+                keyboardType={currentStepData.keyboardType}
+                secureTextEntry={currentStepData.field === 'password' && !showPassword}
+                autoFocus
+                autoCapitalize={currentStepData.field === 'email' ? 'none' : 'words'}
+              />
+              {currentStepData.field === 'password' && (
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={24}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+            {fieldError ? (
+              <View style={styles.helperContainer}>
+                <Ionicons name="alert-circle" size={14} color="#FF6B6B" />
+                <Text style={styles.errorHelperText}>{fieldError}</Text>
+              </View>
+            ) : (
+              getHelperText() && (
+                <View style={styles.helperContainer}>
+                  <Ionicons name="information-circle-outline" size={14} color="#999" />
+                  <Text style={styles.helperText}>{getHelperText()}</Text>
+                </View>
+              )
             )}
           </View>
         )}
@@ -310,6 +453,23 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     fontSize: 18,
     color: '#1A1A1A',
+  },
+  helperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 6,
+    paddingHorizontal: 4,
+  },
+  helperText: {
+    fontSize: 13,
+    color: '#999',
+    flex: 1,
+  },
+  errorHelperText: {
+    fontSize: 13,
+    color: '#FF6B6B',
+    flex: 1,
   },
   eyeButton: {
     position: 'absolute',

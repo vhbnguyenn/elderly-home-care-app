@@ -9,8 +9,9 @@ export const API_CONFIG = {
       REGISTER: '/api/auth/register',
       LOGIN: '/api/auth/login',
       LOGOUT: '/api/auth/logout',
-      REFRESH: '/api/auth/refresh',
-      VERIFY_EMAIL: '/api/auth/verify-email',
+      REFRESH: '/api/auth/refresh-token',
+      VERIFY_EMAIL: '/api/auth/verify-code', // Fixed: Changed from verify-email to verify-code
+      RESEND_VERIFICATION: '/api/auth/resend-verification',
       FORGOT_PASSWORD: '/api/auth/forgot-password',
       RESET_PASSWORD: '/api/auth/reset-password',
     },
@@ -48,6 +49,11 @@ export const API_CONFIG = {
       GET_BY_BOOKING: (bookingId: string) => `/api/reviews/booking/${bookingId}`,
       UPDATE: (id: string) => `/api/reviews/${id}`,
       DELETE: (id: string) => `/api/reviews/${id}`,
+    },
+    // AI Matching
+    MATCH: {
+      MATCH_MOBILE: '/api/match-mobile',
+      MATCH_BY_ID: '/api/match',
     },
   },
 };

@@ -36,6 +36,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await AuthService.login(email, password);
     if (!res) return null;
 
+    console.log("🔍 [AuthContext] Raw API response:", res);
+    console.log("🔍 [AuthContext] Raw role from API:", res.role);
+
+    // Normalize role to expected format
+    let normalizedRole = res.role ?? "Care Seeker";
+    if (normalizedRole.toLowerCase() === "careseeker") {
+      normalizedRole = "Care Seeker";
+    } else if (normalizedRole.toLowerCase() === "caregiver") {
+      normalizedRole = "Caregiver";
+    }
+
+    console.log("✅ [AuthContext] Normalized role:", normalizedRole);
+
     const userData: User = {
       id: res.id,
       email: res.email,
@@ -45,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       address: res.address,
       avatar: res.avatar,
       hasCompletedProfile: res.hasCompletedProfile ?? false,
-      role: res.role ?? "Care Seeker",
+      role: normalizedRole,
       status: res.status, // Load status from API
     };
 
@@ -67,9 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    // Call logout API to clear session
-    AuthService.logout().catch(err => console.error("Logout error:", err));
-    
     setUser(null);
     NavigationHelper.goToLogin();
   };

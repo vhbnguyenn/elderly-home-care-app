@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -48,173 +48,12 @@ export default function CaregiverDetailScreen() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const { id } = useLocalSearchParams();
 
-  // Mock elderly profiles data
-  const elderlyProfiles = [
-    {
-      id: '1',
-      name: 'Bà Nguyễn Thị Lan',
-      age: 75,
-      currentCaregivers: 1,
-      family: 'Gia đình Nguyễn',
-      healthStatus: 'good' as const,
-      address: '123 Đường ABC, Quận 1, TP.HCM',
-    },
-    {
-      id: '2',
-      name: 'Ông Trần Văn Minh',
-      age: 82,
-      currentCaregivers: 0,
-      family: 'Gia đình Trần',
-      healthStatus: 'fair' as const,
-      address: '456 Đường XYZ, Quận 2, TP.HCM',
-    },
-  ];
+  // TODO: Replace with real API data from elderly service
+  const elderlyProfiles: any[] = [];
 
-  // Mock caregiver data - map from recommended caregivers
+  // TODO: Replace with real API data from caregiver service
   const caregiverMap: { [key: string]: CaregiverDetail } = {
-    '1': {
-      id: '1',
-      name: 'Mai',
-      age: 35,
-      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-      rating: 4.9,
-      gender: 'female',
-      specialties: ['Cao đẳng Điều dưỡng', 'Chăm sóc đái tháo đường'],
-      description: 'Tôi là một điều dưỡng viên có kinh nghiệm với 10 năm làm việc trong lĩnh vực chăm sóc người cao tuổi. Đặc biệt chuyên về chăm sóc bệnh nhân đái tháo đường và các vấn đề về tim mạch.',
-      education: [
-        'Cao đẳng Điều dưỡng - ĐH Y Dược TP.HCM (2013)',
-        'Chứng chỉ Chăm sóc đái tháo đường - Bệnh viện Chợ Rẫy (2015)',
-      ],
-      certifications: [
-        'Chứng chỉ Sơ cấp cứu',
-        'Chứng chỉ Chăm sóc bệnh nhân đái tháo đường',
-        'Chứng chỉ Điều dưỡng viên hành nghề',
-      ],
-      languages: ['Tiếng Việt', 'Tiếng Anh giao tiếp'],
-      experience: '10 năm kinh nghiệm',
-      location: 'Quận 1, TP.HCM',
-      phone: '0901 234 567',
-      email: 'mai.nurse@gmail.com',
-      reviews: [
-        {
-          id: '1',
-          userName: 'Gia đình Nguyễn',
-          userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Chị Mai rất tận tâm và chuyên nghiệp. Mẹ tôi rất yêu quý chị.',
-          date: '2 tuần trước',
-        },
-        {
-          id: '2',
-          userName: 'Gia đình Trần',
-          userAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Có kiến thức y tế tốt, rất đáng tin cậy.',
-          date: '1 tháng trước',
-        },
-      ],
-    },
-    '2': {
-      id: '2',
-      name: 'Hùng',
-      age: 42,
-      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop&crop=face',
-      rating: 4.8,
-      gender: 'male',
-      specialties: ['Vật lý trị liệu', 'Phục hồi chức năng'],
-      description: 'Chuyên viên vật lý trị liệu với 15 năm kinh nghiệm. Chuyên về phục hồi chức năng vận động cho người cao tuổi sau tai biến và chấn thương.',
-      education: [
-        'Cử nhân Vật lý trị liệu - ĐH Y Hà Nội (2008)',
-        'Thạc sĩ Phục hồi chức năng - ĐH Y Dược TP.HCM (2015)',
-      ],
-      certifications: [
-        'Chứng chỉ Vật lý trị liệu viên',
-        'Chứng chỉ Phục hồi chức năng nâng cao',
-        'Chứng chỉ Massage trị liệu',
-      ],
-      languages: ['Tiếng Việt'],
-      experience: '15 năm kinh nghiệm',
-      location: 'Quận 3, TP.HCM',
-      phone: '0902 345 678',
-      email: 'hung.physio@gmail.com',
-      reviews: [
-        {
-          id: '1',
-          userName: 'Gia đình Lê',
-          userAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Anh Hùng giúp bố tôi phục hồi rất tốt sau tai biến.',
-          date: '3 tuần trước',
-        },
-      ],
-    },
-    '3': {
-      id: '3',
-      name: 'Linh',
-      age: 28,
-      avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=150&h=150&fit=crop&crop=face',
-      rating: 4.7,
-      gender: 'female',
-      specialties: ['Chăm sóc sau phẫu thuật', 'Y tế tại nhà'],
-      description: 'Điều dưỡng viên chuyên về chăm sóc sau phẫu thuật và chăm sóc y tế tại nhà. Tận tâm và chu đáo trong công việc.',
-      education: [
-        'Cử nhân Điều dưỡng - ĐH Y Dược Thái Nguyên (2018)',
-      ],
-      certifications: [
-        'Chứng chỉ Điều dưỡng viên',
-        'Chứng chỉ Chăm sóc sau phẫu thuật',
-        'Chứng chỉ Sơ cấp cứu',
-      ],
-      languages: ['Tiếng Việt', 'Tiếng Anh'],
-      experience: '5 năm kinh nghiệm',
-      location: 'Quận 7, TP.HCM',
-      phone: '0903 456 789',
-      email: 'linh.nurse@gmail.com',
-      reviews: [
-        {
-          id: '1',
-          userName: 'Gia đình Phạm',
-          userAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Chị Linh chăm sóc mẹ tôi sau phẫu thuật rất tốt.',
-          date: '1 tuần trước',
-        },
-      ],
-    },
-    '4': {
-      id: '4',
-      name: 'Nam',
-      age: 38,
-      avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
-      rating: 4.8,
-      gender: 'male',
-      specialties: ['Chăm sóc bệnh Alzheimer', 'Hỗ trợ di chuyển'],
-      description: 'Chuyên viên chăm sóc người cao tuổi với chuyên môn về bệnh Alzheimer và sa sút trí tuệ. Kiên nhẫn và hiểu biết sâu về tâm lý người bệnh.',
-      education: [
-        'Cử nhân Điều dưỡng - ĐH Y Huế (2010)',
-        'Chứng chỉ Chăm sóc bệnh Alzheimer - Singapore (2016)',
-      ],
-      certifications: [
-        'Chứng chỉ Chăm sóc người cao tuổi',
-        'Chứng chỉ Chăm sóc bệnh Alzheimer',
-        'Chứng chỉ Hỗ trợ di chuyển an toàn',
-      ],
-      languages: ['Tiếng Việt'],
-      experience: '12 năm kinh nghiệm',
-      location: 'Quận Bình Thạnh, TP.HCM',
-      phone: '0904 567 890',
-      email: 'nam.caregiver@gmail.com',
-      reviews: [
-        {
-          id: '1',
-          userName: 'Gia đình Hoàng',
-          userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face',
-          rating: 5,
-          comment: 'Anh Nam rất kiên nhẫn với bà tôi bị Alzheimer.',
-          date: '2 tuần trước',
-        },
-      ],
-    },
+    // Mock data removed - TODO: fetch from API by id
   };
 
   const caregiver = caregiverMap[id as string] || caregiverMap['1'];
@@ -235,7 +74,7 @@ export default function CaregiverDetailScreen() {
       });
     } catch (error) {
       console.error('Error opening video call:', error);
-      Alert.alert('Lỗi', 'Không thể thực hiện cuộc gọi');
+      Alert.alert('Lá»—i', 'KhÃ´ng thá»ƒ thá»±c hiá»‡n cuá»™c gá»i');
     }
   };
 
@@ -251,7 +90,7 @@ export default function CaregiverDetailScreen() {
       });
     } catch (error) {
       console.error('Error navigating to chat:', error);
-      Alert.alert('Lỗi', 'Không thể mở trang chat');
+      Alert.alert('Lá»—i', 'KhÃ´ng thá»ƒ má»Ÿ trang chat');
     }
   };
 
@@ -300,7 +139,7 @@ export default function CaregiverDetailScreen() {
         </TouchableOpacity>
         
         <View style={styles.headerContent}>
-          <ThemedText style={styles.headerTitle}>Chi tiết người chăm sóc</ThemedText>
+          <ThemedText style={styles.headerTitle}>Chi tiáº¿t ngÆ°á»i chÄƒm sÃ³c</ThemedText>
         </View>
         
         <View style={styles.placeholder} />
@@ -323,11 +162,11 @@ export default function CaregiverDetailScreen() {
                 {renderStars(caregiver.rating)}
               </View>
               <ThemedText style={styles.ratingText}>
-                {caregiver.rating} ({caregiver.reviews.length} đánh giá)
+                {caregiver.rating} ({caregiver.reviews.length} Ä‘Ã¡nh giÃ¡)
               </ThemedText>
             </View>
             <ThemedText style={styles.experience}>{caregiver.experience}</ThemedText>
-            <ThemedText style={styles.location}>📍 {caregiver.location}</ThemedText>
+            <ThemedText style={styles.location}>ðŸ“ {caregiver.location}</ThemedText>
           </View>
         </View>
 
@@ -348,7 +187,7 @@ export default function CaregiverDetailScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="call-outline" size={20} color="white" />
-            <ThemedText style={styles.callButtonText}>Gọi</ThemedText>
+            <ThemedText style={styles.callButtonText}>Gá»i</ThemedText>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -357,7 +196,7 @@ export default function CaregiverDetailScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="calendar-outline" size={20} color="white" />
-            <ThemedText style={styles.bookButtonText}>Đặt lịch</ThemedText>
+            <ThemedText style={styles.bookButtonText}>Äáº·t lá»‹ch</ThemedText>
           </TouchableOpacity>
         </View>
 
@@ -368,7 +207,7 @@ export default function CaregiverDetailScreen() {
             onPress={() => setSelectedTab('info')}
           >
             <ThemedText style={[styles.tabText, selectedTab === 'info' && styles.activeTabText]}>
-              Thông tin
+              ThÃ´ng tin
             </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -376,7 +215,7 @@ export default function CaregiverDetailScreen() {
             onPress={() => setSelectedTab('reviews')}
           >
             <ThemedText style={[styles.tabText, selectedTab === 'reviews' && styles.activeTabText]}>
-              Đánh giá ({caregiver.reviews.length})
+              ÄÃ¡nh giÃ¡ ({caregiver.reviews.length})
             </ThemedText>
           </TouchableOpacity>
         </View>
@@ -386,13 +225,13 @@ export default function CaregiverDetailScreen() {
           <View style={styles.infoContent}>
             {/* Description */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Giới thiệu</ThemedText>
+              <ThemedText style={styles.sectionTitle}>Giá»›i thiá»‡u</ThemedText>
               <ThemedText style={styles.sectionContent}>{caregiver.description}</ThemedText>
             </View>
 
             {/* Specialties */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Chuyên môn</ThemedText>
+              <ThemedText style={styles.sectionTitle}>ChuyÃªn mÃ´n</ThemedText>
               <View style={styles.specialtiesContainer}>
                 {caregiver.specialties.map((specialty, index) => (
                   <View key={index} style={styles.specialtyTag}>
@@ -404,7 +243,7 @@ export default function CaregiverDetailScreen() {
 
             {/* Education */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Học vấn</ThemedText>
+              <ThemedText style={styles.sectionTitle}>Há»c váº¥n</ThemedText>
               {caregiver.education.map((edu, index) => (
                 <View key={index} style={styles.educationItem}>
                   <Ionicons name="school-outline" size={16} color="#68C2E8" />
@@ -415,7 +254,7 @@ export default function CaregiverDetailScreen() {
 
             {/* Certifications */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Chứng chỉ</ThemedText>
+              <ThemedText style={styles.sectionTitle}>Chá»©ng chá»‰</ThemedText>
               {caregiver.certifications.map((cert, index) => (
                 <View key={index} style={styles.certificationItem}>
                   <Ionicons name="ribbon-outline" size={16} color="#68C2E8" />
@@ -426,7 +265,7 @@ export default function CaregiverDetailScreen() {
 
             {/* Languages */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Ngôn ngữ</ThemedText>
+              <ThemedText style={styles.sectionTitle}>NgÃ´n ngá»¯</ThemedText>
               <View style={styles.languagesContainer}>
                 {caregiver.languages.map((lang, index) => (
                   <View key={index} style={styles.languageTag}>
@@ -438,7 +277,7 @@ export default function CaregiverDetailScreen() {
 
             {/* Contact */}
             <View style={styles.section}>
-              <ThemedText style={styles.sectionTitle}>Liên hệ</ThemedText>
+              <ThemedText style={styles.sectionTitle}>LiÃªn há»‡</ThemedText>
               <View style={styles.contactItem}>
                 <Ionicons name="call-outline" size={16} color="#68C2E8" />
                 <ThemedText style={styles.contactText}>{caregiver.phone}</ThemedText>

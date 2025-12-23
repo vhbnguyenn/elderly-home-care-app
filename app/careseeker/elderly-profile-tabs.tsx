@@ -685,3 +685,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+// Default export to satisfy route requirement (this file is used as helper utilities)
+export default function ElderlyProfileTabs() {
+  return null;
+}

@@ -1,22 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Alert,
     Animated,
     Dimensions,
+    Image,
     Modal,
     ScrollView,
     StyleSheet,
+    Text,
     TouchableOpacity,
     View,
+    ActivityIndicator,
 } from 'react-native';
 
 import { EmergencyAlert } from '@/components/alerts/EmergencyAlert';
 import { BookingModal } from '@/components/caregiver/BookingModal';
-import { RecommendedCaregivers } from '@/components/caregiver/RecommendedCaregivers';
 import { ElderlyProfiles } from '@/components/elderly/ElderlyProfiles';
-import { SimpleNavBar } from '@/components/navigation/SimpleNavBar';
 import { RequestNotification } from '@/components/notifications/RequestNotification';
 import { AppointmentScheduleToday } from '@/components/schedule/AppointmentScheduleToday';
 import { ThemedText } from '@/components/themed-text';
@@ -25,36 +26,37 @@ import { CustomModal } from '@/components/ui/CustomModal';
 import { NotificationPanel } from '@/components/ui/NotificationPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
+import { caregiverService, CaregiverProfile } from '@/services/caregiver.service';
+import { ElderlyAPI, ElderlyProfile } from '@/services/api/elderly.api';
+import { BookingAPI, Booking } from '@/services/api/booking.api';
+import { matchService } from '@/services/matchServiceAxios';
+import { MobileMatchRequest } from '@/services/types';
 
 const { width } = Dimensions.get('window');
-
-interface ServiceModule {
-  id: string;
-  title: string;
-  icon: string;
-  color: string;
-  description: string;
-  route?: string;
-}
-
 
 export default function DashboardScreen() {
   const { user, logout } = useAuth();
   const { emergencyAlertVisible, hideEmergencyAlert } = useNotification();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [showAppInfoModal, setShowAppInfoModal] = useState(false);
   const [showAddElderlyModal, setShowAddElderlyModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<any>(null);
+  const [fadeAnim] = useState(new Animated.Value(0));
   
-  // Request notification data - TODO: Fetch from API
-  const requestCount = 0; // Set to 0 to hide mock notification
-  const showRequestNotification = false; // Only show when there are real requests
+  // Real data states
+  const [recommendedCaregivers, setRecommendedCaregivers] = useState<CaregiverProfile[]>([]);
+  const [isLoadingCaregivers, setIsLoadingCaregivers] = useState(true);
+  const [elderlyProfiles, setElderlyProfiles] = useState<ElderlyProfile[]>([]);
+  const [isLoadingElderly, setIsLoadingElderly] = useState(true);
+  const [appointments, setAppointments] = useState<Booking[]>([]);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(true);
+  const [showWelcomeTutorial, setShowWelcomeTutorial] = useState(false);
+  const requestCount = 0;
+  const showRequestNotification = false;
   
-  // Emergency alert data
   const emergencyAlert = {
     caregiverName: 'Nguyễn Văn A',
     elderlyName: 'Bà Nguyễn Thị B',
@@ -62,221 +64,185 @@ export default function DashboardScreen() {
     location: '123 Đường ABC, Quận 1, TP.HCM',
     message: 'Người già có dấu hiệu khó thở, cần hỗ trợ y tế ngay lập tức!'
   };
-  
-  // Sample appointment data
-  const appointments = [  
-    {
-      id: '1',
-      caregiverName: 'Trần Văn Nam',
-      caregiverAvatar: 'N',
-      timeSlot: '08:00 - 12:00',
-      status: 'completed' as const,
-      address: '123 Đường ABC, Quận 1, TP.HCM',
-      rating: 4.8,
-      isVerified: true,
-      tasks: [
-        { id: '7', name: 'Nhắc nhở uống thuốc buổi sáng', completed: true, time: '09:00', status: 'completed' as const },
-        { id: '8', name: 'Tập thể dục nhẹ', completed: true, time: '08:00', status: 'completed' as const },
-        { id: '9', name: 'Chuẩn bị bữa trưa', completed: false, time: '12:00', status: 'failed' as const },
-        { id: '10', name: 'Dọn dẹp phòng', completed: false, time: '14:00', status: 'failed' as const },
-      ],
-    },
-    {
-      id: '2',
-      caregiverName: 'Nguyễn Thị Mai',
-      caregiverAvatar: 'M',
-      timeSlot: '14:00 - 18:00',
-      status: 'in-progress' as const,
-      address: '456 Đường XYZ, Quận 2, TP.HCM',
-      rating: 4.5,
-      isVerified: true,
-      tasks: [
-        { id: '1', name: 'Nhắc nhở uống thuốc buổi sáng', completed: true, time: '09:00', status: 'completed' as const },
-        { id: '2', name: 'Tập thể dục nhẹ', completed: true, time: '08:00', status: 'completed' as const },
-        { id: '3', name: 'Chuẩn bị bữa trưa', completed: false, time: '12:00', status: 'pending' as const },
-        { id: '4', name: 'Dọn dẹp phòng', completed: false, time: '14:00', status: 'pending' as const },
-        { id: '5', name: 'Trò chuyện và giải trí', completed: false, time: '15:00', status: 'pending' as const },
-        { id: '6', name: 'Mua sắm đồ dùng', completed: false, time: '16:00', status: 'pending' as const },
-      ],
-    },
-    {
-      id: '3',
-      caregiverName: 'Lê Thị Hoa',
-      caregiverAvatar: 'H',
-      timeSlot: '19:00 - 22:00',
-      status: 'upcoming' as const,
-      address: '789 Đường DEF, Quận 3, TP.HCM',
-      rating: 4.2,
-      isVerified: false,
-      tasks: [
-        { id: '11', name: 'Nhắc nhở uống thuốc buổi sáng', completed: false, time: '09:00' },
-        { id: '12', name: 'Tập thể dục nhẹ', completed: false, time: '08:00' },
-        { id: '13', name: 'Chuẩn bị bữa trưa', completed: false, time: '12:00' },
-        { id: '14', name: 'Dọn dẹp phòng', completed: false, time: '14:00' },
-        { id: '15', name: 'Trò chuyện và giải trí', completed: false, time: '15:00' },
-        { id: '16', name: 'Mua sắm đồ dùng', completed: false, time: '16:00' },
-      ],
-    },
-  ];
-  
-  // Handle booking press
+
+
+  // Fetch recommended caregivers using AI matching
+  useEffect(() => {
+    const fetchCaregivers = async () => {
+      try {
+        setIsLoadingCaregivers(true);
+        
+        // Wait for elderly profiles to load first
+        if (isLoadingElderly) {
+          return;
+        }
+
+        // If user has elderly profiles, use AI matching
+        if (elderlyProfiles.length > 0) {
+          const firstElderly = elderlyProfiles[0]; // Use first elderly profile for matching
+          
+          console.log('[Dashboard] 🤖 Using AI matching with elderly profile:', firstElderly.name);
+          
+          // Build match request
+          const matchRequest: MobileMatchRequest = {
+            seeker_name: user?.name || 'User',
+            care_level: firstElderly.health_status === 'good' ? 1 : firstElderly.health_status === 'fair' ? 2 : 3,
+            health_status: firstElderly.health_status || 'unknown',
+            elderly_age: firstElderly.age || 70,
+            caregiver_age_range: null,
+            gender_preference: firstElderly.gender_preference || null,
+            required_years_experience: null,
+            overall_rating_range: [4.0, 5.0],
+            personality: [],
+            attitude: [],
+            skills: {
+              required_skills: firstElderly.required_skills || [],
+              priority_skills: [],
+            },
+            time_slots: [],
+            location: {
+              lat: firstElderly.location?.coordinates?.[1] || 0,
+              lon: firstElderly.location?.coordinates?.[0] || 0,
+              address: firstElderly.address || '',
+            },
+            budget_per_hour: 50000,
+            top_n: 10,
+          };
+
+          const matchResponse = await matchService.matchCaregivers(matchRequest);
+          
+          console.log('[Dashboard] ✅ AI matching success:', matchResponse.matched_caregivers.length, 'caregivers');
+          
+          // Transform match response to CaregiverProfile format
+          const matchedCaregivers: CaregiverProfile[] = matchResponse.matched_caregivers.map((rec: any) => ({
+            id: rec.caregiver_id,
+            user_id: rec.caregiver_id,
+            personal_info: {
+              full_name: rec.name,
+              age: rec.age,
+              gender: rec.gender,
+              avatar_url: rec.avatar,
+            },
+            skills: rec.skills || [],
+            specialties: rec.specialties || [],
+            rating: {
+              average_score: rec.rating || 0,
+              total_reviews: rec.total_reviews || 0,
+            },
+            experience: {
+              years_of_experience: rec.years_experience || 0,
+            },
+            pricing: {
+              hourly_rate: rec.price_per_hour || 0,
+            },
+            availability: {
+              is_available: true,
+            },
+            match_score: rec.match_score,
+            match_percentage: rec.match_percentage,
+          }));
+          
+          setRecommendedCaregivers(matchedCaregivers);
+        } else {
+          // No elderly profiles, fallback to getAllCaregivers
+          console.log('[Dashboard] No elderly profiles, using getAllCaregivers');
+          const response = await caregiverService.getAllCaregivers({ 
+            page: 1, 
+            limit: 10 
+          });
+          setRecommendedCaregivers(response.caregivers);
+        }
+      } catch (error) {
+        console.log('[Dashboard] Error fetching caregivers:', error);
+        // Fallback to getAllCaregivers on error
+        try {
+          const response = await caregiverService.getAllCaregivers({ 
+            page: 1, 
+            limit: 10 
+          });
+          setRecommendedCaregivers(response.caregivers);
+        } catch (fallbackError) {
+          console.log('[Dashboard] Fallback also failed:', fallbackError);
+          setRecommendedCaregivers([]);
+        }
+      } finally {
+        setIsLoadingCaregivers(false);
+      }
+    };
+
+    fetchCaregivers();
+  }, [elderlyProfiles, isLoadingElderly, user]);
+
+  // Fetch elderly profiles from API
+  useEffect(() => {
+    const fetchElderly = async () => {
+      try {
+        setIsLoadingElderly(true);
+        const profiles = await ElderlyAPI.getAll();
+        setElderlyProfiles(profiles);
+      } catch (error) {
+        console.log('[Dashboard] Error fetching elderly profiles:', error);
+        setElderlyProfiles([]);
+      } finally {
+        setIsLoadingElderly(false);
+      }
+    };
+
+    fetchElderly();
+  }, []);
+
+  // Check if user needs to complete onboarding
+  useEffect(() => {
+    if (user) {
+      console.log('[Dashboard] Checking onboarding status:');
+      console.log('  - Name:', user.name || 'MISSING');
+      console.log('  - Phone:', user.phone || 'MISSING');
+      console.log('  - Address:', user.address || 'MISSING');
+      
+      // Check if user is missing any required info
+      const needsOnboarding = !user.name || !user.phone || !user.address;
+      
+      if (needsOnboarding) {
+        console.log('[Dashboard] ⚠️ User needs onboarding, redirecting...');
+        router.replace('/onboarding');
+      } else {
+        console.log('[Dashboard] ✅ User profile complete');
+      }
+    }
+  }, [user]);
+
+  // Check if user is new (no elderly profiles) and show welcome tutorial
+  useEffect(() => {
+    if (!isLoadingElderly && !isLoadingAppointments && elderlyProfiles.length === 0 && appointments.length === 0 && user?.name) {
+      setShowWelcomeTutorial(true);
+    }
+  }, [isLoadingElderly, isLoadingAppointments, elderlyProfiles.length, appointments.length, user]);
+
+  // Fetch appointments (bookings) from API
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        setIsLoadingAppointments(true);
+        const bookings = await BookingAPI.getCareseekerBookings();
+        setAppointments(bookings);
+      } catch (error) {
+        console.log('[Dashboard] Error fetching appointments:', error);
+        setAppointments([]);
+      } finally {
+        setIsLoadingAppointments(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  // Real notifications - for now empty array until notification API is ready
+  const [notifications, setNotifications] = useState<any[]>([]);
+
   const handleBookPress = (caregiver: any) => {
     setSelectedCaregiver(caregiver);
     setShowBookingModal(true);
   };
-
-  // Sample elderly profiles data
-  const elderlyProfiles = [
-    {
-      id: '1',
-      name: 'Bà Nguyễn Thị Lan',
-      age: 75,
-      avatar: 'https://via.placeholder.com/60x60/4ECDC4/FFFFFF?text=NL',
-      relationship: 'Bà nội',
-      gender: 'female' as const,
-      currentCaregivers: 1,
-      family: 'Gia đình Nguyễn',
-      healthStatus: 'good' as const,
-      address: '123 Nguyễn Văn Linh, Quận 7, TP.HCM',
-    },
-    {
-      id: '2',
-      name: 'Ông Trần Văn Minh',
-      age: 82,
-      healthStatus: 'fair' as const,
-      avatar: 'https://via.placeholder.com/60x60/27AE60/FFFFFF?text=TM',
-      relationship: 'Ông ngoại',
-      gender: 'male' as const,
-      currentCaregivers: 0,
-      family: 'Gia đình Trần',
-      address: '456 Lê Văn Việt, Quận 9, TP.HCM',
-    },
-    {
-      id: '3',
-      name: 'Bà Lê Thị Hoa',
-      age: 68,
-      healthStatus: 'good' as const,
-      avatar: 'https://via.placeholder.com/60x60/F39C12/FFFFFF?text=LH',
-      relationship: 'Bà ngoại',
-      gender: 'female' as const,
-      currentCaregivers: 2,
-      family: 'Gia đình Lê',
-      address: '789 Võ Văn Ngân, Thủ Đức, TP.HCM',
-    },
-    {
-      id: '4',
-      name: 'Ông Phạm Văn Đức',
-      age: 79,
-      healthStatus: 'Yếu',
-      avatar: 'https://via.placeholder.com/60x60/E74C3C/FFFFFF?text=PD',
-      relationship: 'Ông nội',
-      gender: 'male' as const,
-      address: '234 Phan Văn Trị, Gò Vấp, TP.HCM',
-    },
-  ];
-  
-  // Recommended caregivers - Fixed data
-  const recommendedCaregivers = [
-    {
-      id: '1',
-      name: 'Mai',
-      age: 35,
-      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-      rating: 4.9,
-      gender: 'female' as const,
-      specialties: ['Cao đẳng Điều dưỡng', 'Chăm sóc đái tháo đường'],
-    },
-    {
-      id: '2',
-      name: 'Hùng',
-      age: 42,
-      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop&crop=face',
-      rating: 4.8,
-      gender: 'male' as const,
-      specialties: ['Vật lý trị liệu', 'Phục hồi chức năng'],
-    },
-    {
-      id: '3',
-      name: 'Linh',
-      age: 28,
-      avatar: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=150&h=150&fit=crop&crop=face',
-      rating: 4.7,
-      gender: 'female' as const,
-      specialties: ['Chăm sóc sau phẫu thuật', 'Y tế tại nhà'],
-    },
-    {
-      id: '4',
-      name: 'Nam',
-      age: 38,
-      avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
-      rating: 4.8,
-      gender: 'male' as const,
-      specialties: ['Chăm sóc bệnh Alzheimer', 'Hỗ trợ di chuyển'],
-    },
-  ];
-  
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      title: 'Yêu cầu được chấp nhận',
-      message: 'Chị Nguyễn Thị Mai đã chấp nhận yêu cầu chăm sóc của bạn',
-      time: '5 phút trước',
-      type: 'success' as const,
-      isRead: false,
-    },
-    {
-      id: '2',
-      title: 'Lịch hẹn sắp tới',
-      message: 'Bạn có lịch hẹn với Trần Văn Nam vào lúc 14:00 hôm nay',
-      time: '1 giờ trước',
-      type: 'info' as const,
-      isRead: false,
-    },
-    {
-      id: '3',
-      title: 'Nhắc nhở',
-      message: 'Đừng quên đánh giá dịch vụ chăm sóc tuần vừa qua',
-      time: '2 giờ trước',
-      type: 'reminder' as const,
-      isRead: true,
-    },
-    {
-      id: '4',
-      title: 'Yêu cầu bị từ chối',
-      message: 'Anh Lê Văn Đức không thể nhận yêu cầu chăm sóc của bạn',
-      time: '1 ngày trước',
-      type: 'info' as const,
-      isRead: true,
-    },
-    {
-      id: '5',
-      title: 'Cập nhật hệ thống',
-      message: 'Hệ thống sẽ bảo trì từ 2:00 - 4:00 sáng ngày mai',
-      time: '2 ngày trước',
-      type: 'info' as const,
-      isRead: true,
-    },
-  ]);
-  const [fadeAnim] = useState(new Animated.Value(0));
-
-  const handleModulePress = (module: ServiceModule) => {
-    if (module.id === 'app-info') {
-      // Hiển thị footer thay vì navigate
-      setShowAppInfoModal(true);
-    } else if (module.id === 'add-elderly') {
-      // Mở modal thay vì navigate
-      setShowAddElderlyModal(true);
-    } else if (module.route) {
-      router.push(module.route as any);
-    } else {
-      Alert.alert(
-        module.title,
-        `Tính năng "${module.title}" sẽ sớm được phát triển!`,
-        [{ text: 'OK' }]
-      );
-    }
-  };
-
 
   const handleProfilePress = () => {
     setShowProfileModal(true);
@@ -304,13 +270,9 @@ export default function DashboardScreen() {
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      // Simulate logout process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setShowProfileModal(false);
       setShowLogoutModal(false);
-      
-      // Logout will automatically redirect to splash/login due to AuthContext
       logout();
     } catch (error) {
       console.error('Logout error:', error);
@@ -319,183 +281,422 @@ export default function DashboardScreen() {
     }
   };
 
+
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.fullContainer} showsVerticalScrollIndicator={false}>
-      {/* Header - bTaskee Style */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View style={styles.headerLeft}>
+      {/* Background Gradient */}
+      <LinearGradient
+        colors={['#FFF5F5', '#FFFFFF', '#FFF9F5']}
+        style={styles.backgroundGradient}
+      />
+
+      {/* Decorative Background */}
+      <View style={styles.decorativeBackground}>
+        <View style={styles.bgCircle1} />
+        <View style={styles.bgCircle2} />
+        <View style={styles.bgCircle3} />
+      </View>
+
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
             <TouchableOpacity style={styles.avatarButton} onPress={handleProfilePress}>
-              <View style={styles.userAvatar}>
-                <Ionicons name="person" size={20} color="#FFFFFF" />
-              </View>
+              <LinearGradient
+                colors={['#FF6B35', '#FF8E53']}
+                style={styles.userAvatar}
+              >
+                <Ionicons name="person" size={24} color="#FFFFFF" />
+              </LinearGradient>
             </TouchableOpacity>
             <View style={styles.greetingContainer}>
-              <ThemedText style={styles.greeting}>Xin chào!</ThemedText>
-              <ThemedText style={styles.userName}>{user?.name || user?.email?.split('@')[0] || 'Người dùng'}</ThemedText>
+              <Text style={styles.greeting}>Xin chào!</Text>
+              <Text style={styles.userName}>
+                {user?.name || user?.email?.split('@')[0] || 'Người dùng'}
+              </Text>
             </View>
           </View>
         </View>
-      </View>
 
-      {/* Main Content */}
-      <View style={styles.mainContent}>
-        {/* Emergency Alert */}
-        {emergencyAlertVisible && (
-          <View style={styles.emergencyContainer}>
-            <EmergencyAlert 
-              alert={emergencyAlert}
-              visible={emergencyAlertVisible}
-              onDismiss={hideEmergencyAlert}
-            />
-          </View>
-        )}
+        {/* Main Content */}
+        <View style={styles.mainContent}>
+          {/* Quick Stats Cards */}
+          <View style={styles.statsContainer}>
+            <TouchableOpacity 
+              style={styles.statCard}
+              onPress={() => router.push('/careseeker/elderly-list')}
+            >
+              <View style={[styles.statIconContainer, { backgroundColor: '#FFE5DC' }]}>
+                <Ionicons name="people" size={24} color="#FF6B35" />
+              </View>
+              <View style={styles.statInfo}>
+                <Text style={styles.statNumber}>{elderlyProfiles.length}</Text>
+                <Text style={styles.statLabel}>Người thân</Text>
+              </View>
+            </TouchableOpacity>
 
-        {/* Request Notification */}
-        {showRequestNotification && requestCount > 0 && (
-          <View style={styles.requestNotificationContainer}>
-            <RequestNotification 
-              requestCount={requestCount} 
-              visible={showRequestNotification} 
-            />
-          </View>
-        )}
+            <TouchableOpacity 
+              style={styles.statCard}
+              onPress={() => router.push('/careseeker/schedule')}
+            >
+              <View style={[styles.statIconContainer, { backgroundColor: '#E3F2FD' }]}>
+                <Ionicons name="calendar" size={24} color="#2196F3" />
+              </View>
+              <View style={styles.statInfo}>
+                <Text style={styles.statNumber}>{appointments.length}</Text>
+                <Text style={styles.statLabel}>Lịch hẹn</Text>
+              </View>
+            </TouchableOpacity>
 
-        {/* Recommended Caregivers */}
-        <RecommendedCaregivers 
-          caregivers={recommendedCaregivers} 
-          onBookPress={handleBookPress}
-        />
-
-        {/* Elderly Profiles - Compact */}
-        <View style={styles.elderlySection}>
-          <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>Hồ sơ người già</ThemedText>
-            <TouchableOpacity onPress={() => router.push('/careseeker/elderly-list')}>
-              <ThemedText style={styles.seeAllText}>Xem tất cả →</ThemedText>
+            <TouchableOpacity 
+              style={styles.statCard}
+              onPress={() => router.push('/careseeker/hired-caregivers')}
+            >
+              <View style={[styles.statIconContainer, { backgroundColor: '#F3E5F5' }]}>
+                <Ionicons name="heart" size={24} color="#9C27B0" />
+              </View>
+              <View style={styles.statInfo}>
+                <Text style={styles.statNumber}>0</Text>
+                <Text style={styles.statLabel}>Đã thuê</Text>
+              </View>
             </TouchableOpacity>
           </View>
-          <ElderlyProfiles profiles={elderlyProfiles.slice(0, 3)} />
-        </View>
 
-        {/* Appointment Today - Compact */}
-        {appointments.length > 0 && (
-          <View style={styles.appointmentSection}>
-            <ThemedText style={styles.sectionTitle}>Lịch hẹn hôm nay</ThemedText>
-            <AppointmentScheduleToday appointments={appointments.slice(0, 2)} />
-            {appointments.length > 2 && (
-              <TouchableOpacity 
-                style={styles.viewMoreButton}
-                onPress={() => router.push('/careseeker/appointments')}
+          {/* Emergency Alert */}
+          {emergencyAlertVisible && (
+            <View style={styles.emergencyContainer}>
+              <EmergencyAlert 
+                alert={emergencyAlert}
+                visible={emergencyAlertVisible}
+                onDismiss={hideEmergencyAlert}
+              />
+            </View>
+          )}
+
+          {/* Request Notification */}
+          {showRequestNotification && requestCount > 0 && (
+            <View style={styles.requestNotificationContainer}>
+              <RequestNotification 
+                requestCount={requestCount} 
+                visible={showRequestNotification} 
+              />
+            </View>
+          )}
+
+          {/* Recommended Caregivers */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Phù hợp với người thân</Text>
+              {recommendedCaregivers.length > 0 && (
+                <TouchableOpacity onPress={() => router.push('/careseeker/caregiver-search')}>
+                  <Text style={styles.seeAllText}>Xem tất cả →</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            
+            {isLoadingCaregivers ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FF6B35" />
+                <Text style={styles.loadingText}>Đang tải...</Text>
+              </View>
+            ) : elderlyProfiles.length === 0 ? (
+              <View style={styles.emptyCaregiverContainer}>
+                <View style={styles.emptyIconCircle}>
+                  <Ionicons name="heart-outline" size={56} color="#FF6B35" />
+                </View>
+                <Text style={styles.emptyTitle}>Khám phá tính năng AI Matching</Text>
+                <Text style={styles.emptyDescription}>
+                  Thêm hồ sơ người thân để AI gợi ý những người chăm sóc phù hợp nhất với nhu cầu của bạn
+                </Text>
+                <View style={styles.emptyActionsRow}>
+                  <TouchableOpacity 
+                    style={styles.emptyActionButtonPrimary}
+                    onPress={() => router.push('/careseeker/add-elderly')}
+                  >
+                    <LinearGradient
+                      colors={['#FF6B35', '#FF8E53']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.emptyActionGradient}
+                    >
+                      <Ionicons name="add-circle-outline" size={18} color="#FFF" />
+                      <Text style={styles.emptyActionTextPrimary}>Thêm hồ sơ</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.emptyActionButton}
+                    onPress={() => router.push('/careseeker/caregiver-search')}
+                  >
+                    <Text style={styles.emptyActionText}>Xem tất cả</Text>
+                    <Ionicons name="arrow-forward" size={16} color="#FF6B35" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : recommendedCaregivers.length === 0 ? (
+              <View style={styles.emptyCaregiverContainer}>
+                <View style={styles.emptyIconCircle}>
+                  <Ionicons name="people-outline" size={56} color="#FF6B35" />
+                </View>
+                <Text style={styles.emptyTitle}>Đang tìm kiếm người phù hợp</Text>
+                <Text style={styles.emptyDescription}>
+                  AI đang phân tích để tìm những người chăm sóc tốt nhất cho người thân của bạn
+                </Text>
+                <TouchableOpacity 
+                  style={styles.emptyActionButton}
+                  onPress={() => router.push('/careseeker/caregiver-search')}
+                >
+                  <Text style={styles.emptyActionText}>Xem tất cả người chăm sóc</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#FF6B35" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.caregiverScroll}
               >
-                <ThemedText style={styles.viewMoreText}>
-                  Xem thêm {appointments.length - 2} lịch hẹn khác
-                </ThemedText>
-              </TouchableOpacity>
+                {recommendedCaregivers.map((caregiver) => (
+                  <View key={caregiver.id} style={styles.caregiverCard}>
+                    <View style={styles.caregiverImageContainer}>
+                      <Image 
+                        source={{ uri: caregiver.personal_info?.avatar_url || 'https://via.placeholder.com/150' }} 
+                        style={styles.caregiverImage}
+                      />
+                      <View style={styles.ratingBadge}>
+                        <Text style={styles.ratingText}>
+                          {caregiver.rating?.average_score?.toFixed(1) || '5.0'} ★
+                        </Text>
+                      </View>
+                    </View>
+                    
+                    <Text style={styles.caregiverName}>
+                      {caregiver.personal_info?.full_name || 'N/A'}, {caregiver.personal_info?.age || ''}
+                    </Text>
+                    
+                    <View style={styles.specialtyContainer}>
+                      {(caregiver.specialties || caregiver.skills || []).slice(0, 2).map((specialty, index) => (
+                        <View key={index} style={styles.specialtyTag}>
+                          <Text style={styles.specialtyText} numberOfLines={1}>
+                            {specialty}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                    
+                    <TouchableOpacity 
+                      style={styles.bookButton}
+                      onPress={() => handleBookPress(caregiver)}
+                    >
+                      <LinearGradient
+                        colors={['#FF6B35', '#FF8E53']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.bookButtonGradient}
+                      >
+                        <Ionicons name="calendar" size={16} color="#FFFFFF" />
+                        <Text style={styles.bookButtonText}>Đặt lịch</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
             )}
           </View>
-        )}
 
-      </View>
+          {/* Elderly Profiles */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Hồ sơ người thân</Text>
+              <View style={styles.sectionActions}>
+                <TouchableOpacity 
+                  style={styles.addButton}
+                  onPress={() => router.push('/careseeker/add-elderly')}
+                >
+                  <Ionicons name="add-circle" size={24} color="#FF6B35" />
+                </TouchableOpacity>
+                {elderlyProfiles.length > 0 && (
+                  <TouchableOpacity onPress={() => router.push('/careseeker/elderly-list')}>
+                    <Text style={styles.seeAllText}>Xem tất cả →</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+            
+            {isLoadingElderly ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FF6B35" />
+                <Text style={styles.loadingText}>Đang tải hồ sơ...</Text>
+              </View>
+            ) : elderlyProfiles.length === 0 ? (
+              <View style={styles.emptyElderlyContainer}>
+                <View style={styles.emptyIconCircle}>
+                  <Ionicons name="person-add-outline" size={56} color="#FF6B35" />
+                </View>
+                <Text style={styles.emptyTitle}>Chưa có hồ sơ người thân</Text>
+                <Text style={styles.emptyDescription}>
+                  Hãy thêm thông tin người thân cần chăm sóc để chúng tôi có thể tìm kiếm người chăm sóc phù hợp nhất cho bạn
+                </Text>
+                <TouchableOpacity 
+                  style={styles.addElderlyButton}
+                  onPress={() => router.push('/careseeker/add-elderly')}
+                >
+                  <LinearGradient
+                    colors={['#FF6B35', '#FF8E53']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.addElderlyButtonGradient}
+                  >
+                    <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" />
+                    <Text style={styles.addElderlyButtonText}>Thêm hồ sơ người thân</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <ElderlyProfiles profiles={elderlyProfiles} />
+            )}
+          </View>
 
-        {/* Bottom spacing */}
-        <View style={styles.bottomSpacing} />
+          {/* Appointments Today */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Lịch hẹn hôm nay</Text>
+            </View>
+            {isLoadingAppointments ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FF6B35" />
+                <Text style={styles.loadingText}>Đang tải lịch hẹn...</Text>
+              </View>
+            ) : appointments.length === 0 ? (
+              <View style={styles.emptyAppointmentContainer}>
+                <View style={styles.emptyIconCircle}>
+                  <Ionicons name="calendar-outline" size={56} color="#FF6B35" />
+                </View>
+                <Text style={styles.emptyTitle}>Chưa có lịch hẹn nào</Text>
+                <Text style={styles.emptyDescription}>
+                  Tìm kiếm và đặt lịch với người chăm sóc để bắt đầu
+                </Text>
+                <TouchableOpacity 
+                  style={styles.emptyActionButton}
+                  onPress={() => router.push('/careseeker/caregiver-search')}
+                >
+                  <Text style={styles.emptyActionText}>Tìm người chăm sóc</Text>
+                  <Ionicons name="search" size={16} color="#FF6B35" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <AppointmentScheduleToday appointments={appointments} />
+            )}
+          </View>
+
+          <View style={styles.bottomSpacing} />
+        </View>
       </ScrollView>
 
-      {/* App Info Modal */}
+      {/* Welcome Tutorial Modal for New Users */}
       <Modal
-        visible={showAppInfoModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowAppInfoModal(false)}
+        visible={showWelcomeTutorial}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowWelcomeTutorial(false)}
       >
-        <View style={styles.appInfoModalContainer}>
-          <View style={styles.appInfoModalHeader}>
-            <TouchableOpacity
-              style={styles.appInfoCloseButton}
-              onPress={() => setShowAppInfoModal(false)}
+        <View style={styles.tutorialOverlay}>
+          <View style={styles.tutorialContainer}>
+            <LinearGradient
+              colors={['#FF6B35', '#FF8E53']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.tutorialHeader}
             >
-              <Ionicons name="close" size={24} color="#6C757D" />
-            </TouchableOpacity>
-            <ThemedText style={styles.appInfoModalTitle}>Thông tin ứng dụng</ThemedText>
-            <View style={styles.appInfoPlaceholder} />
+              <Ionicons name="hand-right" size={48} color="#FFF" />
+              <Text style={styles.tutorialTitle}>Chào mừng bạn đến với ElderCare!</Text>
+              <Text style={styles.tutorialSubtitle}>
+                Hãy bắt đầu bằng cách thêm thông tin người thân cần chăm sóc
+              </Text>
+            </LinearGradient>
+            
+            <View style={styles.tutorialContent}>
+              <View style={styles.tutorialStep}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>1</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Thêm hồ sơ người thân</Text>
+                  <Text style={styles.stepDesc}>
+                    Cung cấp thông tin về người già trong gia đình để chúng tôi tìm người chăm sóc phù hợp
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.tutorialStep}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>2</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Tìm kiếm người chăm sóc</Text>
+                  <Text style={styles.stepDesc}>
+                    Duyệt qua danh sách người chăm sóc được đề xuất phù hợp với nhu cầu của bạn
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.tutorialStep}>
+                <View style={styles.stepNumber}>
+                  <Text style={styles.stepNumberText}>3</Text>
+                </View>
+                <View style={styles.stepContent}>
+                  <Text style={styles.stepTitle}>Đặt lịch chăm sóc</Text>
+                  <Text style={styles.stepDesc}>
+                    Chọn người chăm sóc yêu thích và đặt lịch hẹn dễ dàng
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.tutorialActions}>
+              <TouchableOpacity 
+                style={styles.tutorialSkipButton}
+                onPress={() => setShowWelcomeTutorial(false)}
+              >
+                <Text style={styles.tutorialSkipText}>Bỏ qua</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.tutorialStartButton}
+                onPress={() => {
+                  setShowWelcomeTutorial(false);
+                  router.push('/careseeker/add-elderly');
+                }}
+              >
+                <LinearGradient
+                  colors={['#FF6B35', '#FF8E53']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.tutorialStartButtonGradient}
+                >
+                  <Text style={styles.tutorialStartText}>Bắt đầu ngay</Text>
+                  <Ionicons name="arrow-forward" size={20} color="#FFF" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <ScrollView style={styles.appInfoModalContent}>
-            {/* App Info */}
-            <View style={styles.appInfoSection}>
-              <View style={styles.appInfoLogo}>
-                <Ionicons name="heart" size={32} color="#68C2E8" />
-              </View>
-              <ThemedText style={styles.appInfoTitle}>
-                Elder Care Connect
-              </ThemedText>
-              <ThemedText style={styles.appInfoTagline}>
-                Chăm sóc tận tâm, công nghệ hiện đại
-              </ThemedText>
-            </View>
-
-            {/* Quick Stats */}
-            <View style={styles.appInfoStatsSection}>
-              <View style={styles.appInfoStatItem}>
-                <Ionicons name="people" size={24} color="#68C2E8" />
-                <ThemedText style={styles.appInfoStatNumber}>1000+</ThemedText>
-                <ThemedText style={styles.appInfoStatLabel}>Người chăm sóc</ThemedText>
-              </View>
-              <View style={styles.appInfoStatItem}>
-                <Ionicons name="home" size={24} color="#68C2E8" />
-                <ThemedText style={styles.appInfoStatNumber}>500+</ThemedText>
-                <ThemedText style={styles.appInfoStatLabel}>Gia đình</ThemedText>
-              </View>
-              <View style={styles.appInfoStatItem}>
-                <Ionicons name="star" size={24} color="#68C2E8" />
-                <ThemedText style={styles.appInfoStatNumber}>4.9</ThemedText>
-                <ThemedText style={styles.appInfoStatLabel}>Đánh giá</ThemedText>
-              </View>
-            </View>
-
-            {/* Contact Info */}
-            <View style={styles.appInfoContactSection}>
-              <ThemedText style={styles.appInfoSectionTitle}>Thông tin liên hệ</ThemedText>
-              <View style={styles.appInfoContactItem}>
-                <Ionicons name="call" size={20} color="#6C757D" />
-                <ThemedText style={styles.appInfoContactText}>Hotline: 1900-1234</ThemedText>
-              </View>
-              <View style={styles.appInfoContactItem}>
-                <Ionicons name="mail" size={20} color="#6C757D" />
-                <ThemedText style={styles.appInfoContactText}>support@eldercare.com</ThemedText>
-              </View>
-              <View style={styles.appInfoContactItem}>
-                <Ionicons name="location" size={20} color="#6C757D" />
-                <ThemedText style={styles.appInfoContactText}>123 Đường ABC, Quận 1, TP.HCM</ThemedText>
-              </View>
-            </View>
-
-            {/* Bottom Links */}
-            <View style={styles.appInfoLinksSection}>
-              <ThemedText style={styles.appInfoCopyright}>
-                © 2024 Elder Care Connect. Tất cả quyền được bảo lưu.
-              </ThemedText>
-              <View style={styles.appInfoLinks}>
-                <ThemedText style={styles.appInfoLink}>Điều khoản sử dụng</ThemedText>
-                <ThemedText style={styles.appInfoLink}>Chính sách bảo mật</ThemedText>
-              </View>
-            </View>
-          </ScrollView>
-          </View>
+        </View>
       </Modal>
 
       {/* Profile Modal */}
       <Modal
         visible={showProfileModal}
-        transparent={true}
+        transparent
         animationType="none"
         onRequestClose={handleCloseModal}
       >
         <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={handleCloseModal}
         >
           <Animated.View 
@@ -507,35 +708,38 @@ export default function DashboardScreen() {
             onTouchEnd={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <View style={styles.modalAvatar}>
-                <Ionicons name="person" size={40} color="#68C2E8" />
-              </View>
-              <ThemedText style={styles.modalName}>
+              <LinearGradient
+                colors={['#FF6B35', '#FF8E53']}
+                style={styles.modalAvatar}
+              >
+                <Ionicons name="person" size={40} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={styles.modalName}>
                 {user?.name || 'Người dùng'}
-              </ThemedText>
-              <ThemedText style={styles.modalEmail}>
+              </Text>
+              <Text style={styles.modalEmail}>
                 {user?.email}
-              </ThemedText>
+              </Text>
             </View>
 
             <View style={styles.modalInfo}>
               <View style={styles.infoRow}>
                 <Ionicons name="call" size={20} color="#6c757d" />
-                <ThemedText style={styles.infoText}>
+                <Text style={styles.infoText}>
                   {user?.phone || 'Chưa cập nhật'}
-                </ThemedText>
+                </Text>
               </View>
               <View style={styles.infoRow}>
                 <Ionicons name="location" size={20} color="#6c757d" />
-                <ThemedText style={styles.infoText}>
+                <Text style={styles.infoText}>
                   {user?.address || 'Chưa cập nhật'}
-                </ThemedText>
+                </Text>
               </View>
               <View style={styles.infoRow}>
                 <Ionicons name="calendar" size={20} color="#6c757d" />
-                <ThemedText style={styles.infoText}>
+                <Text style={styles.infoText}>
                   {user?.dateOfBirth || 'Chưa cập nhật'}
-                </ThemedText>
+                </Text>
               </View>
             </View>
 
@@ -544,8 +748,13 @@ export default function DashboardScreen() {
               onPress={handleLogout}
               activeOpacity={0.7}
             >
-              <Ionicons name="log-out-outline" size={20} color="white" />
-              <ThemedText style={styles.logoutButtonText}>Đăng xuất</ThemedText>
+              <LinearGradient
+                colors={['#e74c3c', '#c0392b']}
+                style={styles.logoutButtonGradient}
+              >
+                <Ionicons name="log-out-outline" size={20} color="white" />
+                <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
         </TouchableOpacity>
@@ -563,8 +772,6 @@ export default function DashboardScreen() {
             <NotificationPanel 
               notifications={notifications}
               onNotificationPress={(notification) => {
-                console.log('Notification pressed:', notification);
-                // Mark as read when pressed
                 setNotifications(prev => 
                   prev.map(notif => 
                     notif.id === notification.id 
@@ -582,11 +789,11 @@ export default function DashboardScreen() {
                   )
                 );
               }}
-               onMarkAllAsRead={() => {
-                 setNotifications(prev => 
-                   prev.map(notif => ({ ...notif, isRead: true }))
-                 );
-               }}
+              onMarkAllAsRead={() => {
+                setNotifications(prev => 
+                  prev.map(notif => ({ ...notif, isRead: true }))
+                );
+              }}
             />
           </View>
         </TouchableOpacity>
@@ -597,7 +804,6 @@ export default function DashboardScreen() {
         visible={showAddElderlyModal}
         onClose={() => setShowAddElderlyModal(false)}
         onSuccess={() => {
-          // Refresh elderly profiles or show success message
           console.log('Elderly profile created successfully');
         }}
       />
@@ -631,8 +837,34 @@ export default function DashboardScreen() {
         />
       )}
 
-      {/* Navigation Bar */}
-      <SimpleNavBar />
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem}>
+          <Ionicons name="home" size={24} color="#FF6B35" />
+          <Text style={[styles.navText, styles.navTextActive]}>Trang chủ</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/careseeker/appointments')}
+        >
+          <Ionicons name="calendar-outline" size={24} color="#9CA3AF" />
+          <Text style={styles.navText}>Lịch hẹn</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/careseeker/hired-caregivers')}
+        >
+          <Ionicons name="people-outline" size={24} color="#9CA3AF" />
+          <Text style={styles.navText}>Đã thuê</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={handleProfilePress}
+        >
+          <Ionicons name="person-outline" size={24} color="#9CA3AF" />
+          <Text style={styles.navText}>Cá nhân</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -640,253 +872,550 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFFFFF',
   },
-  fullContainer: {
+  backgroundGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 300,
+  },
+  decorativeBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: 300,
+    top: 0,
+    left: 0,
+  },
+  bgCircle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#FF572212',
+    top: -50,
+    right: -50,
+  },
+  bgCircle2: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#FF572210',
+    top: 100,
+    left: -30,
+  },
+  bgCircle3: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FF572208',
+    top: 50,
+    right: 100,
+  },
+  scrollView: {
     flex: 1,
   },
-  // Header - bTaskee Style
+  scrollContent: {
+    paddingBottom: 100,
+  },
   header: {
-    backgroundColor: '#68C2E8',
-    paddingTop: 30,
+    paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: 56,
-  },
-  headerLeft: {
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
   avatarButton: {
     marginRight: 14,
   },
   userAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    elevation: 4,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   greetingContainer: {
     flex: 1,
-    justifyContent: 'center',
   },
   greeting: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 3,
+    color: '#6B7280',
+    marginBottom: 4,
   },
   userName: {
-    fontSize: 19,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  // Main Content
-  mainContent: {
-    flex: 1,
-    backgroundColor: '#F5F7FA',
-  },
-  emergencyContainer: {
-    marginTop: 16,
-    marginHorizontal: 16,
-  },
-  requestNotificationContainer: {
-    marginTop: 16,
-    marginHorizontal: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: '#2C3E50',
-    marginBottom: 20,
-    paddingHorizontal: 4,
   },
-  // Elderly Section
-  elderlySection: {
-    marginTop: 16,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 20,
-    paddingBottom: 24,
-    paddingHorizontal: 20,
+  mainContent: {
+    paddingTop: 10,
+  },
+  emergencyContainer: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  requestNotificationContainer: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  section: {
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  sectionActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  addButton: {
+    padding: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statInfo: {
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 2,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#7F8C8D',
+    fontWeight: '500',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2C3E50',
   },
   seeAllText: {
     fontSize: 14,
+    color: '#FF6B35',
     fontWeight: '600',
-    color: '#68C2E8',
   },
-  // Appointment Section
-  appointmentSection: {
-    marginTop: 16,
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  viewMoreButton: {
-    marginTop: 12,
-    paddingVertical: 12,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F7FA',
-    borderRadius: 8,
-  },
-  viewMoreText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#68C2E8',
-  },
-  footer: {
-    backgroundColor: '#2c3e50',
-    paddingHorizontal: 20,
     paddingVertical: 40,
-    marginTop: 20,
+    paddingHorizontal: 20,
   },
-  footerContent: {
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
-  footerHeader: {
+  emptyText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#999',
+  },
+  emptyCaregiverContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 40,
     alignItems: 'center',
-    marginBottom: 30,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
-  appLogo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+  emptyIconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#FFF5F2',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  footerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2C3E50',
     marginBottom: 8,
+    textAlign: 'center',
   },
-  footerTagline: {
+  emptyDescription: {
     fontSize: 14,
-    color: '#bdc3c7',
+    color: '#7F8C8D',
     textAlign: 'center',
     lineHeight: 20,
+    marginBottom: 20,
+    paddingHorizontal: 20,
   },
-  footerStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-  },
-  footerStatItem: {
-    alignItems: 'center',
+  emptyActionButton: {
     flex: 1,
-  },
-  footerStatNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  footerStatLabel: {
-    fontSize: 12,
-    color: '#bdc3c7',
-    textAlign: 'center',
-  },
-  footerContact: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 25,
-    gap: 30,
-  },
-  contactItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#FF6B35',
+    backgroundColor: '#FFF',
+    gap: 6,
+  },
+  emptyActionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  emptyActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  emptyActionButtonPrimary: {
+    flex: 1.2,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  emptyActionGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  emptyActionTextPrimary: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  emptyElderlyContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 40,
+    alignItems: 'center',
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  addElderlyButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  addElderlyButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
     gap: 8,
   },
-  contactText: {
-    fontSize: 14,
-    color: '#bdc3c7',
+  addElderlyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  footerBottom: {
+  emptyAppointmentContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 40,
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-    paddingTop: 20,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
-  copyrightText: {
-    fontSize: 12,
-    color: '#95a5a6',
-    textAlign: 'center',
+  caregiverScroll: {
+    paddingLeft: 20,
+    paddingRight: 10,
+  },
+  caregiverCard: {
+    width: 160,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 12,
+    marginRight: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  caregiverImageContainer: {
+    position: 'relative',
     marginBottom: 12,
   },
-  footerLinks: {
-    flexDirection: 'row',
-    gap: 20,
+  caregiverImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
   },
-  footerLink: {
+  ratingBadge: {
+    position: 'absolute',
+    bottom: 8,
+    left: 8,
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  ratingText: {
     fontSize: 12,
-    color: '#68C2E8',
-    textDecorationLine: 'underline',
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
-  modalOverlay: {
+  caregiverName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 8,
+  },
+  specialtyContainer: {
+    marginBottom: 12,
+  },
+  specialtyTag: {
+    backgroundColor: '#E0F2FE',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  specialtyText: {
+    fontSize: 11,
+    color: '#0284C7',
+  },
+  bookButton: {
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  bookButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    gap: 6,
+  },
+  bookButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  bottomSpacing: {
+    height: 20,
+  },
+  tutorialOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
+  tutorialContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    width: '100%',
+    maxWidth: 400,
+    overflow: 'hidden',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  tutorialHeader: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  tutorialTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFF',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  tutorialSubtitle: {
+    fontSize: 14,
+    color: '#FFF',
+    textAlign: 'center',
+    opacity: 0.95,
+    lineHeight: 20,
+  },
+  tutorialContent: {
+    padding: 24,
+  },
+  tutorialStep: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    alignItems: 'flex-start',
+  },
+  stepNumber: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFE5DC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  stepNumberText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FF6B35',
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2C3E50',
+    marginBottom: 6,
+  },
+  stepDesc: {
+    fontSize: 14,
+    color: '#7F8C8D',
+    lineHeight: 20,
+  },
+  tutorialActions: {
+    flexDirection: 'row',
+    padding: 20,
+    paddingTop: 0,
+    gap: 12,
+  },
+  tutorialSkipButton: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#E0E0E0',
+  },
+  tutorialSkipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#7F8C8D',
+  },
+  tutorialStartButton: {
+    flex: 1.5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  tutorialStartButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    gap: 8,
+  },
+  tutorialStartText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     width: '100%',
-    maxWidth: 300,
-    elevation: 5,
+    maxWidth: 400,
+    elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowRadius: 12,
   },
   modalHeader: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   modalAvatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#f8f9fa',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-    borderWidth: 3,
-    borderColor: '#68C2E8',
+    marginBottom: 16,
   },
   modalName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#2C3E50',
     marginBottom: 4,
   },
   modalEmail: {
     fontSize: 14,
-    color: '#6c757d',
+    color: '#6B7280',
   },
   modalInfo: {
     marginBottom: 24,
@@ -894,30 +1423,31 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
   infoText: {
     fontSize: 14,
-    color: '#2c3e50',
+    color: '#2C3E50',
+    marginLeft: 12,
     flex: 1,
   },
   logoutButtonModal: {
-    backgroundColor: '#e74c3c',
     borderRadius: 12,
-    padding: 16,
+    overflow: 'hidden',
+  },
+  logoutButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 14,
     gap: 8,
   },
   logoutButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'white',
-  },
-  bottomSpacing: {
-    height: 120,
+    color: '#FFFFFF',
   },
   notificationOverlay: {
     position: 'absolute',
@@ -949,190 +1479,35 @@ const styles = StyleSheet.create({
     borderBottomColor: 'white',
     zIndex: 1002,
   },
-  // Service Banner Styles
-  serviceBannerContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  serviceBanner: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 12,
-    elevation: 4,
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 140,
   },
-  bannerImageContainer: {
-    marginRight: 20,
-  },
-  bannerImagePlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: '#68C2E8',
-  },
-  bannerContent: {
+  navItem: {
     flex: 1,
-    justifyContent: 'center',
-  },
-  bannerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 8,
-    lineHeight: 24,
-  },
-  bannerSubtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  // Duplicate styles - removed
-  // findNowButton: {
-  //   backgroundColor: '#68C2E8',
-  //   borderRadius: 12,
-  //   paddingVertical: 12,
-  //   paddingHorizontal: 20,
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   alignSelf: 'flex-start',
-  //   elevation: 2,
-  //   shadowColor: '#68C2E8',
-  //   shadowOffset: { width: 0, height: 2 },
-  //   shadowOpacity: 0.3,
-  //   shadowRadius: 4,
-  // },
-  // findNowButtonText: {
-  //   color: 'white',
-  //   fontSize: 16,
-  //   fontWeight: '600',
-  //   marginRight: 8,
-  // },
-  // App Info Modal Styles
-  appInfoModalContainer: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  appInfoModalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: '#68C2E8',
-  },
-  appInfoCloseButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  appInfoModalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'white',
-  },
-  appInfoPlaceholder: {
-    width: 40,
-  },
-  appInfoModalContent: {
-    flex: 1,
-    padding: 20,
-  },
-  appInfoSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  appInfoLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#68C2E8',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  appInfoTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 8,
-  },
-  appInfoTagline: {
-    fontSize: 16,
-    color: '#6C757D',
-    textAlign: 'center',
-  },
-  appInfoStatsSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 30,
-  },
-  appInfoStatItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  appInfoStatNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginTop: 8,
-  },
-  appInfoStatLabel: {
-    fontSize: 12,
-    color: '#6C757D',
+  navText: {
+    fontSize: 11,
+    color: '#9CA3AF',
     marginTop: 4,
-    textAlign: 'center',
   },
-  appInfoContactSection: {
-    marginBottom: 30,
-  },
-  appInfoSectionTitle: {
-    fontSize: 18,
+  navTextActive: {
+    color: '#FF6B35',
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 16,
-  },
-  appInfoContactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  appInfoContactText: {
-    fontSize: 14,
-    color: '#6C757D',
-    marginLeft: 12,
-  },
-  appInfoLinksSection: {
-    alignItems: 'center',
-  },
-  appInfoCopyright: {
-    fontSize: 12,
-    color: '#6C757D',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  appInfoLinks: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  appInfoLink: {
-    fontSize: 12,
-    color: '#68C2E8',
-    textDecorationLine: 'underline',
   },
 });

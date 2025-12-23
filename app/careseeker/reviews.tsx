@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -27,7 +27,7 @@ interface VideoConsultationReview {
   rating: number;
   comment: string;
   date: string;
-  duration: number; // phút
+  duration: number; // phÃºt
   isVerified: boolean;
 }
 
@@ -90,216 +90,14 @@ export default function ReviewsScreen() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedCaregiver, setSelectedCaregiver] = useState<any>(null);
 
-  // Mock elderly profiles for booking
-  const elderlyProfiles = [
-    {
-      id: '1',
-      name: 'Bà Nguyễn Thị Mai',
-      age: 75,
-      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-      healthStatus: 'good',
-      familyName: 'Gia đình Nguyễn',
-    },
-    {
-      id: '2',
-      name: 'Ông Trần Văn Nam',
-      age: 82,
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      healthStatus: 'fair',
-      familyName: 'Gia đình Trần',
-    },
-  ];
+  // TODO: Replace with real API data from elderly service
+  const elderlyProfiles: any[] = [];
 
-  // Mock data - Video Consultation Reviews
-  const videoReviews: VideoConsultationReview[] = [
-    {
-      id: '1',
-      caregiverId: '1',
-      caregiverName: 'Chị Nguyễn Thị Lan',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-      rating: 5,
-      comment: 'Chị Lan tư vấn rất chi tiết và nhiệt tình. Cuộc gọi video rất chất lượng.',
-      date: '2024-01-15',
-      duration: 45,
-      isVerified: true,
-    },
-    {
-      id: '2',
-      caregiverId: '2',
-      caregiverName: 'Chị Trần Văn Hoa',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
-      rating: 4,
-      comment: 'Tư vấn tốt, chị Hoa giải thích rõ ràng các vấn đề sức khỏe.',
-      date: '2024-01-10',
-      duration: 30,
-      isVerified: true,
-    },
-  ];
-
-  // Mock data - Service Reviews
-  const serviceReviews: ServiceReview[] = [
-    {
-      id: '1',
-      caregiverId: '1',
-      caregiverName: 'Chị Nguyễn Thị Lan',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-      rating: 5,
-      comment: 'Chị Lan chăm sóc rất tận tâm và chuyên nghiệp.',
-      date: '2024-01-15',
-      elderlyName: 'Bà Nguyễn Thị Mai',
-      familyName: 'Gia đình Nguyễn',
-      totalHours: 120,
-      completedTasks: 45,
-      pendingTasks: 5,
-      totalTasks: 50,
-      isVerified: true,
-    },
-    {
-      id: '2',
-      caregiverId: '2',
-      caregiverName: 'Anh Lê Minh Đức',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
-      rating: 4,
-      comment: 'Anh Đức hỗ trợ di chuyển rất tốt.',
-      date: '2024-01-05',
-      elderlyName: 'Bà Lê Thị Hoa',
-      familyName: 'Gia đình Lê',
-      totalHours: 80,
-      completedTasks: 30,
-      pendingTasks: 3,
-      totalTasks: 33,
-      isVerified: true,
-    },
-  ];
-
-  // Mock data - System Reviews
-  const systemReviews: SystemReview[] = [
-    {
-      id: '1',
-      rating: 4,
-      comment: 'Ứng dụng chạy mượt mà, giao diện thân thiện.',
-      date: '2024-01-15',
-      category: 'app_performance',
-      isVerified: true,
-    },
-    {
-      id: '2',
-      rating: 5,
-      comment: 'Tính năng tìm kiếm caregiver rất tiện lợi.',
-      date: '2024-01-10',
-      category: 'features',
-      isVerified: true,
-    },
-    {
-      id: '3',
-      rating: 3,
-      comment: 'Cần cải thiện tốc độ tải trang.',
-      date: '2024-01-05',
-      category: 'ui_ux',
-      isVerified: true,
-    },
-  ];
-
-  // Mock data - Complaint Reviews
-  const complaintReviews: ComplaintReview[] = [
-    {
-      id: '1',
-      complainantName: 'Nguyễn Văn A',
-      complainantAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      accusedName: 'Chị Trần Thị B',
-      accusedAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-      adminName: 'Admin Nguyễn',
-      adminAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      date: '2024-01-15',
-      time: '14:30',
-      status: 'resolved',
-      category: 'Chất lượng dịch vụ',
-      isVerified: true,
-    },
-    {
-      id: '2',
-      complainantName: 'Lê Thị C',
-      complainantAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      accusedName: 'Anh Hoàng Văn D',
-      accusedAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      adminName: 'Admin Lê',
-      adminAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      date: '2024-01-10',
-      time: '09:15',
-      status: 'resolved',
-      category: 'Thái độ phục vụ',
-      isVerified: true,
-    },
-  ];
-
-  // Mock data cho pending reviews
-  const pendingReviews = [
-    // Video Reviews
-    {
-      id: '1',
-      type: 'video',
-      caregiverName: 'Nguyễn Thị Lan',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-      serviceDate: '2024-01-15',
-      duration: '30 phút',
-      isExpired: false,
-    },
-    {
-      id: '2',
-      type: 'video',
-      caregiverName: 'Trần Văn Minh',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      serviceDate: '2024-01-10',
-      duration: '45 phút',
-      isExpired: true,
-    },
-    // Service Reviews
-    {
-      id: '3',
-      type: 'service',
-      caregiverName: 'Lê Thị Hoa',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      serviceDate: '2024-01-12',
-      elderlyName: 'Bà Nguyễn Thị Mai',
-      familyName: 'Gia đình Nguyễn',
-      isExpired: false,
-    },
-    {
-      id: '4',
-      type: 'service',
-      caregiverName: 'Hoàng Văn Dũng',
-      caregiverAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      serviceDate: '2024-01-08',
-      elderlyName: 'Ông Trần Văn Nam',
-      familyName: 'Gia đình Trần',
-      isExpired: true,
-    },
-    // System Reviews
-    {
-      id: '5',
-      type: 'system',
-      category: 'App Performance',
-      date: '2024-01-10',
-      isExpired: false,
-    },
-    {
-      id: '6',
-      type: 'system',
-      category: 'UI/UX Design',
-      date: '2024-01-05',
-      isExpired: false,
-    },
-    // Complaint Reviews
-    {
-      id: '7',
-      type: 'complaint',
-      complainantName: 'Nguyễn Văn A',
-      accusedName: 'Trần Thị B',
-      date: '2024-01-10',
-      category: 'Thái độ phục vụ',
-      isExpired: false,
-    },
-  ];
+  // TODO: Replace with real API data from review service
+  const videoReviews: VideoConsultationReview[] = [];
+  const serviceReviews: ServiceReview[] = [];
+  const systemReviews: SystemReview[] = [];
+  const complaintReviews: ComplaintReview[] = [];
 
   const renderStars = (rating: number) => {
     return (
@@ -326,12 +124,12 @@ export default function ReviewsScreen() {
 
   const handleImagePicker = async () => {
     Alert.alert(
-      'Chọn ảnh',
-      'Bạn muốn chọn từ thư viện hay chụp ảnh mới?',
+      'Chá»n áº£nh',
+      'Báº¡n muá»‘n chá»n tá»« thÆ° viá»‡n hay chá»¥p áº£nh má»›i?',
       [
-        { text: 'Hủy', style: 'cancel' },
-        { text: 'Thư viện', onPress: handlePickFromLibrary },
-        { text: 'Chụp ảnh', onPress: handleTakePhoto },
+        { text: 'Há»§y', style: 'cancel' },
+        { text: 'ThÆ° viá»‡n', onPress: handlePickFromLibrary },
+        { text: 'Chá»¥p áº£nh', onPress: handleTakePhoto },
       ]
     );
   };
@@ -340,7 +138,7 @@ export default function ReviewsScreen() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (status !== 'granted') {
-      Alert.alert('Thông báo', 'Cần quyền truy cập thư viện ảnh');
+      Alert.alert('ThÃ´ng bÃ¡o', 'Cáº§n quyá»n truy cáº­p thÆ° viá»‡n áº£nh');
       return;
     }
 
@@ -360,7 +158,7 @@ export default function ReviewsScreen() {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     
     if (status !== 'granted') {
-      Alert.alert('Thông báo', 'Cần quyền truy cập camera');
+      Alert.alert('ThÃ´ng bÃ¡o', 'Cáº§n quyá»n truy cáº­p camera');
       return;
     }
 
@@ -385,7 +183,7 @@ export default function ReviewsScreen() {
 
   const handleSubmitReview = () => {
     if (rating === 0) {
-      alert('Vui lòng chọn số sao đánh giá');
+      alert('Vui lÃ²ng chá»n sá»‘ sao Ä‘Ã¡nh giÃ¡');
       return;
     }
     
@@ -412,18 +210,18 @@ export default function ReviewsScreen() {
         name: selectedReviewItem.caregiverName,
         avatar: selectedReviewItem.caregiverAvatar,
         hourlyRate: 150000, // Mock rate
-        specialties: ['Chăm sóc người già', 'Tư vấn sức khỏe'],
-        experience: '5 năm',
+        specialties: ['ChÄƒm sÃ³c ngÆ°á»i giÃ ', 'TÆ° váº¥n sá»©c khá»e'],
+        experience: '5 nÄƒm',
         rating: 4.5,
         reviews: 120,
-        location: 'Hồ Chí Minh',
+        location: 'Há»“ ChÃ­ Minh',
         isOnline: true,
         isVerified: true,
       });
       setShowBookingModal(true);
     } else {
       // Just show success message
-      alert('Đánh giá đã được gửi thành công!');
+      alert('ÄÃ¡nh giÃ¡ Ä‘Ã£ Ä‘Æ°á»£c gá»­i thÃ nh cÃ´ng!');
     }
   };
 
@@ -454,10 +252,10 @@ export default function ReviewsScreen() {
 
   const getCategoryText = (category: string) => {
     switch (category) {
-      case 'app_performance': return 'Hiệu suất ứng dụng';
-      case 'ui_ux': return 'Giao diện người dùng';
-      case 'features': return 'Tính năng';
-      case 'support': return 'Hỗ trợ';
+      case 'app_performance': return 'Hiá»‡u suáº¥t á»©ng dá»¥ng';
+      case 'ui_ux': return 'Giao diá»‡n ngÆ°á»i dÃ¹ng';
+      case 'features': return 'TÃ­nh nÄƒng';
+      case 'support': return 'Há»— trá»£';
       default: return category;
     }
   };
@@ -473,10 +271,10 @@ export default function ReviewsScreen() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return 'Hết hạn';
-      case 'resolved': return 'Đã giải quyết';
-      case 'rejected': return 'Đã từ chối';
-      default: return 'Không xác định';
+      case 'pending': return 'Háº¿t háº¡n';
+      case 'resolved': return 'ÄÃ£ giáº£i quyáº¿t';
+      case 'rejected': return 'ÄÃ£ tá»« chá»‘i';
+      default: return 'KhÃ´ng xÃ¡c Ä‘á»‹nh';
     }
   };
 
@@ -491,7 +289,7 @@ export default function ReviewsScreen() {
           </View>
           <View style={styles.caregiverDetails}>
             <ThemedText style={styles.caregiverName}>{item.caregiverName}</ThemedText>
-            <ThemedText style={styles.videoDuration}>Thời lượng: {item.duration} phút</ThemedText>
+            <ThemedText style={styles.videoDuration}>Thá»i lÆ°á»£ng: {item.duration} phÃºt</ThemedText>
           </View>
         </View>
         <View style={styles.ratingContainer}>
@@ -510,7 +308,7 @@ export default function ReviewsScreen() {
         {item.isVerified && (
           <View style={styles.verifiedBadge}>
             <Ionicons name="checkmark-circle" size={14} color="#2ed573" />
-            <ThemedText style={styles.verifiedText}>Đã xác thực</ThemedText>
+            <ThemedText style={styles.verifiedText}>ÄÃ£ xÃ¡c thá»±c</ThemedText>
           </View>
         )}
       </View>
@@ -528,7 +326,7 @@ export default function ReviewsScreen() {
           </View>
           <View style={styles.caregiverDetails}>
             <ThemedText style={styles.caregiverName}>{item.caregiverName}</ThemedText>
-            <ThemedText style={styles.caregiverRole}>Dịch vụ chăm sóc</ThemedText>
+            <ThemedText style={styles.caregiverRole}>Dá»‹ch vá»¥ chÄƒm sÃ³c</ThemedText>
           </View>
         </View>
         <View style={styles.ratingContainer}>
@@ -547,7 +345,7 @@ export default function ReviewsScreen() {
         {item.isVerified && (
           <View style={styles.verifiedBadge}>
             <Ionicons name="checkmark-circle" size={14} color="#2ed573" />
-            <ThemedText style={styles.verifiedText}>Đã xác thực</ThemedText>
+            <ThemedText style={styles.verifiedText}>ÄÃ£ xÃ¡c thá»±c</ThemedText>
           </View>
         )}
       </View>
@@ -580,7 +378,7 @@ export default function ReviewsScreen() {
         {item.isVerified && (
           <View style={styles.verifiedBadge}>
             <Ionicons name="checkmark-circle" size={14} color="#2ed573" />
-            <ThemedText style={styles.verifiedText}>Đã xác thực</ThemedText>
+            <ThemedText style={styles.verifiedText}>ÄÃ£ xÃ¡c thá»±c</ThemedText>
           </View>
         )}
       </View>
@@ -595,7 +393,7 @@ export default function ReviewsScreen() {
             <Ionicons name="warning" size={24} color="#ff4757" />
           </View>
           <View style={styles.complaintDetails}>
-            <ThemedText style={styles.complaintTitle}>Khiếu nại</ThemedText>
+            <ThemedText style={styles.complaintTitle}>Khiáº¿u náº¡i</ThemedText>
             <ThemedText style={styles.complaintCategory}>{item.category}</ThemedText>
           </View>
         </View>
@@ -614,7 +412,7 @@ export default function ReviewsScreen() {
         {item.isVerified && (
           <View style={styles.verifiedBadge}>
             <Ionicons name="checkmark-circle" size={14} color="#2ed573" />
-            <ThemedText style={styles.verifiedText}>Đã xác thực</ThemedText>
+            <ThemedText style={styles.verifiedText}>ÄÃ£ xÃ¡c thá»±c</ThemedText>
           </View>
         )}
       </View>
@@ -629,7 +427,7 @@ export default function ReviewsScreen() {
             <Image source={{ uri: item.caregiverAvatar }} style={styles.avatar} />
             <View style={styles.caregiverDetails}>
               <ThemedText style={styles.caregiverName}>{item.caregiverName}</ThemedText>
-              <ThemedText style={styles.serviceInfo}>Video tư vấn • {item.duration}</ThemedText>
+              <ThemedText style={styles.serviceInfo}>Video tÆ° váº¥n â€¢ {item.duration}</ThemedText>
             </View>
           </View>
         )}
@@ -639,8 +437,8 @@ export default function ReviewsScreen() {
             <Image source={{ uri: item.caregiverAvatar }} style={styles.avatar} />
             <View style={styles.caregiverDetails}>
               <ThemedText style={styles.caregiverName}>{item.caregiverName}</ThemedText>
-              <ThemedText style={styles.serviceInfo}>Dịch vụ chăm sóc</ThemedText>
-              <ThemedText style={styles.elderlyInfo}>{item.elderlyName} • {item.familyName}</ThemedText>
+              <ThemedText style={styles.serviceInfo}>Dá»‹ch vá»¥ chÄƒm sÃ³c</ThemedText>
+              <ThemedText style={styles.elderlyInfo}>{item.elderlyName} â€¢ {item.familyName}</ThemedText>
             </View>
           </View>
         )}
@@ -651,7 +449,7 @@ export default function ReviewsScreen() {
               <Ionicons name="settings" size={24} color="#30A0E0" />
             </View>
             <View style={styles.systemDetails}>
-              <ThemedText style={styles.systemTitle}>Đánh giá hệ thống</ThemedText>
+              <ThemedText style={styles.systemTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
               <ThemedText style={styles.systemCategory}>{item.category}</ThemedText>
             </View>
           </View>
@@ -663,10 +461,10 @@ export default function ReviewsScreen() {
               <Ionicons name="warning" size={24} color="#ff4757" />
             </View>
             <View style={styles.complaintDetails}>
-              <ThemedText style={styles.complaintTitle}>Khiếu nại</ThemedText>
+              <ThemedText style={styles.complaintTitle}>Khiáº¿u náº¡i</ThemedText>
               <ThemedText style={styles.complaintCategory}>{item.category}</ThemedText>
               <ThemedText style={styles.complaintPeople}>
-                {item.complainantName} → {item.accusedName}
+                {item.complainantName} â†’ {item.accusedName}
               </ThemedText>
             </View>
           </View>
@@ -675,14 +473,14 @@ export default function ReviewsScreen() {
         <View style={styles.ratingContainer}>
           {item.isExpired ? (
             <View style={styles.expiredBadge}>
-              <ThemedText style={styles.expiredText}>Hết hạn</ThemedText>
+              <ThemedText style={styles.expiredText}>Háº¿t háº¡n</ThemedText>
             </View>
           ) : (
             <TouchableOpacity 
               style={styles.reviewButton}
               onPress={() => handleReviewPress(item)}
             >
-              <ThemedText style={styles.reviewButtonText}>Đánh giá</ThemedText>
+              <ThemedText style={styles.reviewButtonText}>ÄÃ¡nh giÃ¡</ThemedText>
             </TouchableOpacity>
           )}
         </View>
@@ -706,8 +504,8 @@ export default function ReviewsScreen() {
         </TouchableOpacity>
         
         <View style={styles.headerContent}>
-          <ThemedText style={styles.headerTitle}>Đánh giá</ThemedText>
-          <ThemedText style={styles.headerSubtitle}>Chất lượng dịch vụ</ThemedText>
+          <ThemedText style={styles.headerTitle}>ÄÃ¡nh giÃ¡</ThemedText>
+          <ThemedText style={styles.headerSubtitle}>Cháº¥t lÆ°á»£ng dá»‹ch vá»¥</ThemedText>
         </View>
         
         <View style={styles.headerActions}>
@@ -734,7 +532,7 @@ export default function ReviewsScreen() {
               color={activeTab === 'video' ? '#30A0E0' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
-              Video tư vấn ({videoReviews.length})
+              Video tÆ° váº¥n ({videoReviews.length})
             </ThemedText>
           </TouchableOpacity>
 
@@ -748,7 +546,7 @@ export default function ReviewsScreen() {
               color={activeTab === 'service' ? '#30A0E0' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'service' && styles.tabTextActive]}>
-              Dịch vụ ({serviceReviews.length})
+              Dá»‹ch vá»¥ ({serviceReviews.length})
             </ThemedText>
           </TouchableOpacity>
 
@@ -762,7 +560,7 @@ export default function ReviewsScreen() {
               color={activeTab === 'system' ? '#30A0E0' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'system' && styles.tabTextActive]}>
-              Hệ thống ({systemReviews.length})
+              Há»‡ thá»‘ng ({systemReviews.length})
             </ThemedText>
           </TouchableOpacity>
 
@@ -776,7 +574,7 @@ export default function ReviewsScreen() {
               color={activeTab === 'complaint' ? '#30A0E0' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'complaint' && styles.tabTextActive]}>
-              Khiếu nại ({complaintReviews.length})
+              Khiáº¿u náº¡i ({complaintReviews.length})
             </ThemedText>
           </TouchableOpacity>
         </ScrollView>
@@ -794,7 +592,7 @@ export default function ReviewsScreen() {
             onPress={() => setActiveSubTab('completed')}
           >
             <ThemedText style={[styles.subTabText, activeSubTab === 'completed' && styles.subTabTextActive]}>
-              Đã đánh giá
+              ÄÃ£ Ä‘Ã¡nh giÃ¡
             </ThemedText>
           </TouchableOpacity>
 
@@ -803,7 +601,7 @@ export default function ReviewsScreen() {
             onPress={() => setActiveSubTab('pending')}
           >
             <ThemedText style={[styles.subTabText, activeSubTab === 'pending' && styles.subTabTextActive]}>
-              Chờ đánh giá
+              Chá» Ä‘Ã¡nh giÃ¡
             </ThemedText>
           </TouchableOpacity>
         </ScrollView>
@@ -878,7 +676,7 @@ export default function ReviewsScreen() {
             >
               <Ionicons name="close" size={24} color="#6c757d" />
             </TouchableOpacity>
-            <ThemedText style={styles.modalTitle}>Đánh giá</ThemedText>
+            <ThemedText style={styles.modalTitle}>ÄÃ¡nh giÃ¡</ThemedText>
             <View style={styles.modalPlaceholder} />
           </View>
 
@@ -889,7 +687,7 @@ export default function ReviewsScreen() {
                 <View style={styles.itemInfo}>
                   <Image source={{ uri: selectedReviewItem.caregiverAvatar }} style={styles.itemAvatar} />
                   <View style={styles.itemDetails}>
-                    <ThemedText style={styles.itemTitle}>Video tư vấn</ThemedText>
+                    <ThemedText style={styles.itemTitle}>Video tÆ° váº¥n</ThemedText>
                     <ThemedText style={styles.itemSubtitle}>{selectedReviewItem.caregiverName}</ThemedText>
                     <ThemedText style={styles.itemInfo}>{selectedReviewItem.duration}</ThemedText>
                   </View>
@@ -900,9 +698,9 @@ export default function ReviewsScreen() {
                 <View style={styles.itemInfo}>
                   <Image source={{ uri: selectedReviewItem.caregiverAvatar }} style={styles.itemAvatar} />
                   <View style={styles.itemDetails}>
-                    <ThemedText style={styles.itemTitle}>Dịch vụ chăm sóc</ThemedText>
+                    <ThemedText style={styles.itemTitle}>Dá»‹ch vá»¥ chÄƒm sÃ³c</ThemedText>
                     <ThemedText style={styles.itemSubtitle}>{selectedReviewItem.caregiverName}</ThemedText>
-                    <ThemedText style={styles.itemInfo}>{selectedReviewItem.elderlyName} • {selectedReviewItem.familyName}</ThemedText>
+                    <ThemedText style={styles.itemInfo}>{selectedReviewItem.elderlyName} â€¢ {selectedReviewItem.familyName}</ThemedText>
                   </View>
                 </View>
               )}
@@ -913,7 +711,7 @@ export default function ReviewsScreen() {
                     <Ionicons name="settings" size={24} color="#30A0E0" />
                   </View>
                   <View style={styles.itemDetails}>
-                    <ThemedText style={styles.itemTitle}>Đánh giá hệ thống</ThemedText>
+                    <ThemedText style={styles.itemTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
                     <ThemedText style={styles.itemSubtitle}>{selectedReviewItem.category}</ThemedText>
                   </View>
                 </View>
@@ -925,9 +723,9 @@ export default function ReviewsScreen() {
                     <Ionicons name="warning" size={24} color="#ff4757" />
                   </View>
                   <View style={styles.itemDetails}>
-                    <ThemedText style={styles.itemTitle}>Khiếu nại</ThemedText>
+                    <ThemedText style={styles.itemTitle}>Khiáº¿u náº¡i</ThemedText>
                     <ThemedText style={styles.itemSubtitle}>{selectedReviewItem.category}</ThemedText>
-                    <ThemedText style={styles.itemInfo}>{selectedReviewItem.complainantName} → {selectedReviewItem.accusedName}</ThemedText>
+                    <ThemedText style={styles.itemInfo}>{selectedReviewItem.complainantName} â†’ {selectedReviewItem.accusedName}</ThemedText>
                   </View>
                 </View>
               )}
@@ -935,23 +733,23 @@ export default function ReviewsScreen() {
 
             {/* Rating Section */}
             <View style={styles.ratingSection}>
-              <ThemedText style={styles.ratingTitle}>Đánh giá của bạn</ThemedText>
+              <ThemedText style={styles.ratingTitle}>ÄÃ¡nh giÃ¡ cá»§a báº¡n</ThemedText>
               {renderRatingStars(rating, setRating)}
               <ThemedText style={styles.ratingText}>
-                {rating === 0 ? 'Chọn số sao' : 
-                 rating === 1 ? 'Rất tệ' :
-                 rating === 2 ? 'Tệ' :
-                 rating === 3 ? 'Bình thường' :
-                 rating === 4 ? 'Tốt' : 'Rất tốt'}
+                {rating === 0 ? 'Chá»n sá»‘ sao' : 
+                 rating === 1 ? 'Ráº¥t tá»‡' :
+                 rating === 2 ? 'Tá»‡' :
+                 rating === 3 ? 'BÃ¬nh thÆ°á»ng' :
+                 rating === 4 ? 'Tá»‘t' : 'Ráº¥t tá»‘t'}
               </ThemedText>
             </View>
 
             {/* Comment Section */}
             <View style={styles.commentSection}>
-              <ThemedText style={styles.commentTitle}>Nhận xét (tùy chọn)</ThemedText>
+              <ThemedText style={styles.commentTitle}>Nháº­n xÃ©t (tÃ¹y chá»n)</ThemedText>
               <TextInput
                 style={styles.commentInput}
-                placeholder="Chia sẻ trải nghiệm của bạn..."
+                placeholder="Chia sáº» tráº£i nghiá»‡m cá»§a báº¡n..."
                 value={comment}
                 onChangeText={setComment}
                 multiline
@@ -962,13 +760,13 @@ export default function ReviewsScreen() {
 
             {/* Image Upload Section */}
             <View style={styles.imageSection}>
-              <ThemedText style={styles.imageSectionTitle}>Ảnh đính kèm (tùy chọn)</ThemedText>
+              <ThemedText style={styles.imageSectionTitle}>áº¢nh Ä‘Ã­nh kÃ¨m (tÃ¹y chá»n)</ThemedText>
               <TouchableOpacity 
                 style={styles.addImageButton}
                 onPress={handleImagePicker}
               >
                 <Ionicons name="camera-outline" size={20} color="#30A0E0" />
-                <ThemedText style={styles.addImageButtonText}>Chọn ảnh hoặc chụp ảnh</ThemedText>
+                <ThemedText style={styles.addImageButtonText}>Chá»n áº£nh hoáº·c chá»¥p áº£nh</ThemedText>
               </TouchableOpacity>
               
               {/* Image List */}
@@ -998,7 +796,7 @@ export default function ReviewsScreen() {
               disabled={rating === 0}
             >
               <ThemedText style={[styles.submitButtonText, rating === 0 && styles.submitButtonTextDisabled]}>
-                Gửi đánh giá
+                Gá»­i Ä‘Ã¡nh giÃ¡
               </ThemedText>
             </TouchableOpacity>
           </View>
@@ -1020,7 +818,7 @@ export default function ReviewsScreen() {
             >
               <Ionicons name="close" size={24} color="#6c757d" />
             </TouchableOpacity>
-            <ThemedText style={styles.modalTitle}>Chi tiết</ThemedText>
+            <ThemedText style={styles.modalTitle}>Chi tiáº¿t</ThemedText>
             <View style={styles.modalPlaceholder} />
           </View>
 
@@ -1034,7 +832,7 @@ export default function ReviewsScreen() {
                     <View style={styles.detailHeader}>
                       <Image source={{ uri: selectedDetailItem.caregiverAvatar }} style={styles.detailAvatar} />
                       <View style={styles.detailInfo}>
-                        <ThemedText style={styles.detailTitle}>Video tư vấn</ThemedText>
+                        <ThemedText style={styles.detailTitle}>Video tÆ° váº¥n</ThemedText>
                         <ThemedText style={styles.detailSubtitle}>{selectedDetailItem.caregiverName}</ThemedText>
                         <ThemedText style={styles.detailText}>{selectedDetailItem.duration}</ThemedText>
                       </View>
@@ -1042,25 +840,25 @@ export default function ReviewsScreen() {
                     
                     <View style={styles.detailContent}>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người chăm sóc:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i chÄƒm sÃ³c:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.caregiverName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Ngày tư vấn:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÃ y tÆ° váº¥n:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.serviceDate}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Giờ tư vấn:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Giá» tÆ° váº¥n:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.time || '14:00 - 15:00'}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Thời lượng:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Thá»i lÆ°á»£ng:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.duration}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Trạng thái:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Tráº¡ng thÃ¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>
-                          {selectedDetailItem.isExpired ? 'Hết hạn' : 'Có thể đánh giá'}
+                          {selectedDetailItem.isExpired ? 'Háº¿t háº¡n' : 'CÃ³ thá»ƒ Ä‘Ã¡nh giÃ¡'}
                         </ThemedText>
                       </View>
                     </View>
@@ -1073,65 +871,65 @@ export default function ReviewsScreen() {
                     <View style={styles.detailHeader}>
                       <Image source={{ uri: selectedDetailItem.caregiverAvatar }} style={styles.detailAvatar} />
                       <View style={styles.detailInfo}>
-                        <ThemedText style={styles.detailTitle}>Dịch vụ chăm sóc</ThemedText>
+                        <ThemedText style={styles.detailTitle}>Dá»‹ch vá»¥ chÄƒm sÃ³c</ThemedText>
                         <ThemedText style={styles.detailSubtitle}>{selectedDetailItem.caregiverName}</ThemedText>
-                        <ThemedText style={styles.detailText}>{selectedDetailItem.elderlyName} • {selectedDetailItem.familyName}</ThemedText>
+                        <ThemedText style={styles.detailText}>{selectedDetailItem.elderlyName} â€¢ {selectedDetailItem.familyName}</ThemedText>
                       </View>
                     </View>
                     
                     <View style={styles.detailContent}>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người chăm sóc:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i chÄƒm sÃ³c:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.caregiverName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người thuê:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i thuÃª:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.familyName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người được chăm sóc:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i Ä‘Æ°á»£c chÄƒm sÃ³c:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.elderlyName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Ngày dịch vụ:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÃ y dá»‹ch vá»¥:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.serviceDate}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Giờ dịch vụ:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Giá» dá»‹ch vá»¥:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.time || '08:00 - 17:00'}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Thời lượng:</ThemedText>
-                        <ThemedText style={styles.detailValue}>{selectedDetailItem.duration || '8 giờ'}</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Thá»i lÆ°á»£ng:</ThemedText>
+                        <ThemedText style={styles.detailValue}>{selectedDetailItem.duration || '8 giá»'}</ThemedText>
                       </View>
                       
                       {/* Service Statistics */}
                       <View style={styles.statsSection}>
-                        <ThemedText style={styles.statsTitle}>Thống kê dịch vụ</ThemedText>
+                        <ThemedText style={styles.statsTitle}>Thá»‘ng kÃª dá»‹ch vá»¥</ThemedText>
                         <View style={styles.statsGrid}>
                           <View style={styles.statCard}>
                             <ThemedText style={styles.statValue}>120</ThemedText>
-                            <ThemedText style={styles.statLabel}>Tổng giờ làm</ThemedText>
+                            <ThemedText style={styles.statLabel}>Tá»•ng giá» lÃ m</ThemedText>
                           </View>
                           <View style={styles.statCard}>
                             <ThemedText style={styles.statValue}>45</ThemedText>
-                            <ThemedText style={styles.statLabel}>Task hoàn thành</ThemedText>
+                            <ThemedText style={styles.statLabel}>Task hoÃ n thÃ nh</ThemedText>
                           </View>
                           <View style={styles.statCard}>
                             <ThemedText style={styles.statValue}>5</ThemedText>
-                            <ThemedText style={styles.statLabel}>Task chưa hoàn thành</ThemedText>
+                            <ThemedText style={styles.statLabel}>Task chÆ°a hoÃ n thÃ nh</ThemedText>
                           </View>
                           <View style={styles.statCard}>
                             <ThemedText style={styles.statValue}>50</ThemedText>
-                            <ThemedText style={styles.statLabel}>Tổng task</ThemedText>
+                            <ThemedText style={styles.statLabel}>Tá»•ng task</ThemedText>
                           </View>
                         </View>
                       </View>
                       
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Trạng thái:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Tráº¡ng thÃ¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>
-                          {selectedDetailItem.isExpired ? 'Hết hạn' : 'Có thể đánh giá'}
+                          {selectedDetailItem.isExpired ? 'Háº¿t háº¡n' : 'CÃ³ thá»ƒ Ä‘Ã¡nh giÃ¡'}
                         </ThemedText>
                       </View>
                     </View>
@@ -1146,49 +944,49 @@ export default function ReviewsScreen() {
                         <Ionicons name="settings" size={24} color="#30A0E0" />
                       </View>
                       <View style={styles.detailInfo}>
-                        <ThemedText style={styles.detailTitle}>Đánh giá hệ thống</ThemedText>
+                        <ThemedText style={styles.detailTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
                         <ThemedText style={styles.detailSubtitle}>{selectedDetailItem.category}</ThemedText>
                       </View>
                     </View>
                     
                     <View style={styles.detailContent}>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Danh mục đánh giá:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Danh má»¥c Ä‘Ã¡nh giÃ¡:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.category}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Ngày đánh giá:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÃ y Ä‘Ã¡nh giÃ¡:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.date}</ThemedText>
                       </View>
                       
                       {/* System Evaluation */}
                       <View style={styles.evaluationSection}>
-                        <ThemedText style={styles.evaluationTitle}>Đánh giá hệ thống</ThemedText>
+                        <ThemedText style={styles.evaluationTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
                         <View style={styles.evaluationContent}>
                           <ThemedText style={styles.evaluationText}>
-                            Hệ thống hoạt động ổn định, giao diện thân thiện với người dùng. 
-                            Tốc độ tải trang nhanh, tính năng đầy đủ và dễ sử dụng.
+                            Há»‡ thá»‘ng hoáº¡t Ä‘á»™ng á»•n Ä‘á»‹nh, giao diá»‡n thÃ¢n thiá»‡n vá»›i ngÆ°á»i dÃ¹ng. 
+                            Tá»‘c Ä‘á»™ táº£i trang nhanh, tÃ­nh nÄƒng Ä‘áº§y Ä‘á»§ vÃ  dá»… sá»­ dá»¥ng.
                           </ThemedText>
                         </View>
                       </View>
                       
                       {/* Feedback Section */}
                       <View style={styles.feedbackSection}>
-                        <ThemedText style={styles.feedbackTitle}>Góp ý cải thiện</ThemedText>
+                        <ThemedText style={styles.feedbackTitle}>GÃ³p Ã½ cáº£i thiá»‡n</ThemedText>
                         <View style={styles.feedbackContent}>
                           <ThemedText style={styles.feedbackText}>
-                            • Cải thiện tốc độ phản hồi của hệ thống{'\n'}
-                            • Thêm tính năng thông báo push{'\n'}
-                            • Tối ưu hóa giao diện trên mobile{'\n'}
-                            • Thêm tính năng backup dữ liệu
+                            â€¢ Cáº£i thiá»‡n tá»‘c Ä‘á»™ pháº£n há»“i cá»§a há»‡ thá»‘ng{'\n'}
+                            â€¢ ThÃªm tÃ­nh nÄƒng thÃ´ng bÃ¡o push{'\n'}
+                            â€¢ Tá»‘i Æ°u hÃ³a giao diá»‡n trÃªn mobile{'\n'}
+                            â€¢ ThÃªm tÃ­nh nÄƒng backup dá»¯ liá»‡u
                           </ThemedText>
                         </View>
                       </View>
                       
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Trạng thái:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Tráº¡ng thÃ¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>
-                          {selectedDetailItem.isExpired ? 'Hết hạn' : 'Có thể đánh giá'}
+                          {selectedDetailItem.isExpired ? 'Háº¿t háº¡n' : 'CÃ³ thá»ƒ Ä‘Ã¡nh giÃ¡'}
                         </ThemedText>
                       </View>
                     </View>
@@ -1203,81 +1001,81 @@ export default function ReviewsScreen() {
                         <Ionicons name="warning" size={24} color="#ff4757" />
                       </View>
                       <View style={styles.detailInfo}>
-                        <ThemedText style={styles.detailTitle}>Khiếu nại</ThemedText>
+                        <ThemedText style={styles.detailTitle}>Khiáº¿u náº¡i</ThemedText>
                         <ThemedText style={styles.detailSubtitle}>{selectedDetailItem.category}</ThemedText>
                       </View>
                     </View>
                     
                     <View style={styles.detailContent}>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người khiếu nại:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i khiáº¿u náº¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.complainantName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Người bị khiếu nại:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÆ°á»i bá»‹ khiáº¿u náº¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.accusedName}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Danh mục:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Danh má»¥c:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.category}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Ngày khiếu nại:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÃ y khiáº¿u náº¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.date}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Thời gian:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Thá»i gian:</ThemedText>
                         <ThemedText style={styles.detailValue}>14:30</ThemedText>
                       </View>
                       
                       {/* Admin Information */}
                       <View style={styles.adminSection}>
-                        <ThemedText style={styles.adminTitle}>Thông tin Admin xử lý</ThemedText>
+                        <ThemedText style={styles.adminTitle}>ThÃ´ng tin Admin xá»­ lÃ½</ThemedText>
                         <View style={styles.adminInfo}>
                           <View style={styles.adminAvatar}>
                             <ThemedText style={styles.adminAvatarText}>A</ThemedText>
                           </View>
                           <View style={styles.adminDetails}>
-                            <ThemedText style={styles.adminName}>Admin Lê</ThemedText>
-                            <ThemedText style={styles.adminRole}>Quản trị viên hệ thống</ThemedText>
+                            <ThemedText style={styles.adminName}>Admin LÃª</ThemedText>
+                            <ThemedText style={styles.adminRole}>Quáº£n trá»‹ viÃªn há»‡ thá»‘ng</ThemedText>
                           </View>
                         </View>
                       </View>
                       
                       {/* Complaint Details */}
                       <View style={styles.complaintDetailsSection}>
-                        <ThemedText style={styles.complaintDetailsTitle}>Chi tiết khiếu nại</ThemedText>
+                        <ThemedText style={styles.complaintDetailsTitle}>Chi tiáº¿t khiáº¿u náº¡i</ThemedText>
                         <View style={styles.complaintDetailsContent}>
                           <ThemedText style={styles.complaintDetailsText}>
-                            Người chăm sóc có thái độ không tốt, không tuân thủ quy trình chăm sóc 
-                            và có hành vi thiếu tôn trọng với người già. Cần xem xét và xử lý nghiêm khắc.
+                            NgÆ°á»i chÄƒm sÃ³c cÃ³ thÃ¡i Ä‘á»™ khÃ´ng tá»‘t, khÃ´ng tuÃ¢n thá»§ quy trÃ¬nh chÄƒm sÃ³c 
+                            vÃ  cÃ³ hÃ nh vi thiáº¿u tÃ´n trá»ng vá»›i ngÆ°á»i giÃ . Cáº§n xem xÃ©t vÃ  xá»­ lÃ½ nghiÃªm kháº¯c.
                           </ThemedText>
                         </View>
                       </View>
                       
                       {/* Decision */}
                       <View style={styles.decisionSection}>
-                        <ThemedText style={styles.decisionTitle}>Quyết định xử lý</ThemedText>
+                        <ThemedText style={styles.decisionTitle}>Quyáº¿t Ä‘á»‹nh xá»­ lÃ½</ThemedText>
                         <View style={styles.decisionContent}>
                           <View style={styles.decisionStatus}>
                             <View style={[styles.statusBadge, { backgroundColor: '#2ed573' }]}>
-                              <ThemedText style={styles.statusText}>Đã giải quyết</ThemedText>
+                              <ThemedText style={styles.statusText}>ÄÃ£ giáº£i quyáº¿t</ThemedText>
                             </View>
                           </View>
                           <ThemedText style={styles.decisionText}>
-                            Đã tiến hành cảnh cáo và yêu cầu người chăm sóc cải thiện thái độ. 
-                            Sẽ theo dõi và đánh giá lại trong 30 ngày tới.
+                            ÄÃ£ tiáº¿n hÃ nh cáº£nh cÃ¡o vÃ  yÃªu cáº§u ngÆ°á»i chÄƒm sÃ³c cáº£i thiá»‡n thÃ¡i Ä‘á»™. 
+                            Sáº½ theo dÃµi vÃ  Ä‘Ã¡nh giÃ¡ láº¡i trong 30 ngÃ y tá»›i.
                           </ThemedText>
                           <View style={styles.decisionDate}>
-                            <ThemedText style={styles.decisionDateText}>Ngày quyết định: 15/01/2024</ThemedText>
+                            <ThemedText style={styles.decisionDateText}>NgÃ y quyáº¿t Ä‘á»‹nh: 15/01/2024</ThemedText>
                           </View>
                         </View>
                       </View>
                       
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Trạng thái:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Tráº¡ng thÃ¡i:</ThemedText>
                         <ThemedText style={styles.detailValue}>
-                          {selectedDetailItem.isExpired ? 'Hết hạn' : 'Có thể đánh giá'}
+                          {selectedDetailItem.isExpired ? 'Háº¿t háº¡n' : 'CÃ³ thá»ƒ Ä‘Ã¡nh giÃ¡'}
                         </ThemedText>
                       </View>
                     </View>
@@ -1295,10 +1093,10 @@ export default function ReviewsScreen() {
                       </View>
                       <View style={styles.detailInfo}>
                         <ThemedText style={styles.detailTitle}>
-                          {selectedDetailItem.caregiverName || 'Đánh giá hệ thống'}
+                          {selectedDetailItem.caregiverName || 'ÄÃ¡nh giÃ¡ há»‡ thá»‘ng'}
                         </ThemedText>
                         <ThemedText style={styles.detailSubtitle}>
-                          {selectedDetailItem.category ? getCategoryText(selectedDetailItem.category) : 'Đánh giá đã hoàn thành'}
+                          {selectedDetailItem.category ? getCategoryText(selectedDetailItem.category) : 'ÄÃ¡nh giÃ¡ Ä‘Ã£ hoÃ n thÃ nh'}
                         </ThemedText>
                       </View>
                     </View>
@@ -1308,38 +1106,38 @@ export default function ReviewsScreen() {
                       {selectedDetailItem.caregiverName && (
                         <>
                           <View style={styles.detailRow}>
-                            <ThemedText style={styles.detailLabel}>Người chăm sóc:</ThemedText>
+                            <ThemedText style={styles.detailLabel}>NgÆ°á»i chÄƒm sÃ³c:</ThemedText>
                             <ThemedText style={styles.detailValue}>{selectedDetailItem.caregiverName}</ThemedText>
                           </View>
                           {selectedDetailItem.familyName && (
                             <View style={styles.detailRow}>
-                              <ThemedText style={styles.detailLabel}>Người thuê:</ThemedText>
+                              <ThemedText style={styles.detailLabel}>NgÆ°á»i thuÃª:</ThemedText>
                               <ThemedText style={styles.detailValue}>{selectedDetailItem.familyName}</ThemedText>
                             </View>
                           )}
                           {selectedDetailItem.elderlyName && (
                             <View style={styles.detailRow}>
-                              <ThemedText style={styles.detailLabel}>Người được chăm sóc:</ThemedText>
+                              <ThemedText style={styles.detailLabel}>NgÆ°á»i Ä‘Æ°á»£c chÄƒm sÃ³c:</ThemedText>
                               <ThemedText style={styles.detailValue}>{selectedDetailItem.elderlyName}</ThemedText>
                             </View>
                           )}
                           <View style={styles.detailRow}>
                             <ThemedText style={styles.detailLabel}>
-                              {selectedDetailItem.type === 'video' ? 'Ngày tư vấn:' : 'Ngày dịch vụ:'}
+                              {selectedDetailItem.type === 'video' ? 'NgÃ y tÆ° váº¥n:' : 'NgÃ y dá»‹ch vá»¥:'}
                             </ThemedText>
                             <ThemedText style={styles.detailValue}>{selectedDetailItem.serviceDate || selectedDetailItem.date}</ThemedText>
                           </View>
                           {selectedDetailItem.time && (
                             <View style={styles.detailRow}>
                               <ThemedText style={styles.detailLabel}>
-                                {selectedDetailItem.type === 'video' ? 'Giờ tư vấn:' : 'Giờ dịch vụ:'}
+                                {selectedDetailItem.type === 'video' ? 'Giá» tÆ° váº¥n:' : 'Giá» dá»‹ch vá»¥:'}
                               </ThemedText>
                               <ThemedText style={styles.detailValue}>{selectedDetailItem.time}</ThemedText>
                             </View>
                           )}
                           {selectedDetailItem.duration && (
                             <View style={styles.detailRow}>
-                              <ThemedText style={styles.detailLabel}>Thời lượng:</ThemedText>
+                              <ThemedText style={styles.detailLabel}>Thá»i lÆ°á»£ng:</ThemedText>
                               <ThemedText style={styles.detailValue}>{selectedDetailItem.duration}</ThemedText>
                             </View>
                           )}
@@ -1347,23 +1145,23 @@ export default function ReviewsScreen() {
                           {/* Service Statistics for Service Reviews */}
                           {(selectedDetailItem.type === 'service' || (selectedDetailItem.familyName && selectedDetailItem.elderlyName)) && (
                             <View style={styles.statsSection}>
-                              <ThemedText style={styles.statsTitle}>Thống kê dịch vụ</ThemedText>
+                              <ThemedText style={styles.statsTitle}>Thá»‘ng kÃª dá»‹ch vá»¥</ThemedText>
                               <View style={styles.statsGrid}>
                                 <View style={styles.statCard}>
                                   <ThemedText style={styles.statValue}>{selectedDetailItem.totalHours || 120}</ThemedText>
-                                  <ThemedText style={styles.statLabel}>Tổng giờ làm</ThemedText>
+                                  <ThemedText style={styles.statLabel}>Tá»•ng giá» lÃ m</ThemedText>
                                 </View>
                                 <View style={styles.statCard}>
                                   <ThemedText style={styles.statValue}>{selectedDetailItem.completedTasks || 45}</ThemedText>
-                                  <ThemedText style={styles.statLabel}>Task hoàn thành</ThemedText>
+                                  <ThemedText style={styles.statLabel}>Task hoÃ n thÃ nh</ThemedText>
                                 </View>
                                 <View style={styles.statCard}>
                                   <ThemedText style={styles.statValue}>{selectedDetailItem.pendingTasks || 5}</ThemedText>
-                                  <ThemedText style={styles.statLabel}>Task chưa hoàn thành</ThemedText>
+                                  <ThemedText style={styles.statLabel}>Task chÆ°a hoÃ n thÃ nh</ThemedText>
                                 </View>
                                 <View style={styles.statCard}>
                                   <ThemedText style={styles.statValue}>{selectedDetailItem.totalTasks || 50}</ThemedText>
-                                  <ThemedText style={styles.statLabel}>Tổng task</ThemedText>
+                                  <ThemedText style={styles.statLabel}>Tá»•ng task</ThemedText>
                                 </View>
                               </View>
                             </View>
@@ -1372,26 +1170,26 @@ export default function ReviewsScreen() {
                       )}
                       
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Đánh giá:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>ÄÃ¡nh giÃ¡:</ThemedText>
                         <View style={styles.detailRating}>
                           {renderStars(selectedDetailItem.rating)}
                           <ThemedText style={styles.detailRatingText}>{selectedDetailItem.rating}/5</ThemedText>
                         </View>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Nhận xét:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>Nháº­n xÃ©t:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.comment}</ThemedText>
                       </View>
                       <View style={styles.detailRow}>
-                        <ThemedText style={styles.detailLabel}>Ngày đánh giá:</ThemedText>
+                        <ThemedText style={styles.detailLabel}>NgÃ y Ä‘Ã¡nh giÃ¡:</ThemedText>
                         <ThemedText style={styles.detailValue}>{selectedDetailItem.date}</ThemedText>
                       </View>
                       {selectedDetailItem.isVerified && (
                         <View style={styles.detailRow}>
-                          <ThemedText style={styles.detailLabel}>Trạng thái:</ThemedText>
+                          <ThemedText style={styles.detailLabel}>Tráº¡ng thÃ¡i:</ThemedText>
                           <View style={styles.verifiedBadge}>
                             <Ionicons name="checkmark-circle" size={16} color="#2ed573" />
-                            <ThemedText style={styles.verifiedText}>Đã xác thực</ThemedText>
+                            <ThemedText style={styles.verifiedText}>ÄÃ£ xÃ¡c thá»±c</ThemedText>
                           </View>
                         </View>
                       )}
@@ -1419,7 +1217,7 @@ export default function ReviewsScreen() {
             >
               <Ionicons name="close" size={24} color="#6c757d" />
             </TouchableOpacity>
-            <ThemedText style={styles.modalTitle}>Xác nhận đánh giá</ThemedText>
+            <ThemedText style={styles.modalTitle}>XÃ¡c nháº­n Ä‘Ã¡nh giÃ¡</ThemedText>
             <View style={styles.modalPlaceholder} />
           </View>
 
@@ -1429,11 +1227,11 @@ export default function ReviewsScreen() {
             </View>
             
             <ThemedText style={styles.confirmationTitle}>
-              Bạn đánh giá người này {rating} sao
+              Báº¡n Ä‘Ã¡nh giÃ¡ ngÆ°á»i nÃ y {rating} sao
             </ThemedText>
             
             <ThemedText style={styles.confirmationQuestion}>
-              Vậy bạn có muốn tiếp tục thuê người này không?
+              Váº­y báº¡n cÃ³ muá»‘n tiáº¿p tá»¥c thuÃª ngÆ°á»i nÃ y khÃ´ng?
             </ThemedText>
 
             <View style={styles.confirmationButtons}>
@@ -1442,7 +1240,7 @@ export default function ReviewsScreen() {
                 onPress={() => handleConfirmationChoice('not_hire')}
               >
                 <ThemedText style={styles.confirmationButtonText}>
-                  Gửi đánh giá và không thuê
+                  Gá»­i Ä‘Ã¡nh giÃ¡ vÃ  khÃ´ng thuÃª
                 </ThemedText>
               </TouchableOpacity>
 
@@ -1451,7 +1249,7 @@ export default function ReviewsScreen() {
                 onPress={() => handleConfirmationChoice('hire')}
               >
                 <ThemedText style={[styles.confirmationButtonText, styles.confirmationButtonTextPrimary]}>
-                  Gửi đánh giá và thuê
+                  Gá»­i Ä‘Ã¡nh giÃ¡ vÃ  thuÃª
                 </ThemedText>
               </TouchableOpacity>
             </View>

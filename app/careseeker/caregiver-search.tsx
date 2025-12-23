@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -27,72 +28,9 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { CaregiverRecommendation, MatchResponse } from '@/services/types';
 
-// Mock data
-const mockElderlyProfiles = [
-  {
-    id: '1',
-    name: 'Bà Nguyễn Thị Mai',
-    age: 75,
-    currentCaregivers: 0,
-    family: 'Gia đình Nguyễn',
-    healthStatus: 'fair' as const,
-  },
-  {
-    id: '2',
-    name: 'Ông Trần Văn Hùng',
-    age: 82,
-    currentCaregivers: 1,
-    family: 'Gia đình Trần',
-    healthStatus: 'poor' as const,
-  },
-  {
-    id: '3',
-    name: 'Bà Lê Thị Hoa',
-    age: 78,
-    currentCaregivers: 0,
-    family: 'Gia đình Lê',
-    healthStatus: 'good' as const,
-  },
-];
-
-const mockCaregivers: Caregiver[] = [
-  {
-    id: '1',
-    name: 'Chị Nguyễn Thị Lan',
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face',
-    rating: 4.9,
-    experience: '5 năm',
-    specialties: ['Chăm sóc người cao tuổi', 'Y tế cơ bản'],
-    hourlyRate: 150000,
-    distance: '2.5 km',
-    isVerified: true,
-    totalReviews: 127,
-  },
-  {
-    id: '2',
-    name: 'Chị Trần Văn Hoa',
-    avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face',
-    rating: 4.8,
-    experience: '3 năm',
-    specialties: ['Vật lý trị liệu', 'Chăm sóc sau phẫu thuật'],
-    hourlyRate: 120000,
-    distance: '1.8 km',
-    isVerified: true,
-    totalReviews: 89,
-  },
-  {
-    id: '3',
-    name: 'Anh Lê Minh Đức',
-    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face',
-    rating: 4.7,
-    experience: '7 năm',
-    specialties: ['Chăm sóc đặc biệt', 'Hỗ trợ di chuyển'],
-    hourlyRate: 180000,
-    distance: '3.2 km',
-    isVerified: true,
-    totalReviews: 203,
-  },
-];
+// TODO: Replace with real API data - fetch from elderly service and caregiver service
+const mockElderlyProfiles: any[] = [];
+const mockCaregivers: Caregiver[] = [];
 
 const filterOptions: FilterOption[] = [
   { id: 'all', label: 'Tất cả', icon: 'grid' },
@@ -119,33 +57,8 @@ export default function CaregiverSearchScreen() {
   const translateX = useSharedValue(screenWidth - 80); // Initial position (right side)
   const translateY = useSharedValue(screenHeight - 200); // Initial position (bottom)
 
-  // Mock elderly profiles data
-  const elderlyProfiles = [
-    {
-      id: '1',
-      name: 'Bà Nguyễn Thị Lan',
-      age: 75,
-      currentCaregivers: 1,
-      family: 'Gia đình Nguyễn',
-      healthStatus: 'fair' as const,
-    },
-    {
-      id: '2',
-      name: 'Ông Trần Văn Minh',
-      age: 82,
-      currentCaregivers: 0,
-      family: 'Gia đình Trần',
-      healthStatus: 'poor' as const,
-    },
-    {
-      id: '3',
-      name: 'Bà Lê Thị Hoa',
-      age: 68,
-      currentCaregivers: 2,
-      family: 'Gia đình Lê',
-      healthStatus: 'good' as const,
-    },
-  ];
+  // TODO: Should fetch from elderly API
+  const elderlyProfiles: any[] = [];
 
   const handleCaregiverPress = (caregiver: Caregiver) => {
     router.push('/careseeker/caregiver-detail');
@@ -230,8 +143,26 @@ export default function CaregiverSearchScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container} edges={['bottom']}>
+      {/* Background Gradient */}
+      <LinearGradient
+        colors={['#FFF5F5', '#FFFFFF', '#FFF9F5']}
+        style={styles.backgroundGradient}
+      />
+
+      {/* Decorative Background */}
+      <View style={styles.decorativeBackground}>
+        <View style={styles.bgCircle1} />
+        <View style={styles.bgCircle2} />
+        <View style={styles.bgCircle3} />
+      </View>
+
       {/* Header */}
-      <View style={styles.header}>
+      <LinearGradient
+        colors={['#FF6B35', '#FF8E53']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.header}
+      >
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
@@ -241,7 +172,7 @@ export default function CaregiverSearchScreen() {
         </View>
         
         <View style={styles.placeholder} />
-      </View>
+      </LinearGradient>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -294,17 +225,43 @@ export default function CaregiverSearchScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.caregiversList}>
-            {caregivers.map((caregiver) => (
-              <CaregiverCard
-                key={caregiver.id}
-                caregiver={caregiver}
-                onPress={handleCaregiverPress}
-                onBookPress={handleBookNow}
-                onChatPress={handleChatPress}
-              />
-            ))}
-          </View>
+          {caregivers.length === 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <View style={styles.emptyIconCircle}>
+                <Ionicons name="search-outline" size={64} color="#FF6B35" />
+              </View>
+              <ThemedText style={styles.emptyTitle}>Chưa có người chăm sóc</ThemedText>
+              <ThemedText style={styles.emptyDescription}>
+                Hãy thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác để tìm người chăm sóc phù hợp
+              </ThemedText>
+              <TouchableOpacity 
+                style={styles.emptyActionButton}
+                onPress={handleAIMatching}
+              >
+                <LinearGradient
+                  colors={['#FF6B35', '#FF8E53']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.emptyActionGradient}
+                >
+                  <Ionicons name="sparkles" size={20} color="#FFF" />
+                  <ThemedText style={styles.emptyActionText}>Dùng AI tìm kiếm</ThemedText>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.caregiversList}>
+              {caregivers.map((caregiver) => (
+                <CaregiverCard
+                  key={caregiver.id}
+                  caregiver={caregiver}
+                  onPress={handleCaregiverPress}
+                  onBookPress={handleBookNow}
+                  onChatPress={handleChatPress}
+                />
+              ))}
+            </View>
+          )}
 
           {/* Bottom spacing */}
           <View style={styles.bottomSpacing} />
@@ -359,17 +316,61 @@ export default function CaregiverSearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#FFF',
     paddingBottom: 100, // Space for navigation bar
   },
+  backgroundGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  decorativeBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+  },
+  bgCircle1: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(255, 107, 53, 0.05)',
+    top: -100,
+    right: -80,
+  },
+  bgCircle2: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 142, 83, 0.08)',
+    top: 150,
+    left: -50,
+  },
+  bgCircle3: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 107, 53, 0.06)',
+    bottom: 100,
+    right: 30,
+  },
   header: {
-    backgroundColor: '#68C2E8',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    elevation: 4,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   backButton: {
     padding: 8,
@@ -400,13 +401,13 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
   },
   closeFloatingButton: {
@@ -425,22 +426,27 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    backgroundColor: 'transparent',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: '#2c3e50',
   },
   resultsContainer: {
@@ -466,8 +472,60 @@ const styles = StyleSheet.create({
   },
   sortButtonText: {
     fontSize: 14,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '500',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyIconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#FFF5F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontSize: 15,
+    color: '#7F8C8D',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  emptyActionButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  emptyActionGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    gap: 10,
+  },
+  emptyActionText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   caregiversList: {
     padding: 20,
