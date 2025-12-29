@@ -96,6 +96,9 @@ export default function AddElderlyScreen() {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState('');
   
+  // Field validation errors
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+  
   // Sync emergency contacts from context when returning from emergency contacts page
   useEffect(() => {
     if (tempContacts.length > 0) {
@@ -154,6 +157,46 @@ export default function AddElderlyScreen() {
 
   const totalSteps = 5;
 
+  // Validate individual field
+  const validateField = (fieldName: string, value: any): string => {
+    switch (fieldName) {
+      case 'name':
+        if (!value || !value.trim()) {
+          return 'Vui lòng nhập họ và tên';
+        }
+        return '';
+      
+      case 'age':
+        if (!value || !value.trim()) {
+          return 'Vui lòng nhập tuổi';
+        }
+        const age = parseInt(value);
+        if (isNaN(age) || age < 50 || age > 120) {
+          return 'Tuổi phải là số từ 50 đến 120';
+        }
+        return '';
+      
+      case 'dateOfBirth':
+        if (!value || !value.trim()) {
+          return 'Vui lòng nhập ngày sinh';
+        }
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        if (!dateRegex.test(value)) {
+          return 'Ngày sinh không đúng định dạng (DD/MM/YYYY)';
+        }
+        return '';
+      
+      case 'gender':
+        if (!value) {
+          return 'Vui lòng chọn giới tính';
+        }
+        return '';
+      
+      default:
+        return '';
+    }
+  };
+
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1: // Thông tin cá nhân
@@ -168,6 +211,16 @@ export default function AddElderlyScreen() {
         const age = parseInt(profile.personalInfo.age);
         if (isNaN(age) || age < 50 || age > 120) {
           showErrorTooltip('Tuổi phải là số từ 50 đến 120');
+          return false;
+        }
+        if (!profile.personalInfo.dateOfBirth.trim()) {
+          showErrorTooltip('Vui lòng nhập ngày sinh');
+          return false;
+        }
+        // Validate date format DD/MM/YYYY
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        if (!dateRegex.test(profile.personalInfo.dateOfBirth)) {
+          showErrorTooltip('Ngày sinh không đúng định dạng (DD/MM/YYYY)');
           return false;
         }
         if (!profile.personalInfo.gender) {
@@ -331,7 +384,7 @@ export default function AddElderlyScreen() {
             onPress={() => setFamilySelectionType('create')}
           >
             <View style={styles.familyOptionIcon}>
-              <Ionicons name="add-circle" size={32} color="#68C2E8" />
+              <Ionicons name="add-circle" size={32} color="#FF6B35" />
             </View>
             <View style={styles.familyOptionContent}>
               <ThemedText style={styles.familyOptionTitle}>Tạo mới gia đình</ThemedText>
@@ -347,7 +400,7 @@ export default function AddElderlyScreen() {
             onPress={() => setFamilySelectionType('select')}
           >
             <View style={styles.familyOptionIcon}>
-              <Ionicons name="people" size={32} color="#68C2E8" />
+              <Ionicons name="people" size={32} color="#FF6B35" />
             </View>
             <View style={styles.familyOptionContent}>
               <ThemedText style={styles.familyOptionTitle}>Chọn gia đình có sẵn</ThemedText>
@@ -369,7 +422,7 @@ export default function AddElderlyScreen() {
               setFamilySearchQuery('');
             }}
           >
-            <Ionicons name="arrow-back" size={20} color="#68C2E8" />
+            <Ionicons name="arrow-back" size={20} color="#FF6B35" />
             <ThemedText style={styles.backToOptionsText}>Quay lại</ThemedText>
           </TouchableOpacity>
           
@@ -399,7 +452,7 @@ export default function AddElderlyScreen() {
                 
                 <View style={styles.creatorItem}>
                   <View style={styles.memberInfo}>
-                    <Ionicons name="person" size={20} color="#68C2E8" />
+                    <Ionicons name="person" size={20} color="#FF6B35" />
                     <View style={styles.memberDetails}>
                       <ThemedText style={styles.memberName}>Bạn</ThemedText>
                       <ThemedText style={styles.memberRole}>Quản trị viên</ThemedText>
@@ -512,14 +565,27 @@ export default function AddElderlyScreen() {
           <ThemedText style={styles.requiredMark}>*</ThemedText>
         </View>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, fieldErrors.name && styles.textInputError]}
           value={profile.personalInfo.name}
-          onChangeText={(text) => setProfile(prev => ({
-            ...prev,
-            personalInfo: { ...prev.personalInfo, name: text }
-          }))}
+          onChangeText={(text) => {
+            setProfile(prev => ({
+              ...prev,
+              personalInfo: { ...prev.personalInfo, name: text }
+            }));
+            // Clear error when user starts typing
+            if (fieldErrors.name) {
+              setFieldErrors(prev => ({ ...prev, name: '' }));
+            }
+          }}
+          onBlur={() => {
+            const error = validateField('name', profile.personalInfo.name);
+            setFieldErrors(prev => ({ ...prev, name: error }));
+          }}
           placeholder="Nhập họ và tên"
         />
+        {fieldErrors.name && (
+          <ThemedText style={styles.errorText}>{fieldErrors.name}</ThemedText>
+        )}
       </View>
 
       <View style={styles.inputRow}>
@@ -529,54 +595,110 @@ export default function AddElderlyScreen() {
             <ThemedText style={styles.requiredMark}>*</ThemedText>
           </View>
           <TextInput
-            style={styles.textInput}
+            style={[styles.textInput, fieldErrors.age && styles.textInputError]}
             value={profile.personalInfo.age}
-            onChangeText={(text) => setProfile(prev => ({
-              ...prev,
-              personalInfo: { ...prev.personalInfo, age: text }
-            }))}
+            onChangeText={(text) => {
+              setProfile(prev => ({
+                ...prev,
+                personalInfo: { ...prev.personalInfo, age: text }
+              }));
+              if (fieldErrors.age) {
+                setFieldErrors(prev => ({ ...prev, age: '' }));
+              }
+            }}
+            onBlur={() => {
+              const error = validateField('age', profile.personalInfo.age);
+              setFieldErrors(prev => ({ ...prev, age: error }));
+            }}
             placeholder="Tuổi"
             keyboardType="numeric"
           />
+          {fieldErrors.age && (
+            <ThemedText style={styles.errorText}>{fieldErrors.age}</ThemedText>
+          )}
         </View>
         <View style={styles.inputGroupHalf}>
           <View style={styles.labelContainer}>
-            <ThemedText style={styles.inputLabel}>Giới tính</ThemedText>
+            <ThemedText style={styles.inputLabel}>Ngày sinh</ThemedText>
             <ThemedText style={styles.requiredMark}>*</ThemedText>
           </View>
-          <View style={styles.genderContainer}>
-            <TouchableOpacity
-              style={[
-                styles.genderButton,
-                profile.personalInfo.gender === 'Nam' && styles.genderButtonActive
-              ]}
-              onPress={() => setProfile(prev => ({
+          <TextInput
+            style={[styles.textInput, fieldErrors.dateOfBirth && styles.textInputError]}
+            value={profile.personalInfo.dateOfBirth}
+            onChangeText={(text) => {
+              setProfile(prev => ({
+                ...prev,
+                personalInfo: { ...prev.personalInfo, dateOfBirth: text }
+              }));
+              if (fieldErrors.dateOfBirth) {
+                setFieldErrors(prev => ({ ...prev, dateOfBirth: '' }));
+              }
+            }}
+            onBlur={() => {
+              const error = validateField('dateOfBirth', profile.personalInfo.dateOfBirth);
+              setFieldErrors(prev => ({ ...prev, dateOfBirth: error }));
+            }}
+            placeholder="DD/MM/YYYY"
+            keyboardType="numeric"
+          />
+          {fieldErrors.dateOfBirth && (
+            <ThemedText style={styles.errorText}>{fieldErrors.dateOfBirth}</ThemedText>
+          )}
+        </View>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <View style={styles.labelContainer}>
+          <ThemedText style={styles.inputLabel}>Giới tính</ThemedText>
+          <ThemedText style={styles.requiredMark}>*</ThemedText>
+        </View>
+        <View style={styles.genderContainer}>
+          <TouchableOpacity
+            style={[
+              styles.genderButton,
+              profile.personalInfo.gender === 'Nam' && styles.genderButtonActive,
+              fieldErrors.gender && !profile.personalInfo.gender && styles.genderButtonError
+            ]}
+            onPress={() => {
+              setProfile(prev => ({
                 ...prev,
                 personalInfo: { ...prev.personalInfo, gender: 'Nam' }
-              }))}
-            >
-              <ThemedText style={[
-                styles.genderText,
-                profile.personalInfo.gender === 'Nam' && styles.genderTextActive
-              ]}>Nam</ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.genderButton,
-                profile.personalInfo.gender === 'Nữ' && styles.genderButtonActive
-              ]}
-              onPress={() => setProfile(prev => ({
+              }));
+              if (fieldErrors.gender) {
+                setFieldErrors(prev => ({ ...prev, gender: '' }));
+              }
+            }}
+          >
+            <ThemedText style={[
+              styles.genderText,
+              profile.personalInfo.gender === 'Nam' && styles.genderTextActive
+            ]}>Nam</ThemedText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.genderButton,
+              profile.personalInfo.gender === 'Nữ' && styles.genderButtonActive,
+              fieldErrors.gender && !profile.personalInfo.gender && styles.genderButtonError
+            ]}
+            onPress={() => {
+              setProfile(prev => ({
                 ...prev,
                 personalInfo: { ...prev.personalInfo, gender: 'Nữ' }
-              }))}
-            >
-              <ThemedText style={[
-                styles.genderText,
-                profile.personalInfo.gender === 'Nữ' && styles.genderTextActive
-              ]}>Nữ</ThemedText>
-            </TouchableOpacity>
-          </View>
+              }));
+              if (fieldErrors.gender) {
+                setFieldErrors(prev => ({ ...prev, gender: '' }));
+              }
+            }}
+          >
+            <ThemedText style={[
+              styles.genderText,
+              profile.personalInfo.gender === 'Nữ' && styles.genderTextActive
+            ]}>Nữ</ThemedText>
+          </TouchableOpacity>
         </View>
+        {fieldErrors.gender && (
+          <ThemedText style={styles.errorText}>{fieldErrors.gender}</ThemedText>
+        )}
       </View>
 
       <View style={styles.inputRow}>
@@ -1056,7 +1178,7 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   stepName: {
     fontSize: 13,
@@ -1071,7 +1193,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 2,
   },
   content: {
@@ -1145,6 +1267,16 @@ const styles = StyleSheet.create({
     borderColor: '#E8EBED',
     color: '#2C3E50',
   },
+  textInputError: {
+    borderColor: '#EF4444',
+    borderWidth: 1.5,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
+    marginLeft: 4,
+  },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
@@ -1164,8 +1296,11 @@ const styles = StyleSheet.create({
     borderColor: '#E8EBED',
   },
   genderButtonActive: {
-    backgroundColor: '#E8F6F3',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FFF4F0',
+    borderColor: '#FF6B35',
+  },
+  genderButtonError: {
+    borderColor: '#EF4444',
   },
   genderText: {
     fontSize: 15,
@@ -1173,7 +1308,7 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
   },
   genderTextActive: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   independenceItem: {
     marginBottom: 20,
@@ -1199,8 +1334,8 @@ const styles = StyleSheet.create({
     borderColor: '#E8EBED',
   },
   independenceButtonActive: {
-    backgroundColor: '#E8F6F3',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FFF4F0',
+    borderColor: '#FF6B35',
   },
   independenceButtonText: {
     fontSize: 13,
@@ -1208,7 +1343,7 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
   },
   independenceButtonTextActive: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   careNeedItem: {
     flexDirection: 'row',
@@ -1242,8 +1377,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxActive: {
-    backgroundColor: '#68C2E8',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   houseTypeContainer: {
     flexDirection: 'row',
@@ -1259,8 +1394,8 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   houseTypeButtonActive: {
-    backgroundColor: '#68C2E8',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   houseTypeText: {
     fontSize: 14,
@@ -1302,12 +1437,12 @@ const styles = StyleSheet.create({
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 12,
     elevation: 2,
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -1364,7 +1499,7 @@ const styles = StyleSheet.create({
   backToOptionsText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginLeft: 8,
   },
   familyOption: {
@@ -1410,7 +1545,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -1475,8 +1610,8 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   familyItemSelected: {
-    borderColor: '#68C2E8',
-    backgroundColor: '#f0fdfa',
+    borderColor: '#FF6B35',
+    backgroundColor: '#FFF4F0',
   },
   familyItemContent: {
     flex: 1,
@@ -1588,7 +1723,7 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     flex: 1,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -1642,7 +1777,7 @@ const styles = StyleSheet.create({
   familyPreviewName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginBottom: 8,
   },
   familyPreviewDescription: {
@@ -1730,18 +1865,18 @@ const styles = StyleSheet.create({
   manageContactsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#FFF4F0',
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     gap: 12,
   },
   manageContactsText: {
     flex: 1,
     fontSize: 15,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
   },
 });

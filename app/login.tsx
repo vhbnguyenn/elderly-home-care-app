@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useErrorNotification,
@@ -57,7 +58,11 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
+    
     try {
+      // IMPORTANT: Clear any old tokens before login to prevent token refresh loops
+      await AsyncStorage.multiRemove(['auth_token', 'refresh_token', 'user_data']);
+      
       // Clean email by removing whitespace
       const cleanEmail = email.replace(/\s/g, '');
       const userData = await login(cleanEmail, password);
@@ -82,8 +87,8 @@ export default function LoginScreen() {
           console.log("➡️ Navigating to /caregiver");
           router.replace("/caregiver");
         } else {
-          console.log("➡️ Navigating to /careseeker/dashboard");
-          router.replace("/careseeker/dashboard");
+          console.log("➡️ Navigating to /careseeker/(tabs)/dashboard");
+          router.replace("/careseeker/(tabs)/dashboard");
         }
       }, 500);
     } catch (error: any) {
@@ -244,20 +249,12 @@ export default function LoginScreen() {
         </View>
 
         {/* Forgot Password */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.forgotPassword}
           onPress={() => router.push("/forgot-password")}
         >
           <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
-
-        {/* Register Link */}
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>Chưa có tài khoản? </Text>
-          <TouchableOpacity onPress={() => router.push("/register")}>
-            <Text style={styles.registerLink}>Đăng ký ngay</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       {/* Verify Email Prompt Modal */}
@@ -457,21 +454,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FF5722",
     fontWeight: "500",
-  },
-  registerContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 24,
-  },
-  registerText: {
-    fontSize: 14,
-    color: "#6B7280",
-  },
-  registerLink: {
-    fontSize: 14,
-    color: "#FF5722",
-    fontWeight: "600",
   },
   promptOverlay: {
     position: "absolute",

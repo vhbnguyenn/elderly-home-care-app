@@ -69,16 +69,47 @@ export const AuthService = {
   // Register: Call real API
   register: async (payload: any) => {
     try {
+      console.log("[Auth] Attempting register:", payload.email);
+      
       const response = await axiosInstance.post(
         API_CONFIG.ENDPOINTS.AUTH.REGISTER,
         payload
       );
 
-      console.log("[Auth] Register successful:", response.data);
-      return response.data;
+      console.log("[Auth] Register response:", response.data);
+      
+      // Handle different response formats - similar to login
+      const responseData = response.data.data || response.data;
+      const token = responseData.accessToken || responseData.token;
+      const refreshToken = responseData.refreshToken;
+      const user = responseData.user || responseData;
+
+      console.log("[Auth] 🔍 Register response data:", responseData);
+      console.log("[Auth] 🔑 Token found:", !!token);
+      console.log("[Auth] 👤 User data found:", !!user);
+
+      // Save tokens if provided (some backends return tokens immediately after register)
+      if (token) {
+        await AsyncStorage.setItem("auth_token", token);
+        console.log("[Auth] ✅ Token saved after register");
+      }
+      if (refreshToken) {
+        await AsyncStorage.setItem("refresh_token", refreshToken);
+        console.log("[Auth] ✅ RefreshToken saved after register");
+      }
+      if (user) {
+        await AsyncStorage.setItem("user_data", JSON.stringify(user));
+        console.log("[Auth] ✅ User data saved after register");
+      }
+
+      console.log("[Auth] Register successful");
+      return responseData;
     } catch (error: any) {
-      // Disabled console.error to hide gray toast
-      // console.error("[Auth] Register failed:", error.response?.data || error.message);
+      console.error("[Auth] Register error details:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       
       // Return error object with message for better error handling
       const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Đăng ký thất bại";

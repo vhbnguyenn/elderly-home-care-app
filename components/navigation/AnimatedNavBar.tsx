@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
     id: 'home',
     label: 'Trang chủ',
     icon: 'home',
-    route: '/careseeker/dashboard',
+    route: '/careseeker/(tabs)/dashboard',
   },
   {
     id: 'services',

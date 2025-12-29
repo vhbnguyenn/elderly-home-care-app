@@ -29,8 +29,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { caregiverService, CaregiverProfile } from '@/services/caregiver.service';
 import { ElderlyAPI, ElderlyProfile } from '@/services/api/elderly.api';
 import { BookingAPI, Booking } from '@/services/api/booking.api';
-import { matchService } from '@/services/matchServiceAxios';
-import { MobileMatchRequest } from '@/services/types';
+import { groqMatchingService, GroqMatchRequest } from '@/services/groq-matching.service';
 
 const { width } = Dimensions.get('window');
 
@@ -71,20 +70,41 @@ export default function DashboardScreen() {
     const fetchCaregivers = async () => {
       try {
         setIsLoadingCaregivers(true);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:72',message:'fetchCaregivers started',data:{isLoadingElderly,elderlyProfilesCount:elderlyProfiles.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H6'})}).catch(()=>{});
+        // #endregion
         
         // Wait for elderly profiles to load first
         if (isLoadingElderly) {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:77',message:'Still loading elderly, skip',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H6'})}).catch(()=>{});
+          // #endregion
           return;
         }
 
-        // If user has elderly profiles, use AI matching
+        // TEMPORARY: Disable Groq AI, use getAllCaregivers directly
+        // TODO: Enable this when backend Groq AI endpoint is ready
+        console.log('[Dashboard] 📋 Using getAllCaregivers (Groq AI disabled temporarily)');
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:82',message:'Calling getAllCaregivers',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H6,H7'})}).catch(()=>{});
+        // #endregion
+        
+        const caregivers = await caregiverService.getAllCaregivers();
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:88',message:'getAllCaregivers response',data:{caregiversType:typeof caregivers,isArray:Array.isArray(caregivers),caregiversLength:caregivers?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H6'})}).catch(()=>{});
+        // #endregion
+        setRecommendedCaregivers(caregivers);
+
+        /* GROQ AI CODE - Enable when backend is ready:
+        
+        // If user has elderly profiles, use Groq AI matching
         if (elderlyProfiles.length > 0) {
           const firstElderly = elderlyProfiles[0]; // Use first elderly profile for matching
           
-          console.log('[Dashboard] 🤖 Using AI matching with elderly profile:', firstElderly.name);
+          console.log('[Dashboard] 🤖 Using Groq AI matching with elderly profile:', firstElderly.name);
           
-          // Build match request
-          const matchRequest: MobileMatchRequest = {
+          // Build Groq match request
+          const matchRequest: GroqMatchRequest = {
             seeker_name: user?.name || 'User',
             care_level: firstElderly.health_status === 'good' ? 1 : firstElderly.health_status === 'fair' ? 2 : 3,
             health_status: firstElderly.health_status || 'unknown',
@@ -109,12 +129,13 @@ export default function DashboardScreen() {
             top_n: 10,
           };
 
-          const matchResponse = await matchService.matchCaregivers(matchRequest);
+          // Call Groq AI matching API
+          const matchResponse = await groqMatchingService.findCaregivers(matchRequest);
           
-          console.log('[Dashboard] ✅ AI matching success:', matchResponse.matched_caregivers.length, 'caregivers');
+          console.log('[Dashboard] ✅ Groq AI matching success:', matchResponse.matched_caregivers.length, 'caregivers');
           
           // Transform match response to CaregiverProfile format
-          const matchedCaregivers: CaregiverProfile[] = matchResponse.matched_caregivers.map((rec: any) => ({
+          const matchedCaregivers: CaregiverProfile[] = matchResponse.matched_caregivers.map((rec) => ({
             id: rec.caregiver_id,
             user_id: rec.caregiver_id,
             personal_info: {
@@ -146,22 +167,26 @@ export default function DashboardScreen() {
         } else {
           // No elderly profiles, fallback to getAllCaregivers
           console.log('[Dashboard] No elderly profiles, using getAllCaregivers');
-          const response = await caregiverService.getAllCaregivers({ 
-            page: 1, 
-            limit: 10 
-          });
-          setRecommendedCaregivers(response.caregivers);
+          const caregivers = await caregiverService.getAllCaregivers();
+          setRecommendedCaregivers(caregivers);
         }
+        */
       } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:169',message:'Error in fetchCaregivers',data:{error:String(error),errorMessage:error?.message,errorStack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H6,H7,H8'})}).catch(()=>{});
+        // #endregion
         console.log('[Dashboard] Error fetching caregivers:', error);
         // Fallback to getAllCaregivers on error
         try {
-          const response = await caregiverService.getAllCaregivers({ 
-            page: 1, 
-            limit: 10 
-          });
-          setRecommendedCaregivers(response.caregivers);
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:173',message:'Trying fallback getAllCaregivers',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H6,H7'})}).catch(()=>{});
+          // #endregion
+          const caregivers = await caregiverService.getAllCaregivers();
+          setRecommendedCaregivers(caregivers);
         } catch (fallbackError) {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:179',message:'Fallback also failed',data:{fallbackError:String(fallbackError),errorMessage:fallbackError?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H6,H7,H8'})}).catch(()=>{});
+          // #endregion
           console.log('[Dashboard] Fallback also failed:', fallbackError);
           setRecommendedCaregivers([]);
         }
@@ -178,10 +203,25 @@ export default function DashboardScreen() {
     const fetchElderly = async () => {
       try {
         setIsLoadingElderly(true);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:190',message:'fetchElderly started',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+        // #endregion
+        console.log('[Dashboard] 📞 Fetching elderly profiles from /api/elderly...');
         const profiles = await ElderlyAPI.getAll();
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:195',message:'API returned profiles',data:{profilesType:typeof profiles,isArray:Array.isArray(profiles),profilesValue:profiles,profilesLength:profiles?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H1,H2,H3,H4'})}).catch(()=>{});
+        // #endregion
+        console.log('[Dashboard] ✅ Elderly profiles loaded:', profiles.length, 'profiles');
+        console.log('[Dashboard] 📋 Profiles data:', profiles);
         setElderlyProfiles(profiles);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:197',message:'State set with profiles',data:{profilesSet:profiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H4'})}).catch(()=>{});
+        // #endregion
       } catch (error) {
-        console.log('[Dashboard] Error fetching elderly profiles:', error);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:200',message:'Error fetching elderly',data:{error:String(error),errorMessage:error?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+        console.log('[Dashboard] ❌ Error fetching elderly profiles:', error);
         setElderlyProfiles([]);
       } finally {
         setIsLoadingElderly(false);
@@ -190,26 +230,6 @@ export default function DashboardScreen() {
 
     fetchElderly();
   }, []);
-
-  // Check if user needs to complete onboarding
-  useEffect(() => {
-    if (user) {
-      console.log('[Dashboard] Checking onboarding status:');
-      console.log('  - Name:', user.name || 'MISSING');
-      console.log('  - Phone:', user.phone || 'MISSING');
-      console.log('  - Address:', user.address || 'MISSING');
-      
-      // Check if user is missing any required info
-      const needsOnboarding = !user.name || !user.phone || !user.address;
-      
-      if (needsOnboarding) {
-        console.log('[Dashboard] ⚠️ User needs onboarding, redirecting...');
-        router.replace('/onboarding');
-      } else {
-        console.log('[Dashboard] ✅ User profile complete');
-      }
-    }
-  }, [user]);
 
   // Check if user is new (no elderly profiles) and show welcome tutorial
   useEffect(() => {
@@ -223,8 +243,47 @@ export default function DashboardScreen() {
     const fetchAppointments = async () => {
       try {
         setIsLoadingAppointments(true);
-        const bookings = await BookingAPI.getCareseekerBookings();
-        setAppointments(bookings);
+        const response = await BookingAPI.getCareseekerBookings();
+        
+        // Filter only today's appointments
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const todayAppointments = response.data.filter((booking: Booking) => {
+          const bookingDate = new Date(booking.startDate);
+          bookingDate.setHours(0, 0, 0, 0);
+          return bookingDate.getTime() === today.getTime();
+        });
+        
+        // Map Booking to Appointment format for component
+        const mappedAppointments = todayAppointments.map((booking: Booking) => {
+          // Format time slot
+          const startTime = new Date(booking.startDate);
+          const endTime = new Date(booking.endDate);
+          const timeSlot = `${startTime.getHours()}:${startTime.getMinutes().toString().padStart(2, '0')} - ${endTime.getHours()}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+          
+          // Map status
+          let status: 'completed' | 'upcoming' | 'in-progress' = 'upcoming';
+          if (booking.status === 'completed') status = 'completed';
+          else if (booking.status === 'in_progress') status = 'in-progress';
+          
+          return {
+            id: booking.id || '',
+            caregiverName: booking.caregiver?.fullName || 'Người chăm sóc',
+            caregiverAvatar: booking.caregiver?.avatar || '',
+            timeSlot: timeSlot,
+            status: status,
+            tasks: [], // Tasks can be added later if needed
+            address: `${booking.address}, ${booking.district}, ${booking.city}`,
+            rating: booking.caregiver?.rating || 0,
+            isVerified: true, // Assume verified for now
+          };
+        });
+        
+        console.log('[Dashboard] ✅ Today appointments loaded:', mappedAppointments.length);
+        setAppointments(mappedAppointments);
       } catch (error) {
         console.log('[Dashboard] Error fetching appointments:', error);
         setAppointments([]);
@@ -324,48 +383,6 @@ export default function DashboardScreen() {
 
         {/* Main Content */}
         <View style={styles.mainContent}>
-          {/* Quick Stats Cards */}
-          <View style={styles.statsContainer}>
-            <TouchableOpacity 
-              style={styles.statCard}
-              onPress={() => router.push('/careseeker/elderly-list')}
-            >
-              <View style={[styles.statIconContainer, { backgroundColor: '#FFE5DC' }]}>
-                <Ionicons name="people" size={24} color="#FF6B35" />
-              </View>
-              <View style={styles.statInfo}>
-                <Text style={styles.statNumber}>{elderlyProfiles.length}</Text>
-                <Text style={styles.statLabel}>Người thân</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.statCard}
-              onPress={() => router.push('/careseeker/schedule')}
-            >
-              <View style={[styles.statIconContainer, { backgroundColor: '#E3F2FD' }]}>
-                <Ionicons name="calendar" size={24} color="#2196F3" />
-              </View>
-              <View style={styles.statInfo}>
-                <Text style={styles.statNumber}>{appointments.length}</Text>
-                <Text style={styles.statLabel}>Lịch hẹn</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.statCard}
-              onPress={() => router.push('/careseeker/hired-caregivers')}
-            >
-              <View style={[styles.statIconContainer, { backgroundColor: '#F3E5F5' }]}>
-                <Ionicons name="heart" size={24} color="#9C27B0" />
-              </View>
-              <View style={styles.statInfo}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Đã thuê</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
           {/* Emergency Alert */}
           {emergencyAlertVisible && (
             <View style={styles.emergencyContainer}>
@@ -387,10 +404,18 @@ export default function DashboardScreen() {
             </View>
           )}
 
-          {/* Recommended Caregivers */}
+          {/* AI Recommended Caregivers */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Phù hợp với người thân</Text>
+              <View style={styles.sectionTitleWithBadge}>
+                <Text style={styles.sectionTitle}>Gợi ý phù hợp</Text>
+                {elderlyProfiles.length > 0 && (
+                  <View style={styles.aiPoweredBadge}>
+                    <Ionicons name="sparkles" size={12} color="#3B82F6" />
+                    <Text style={styles.aiPoweredText}>AI</Text>
+                  </View>
+                )}
+              </View>
               {recommendedCaregivers.length > 0 && (
                 <TouchableOpacity onPress={() => router.push('/careseeker/caregiver-search')}>
                   <Text style={styles.seeAllText}>Xem tất cả →</Text>
@@ -406,12 +431,26 @@ export default function DashboardScreen() {
             ) : elderlyProfiles.length === 0 ? (
               <View style={styles.emptyCaregiverContainer}>
                 <View style={styles.emptyIconCircle}>
-                  <Ionicons name="heart-outline" size={56} color="#FF6B35" />
+                  <Ionicons name="sparkles-outline" size={56} color="#FF6B35" />
                 </View>
-                <Text style={styles.emptyTitle}>Khám phá tính năng AI Matching</Text>
+                <Text style={styles.emptyTitle}>Thêm người thân để nhận gợi ý AI</Text>
                 <Text style={styles.emptyDescription}>
-                  Thêm hồ sơ người thân để AI gợi ý những người chăm sóc phù hợp nhất với nhu cầu của bạn
+                  Hãy thêm hồ sơ người thân của bạn. AI sẽ phân tích và tự động gợi ý những người chăm sóc phù hợp nhất dựa trên:
                 </Text>
+                <View style={styles.featureList}>
+                  <View style={styles.featureItem}>
+                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                    <Text style={styles.featureText}>Tình trạng sức khỏe và tuổi tác</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                    <Text style={styles.featureText}>Kỹ năng và kinh nghiệm cần thiết</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <Ionicons name="checkmark-circle" size={18} color="#10B981" />
+                    <Text style={styles.featureText}>Vị trí và sở thích cá nhân</Text>
+                  </View>
+                </View>
                 <View style={styles.emptyActionsRow}>
                   <TouchableOpacity 
                     style={styles.emptyActionButtonPrimary}
@@ -424,7 +463,7 @@ export default function DashboardScreen() {
                       style={styles.emptyActionGradient}
                     >
                       <Ionicons name="add-circle-outline" size={18} color="#FFF" />
-                      <Text style={styles.emptyActionTextPrimary}>Thêm hồ sơ</Text>
+                      <Text style={styles.emptyActionTextPrimary}>Thêm hồ sơ ngay</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                   
@@ -432,7 +471,7 @@ export default function DashboardScreen() {
                     style={styles.emptyActionButton}
                     onPress={() => router.push('/careseeker/caregiver-search')}
                   >
-                    <Text style={styles.emptyActionText}>Xem tất cả</Text>
+                    <Text style={styles.emptyActionText}>Khám phá tất cả</Text>
                     <Ionicons name="arrow-forward" size={16} color="#FF6B35" />
                   </TouchableOpacity>
                 </View>
@@ -527,6 +566,18 @@ export default function DashboardScreen() {
               </View>
             </View>
             
+            {(() => {
+              // #region agent log
+              fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:555',message:'Render elderly section',data:{isLoading:isLoadingElderly,profilesType:typeof elderlyProfiles,isArray:Array.isArray(elderlyProfiles),profilesLength:elderlyProfiles?.length,profilesValue:elderlyProfiles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H4,H5'})}).catch(()=>{});
+              // #endregion
+              console.log('[Dashboard] 🔍 Elderly state:', {
+                isLoading: isLoadingElderly,
+                count: elderlyProfiles?.length,
+                profiles: elderlyProfiles
+              });
+              return null;
+            })()}
+            
             {isLoadingElderly ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#FF6B35" />
@@ -535,11 +586,11 @@ export default function DashboardScreen() {
             ) : elderlyProfiles.length === 0 ? (
               <View style={styles.emptyElderlyContainer}>
                 <View style={styles.emptyIconCircle}>
-                  <Ionicons name="person-add-outline" size={56} color="#FF6B35" />
+                  <Ionicons name="people-outline" size={56} color="#FF6B35" />
                 </View>
-                <Text style={styles.emptyTitle}>Chưa có hồ sơ người thân</Text>
+                <Text style={styles.emptyTitle}>Bắt đầu bằng việc thêm người thân</Text>
                 <Text style={styles.emptyDescription}>
-                  Hãy thêm thông tin người thân cần chăm sóc để chúng tôi có thể tìm kiếm người chăm sóc phù hợp nhất cho bạn
+                  Thêm thông tin người thân cần chăm sóc để chúng tôi giúp bạn tìm người chăm sóc phù hợp nhất
                 </Text>
                 <TouchableOpacity 
                   style={styles.addElderlyButton}
@@ -552,12 +603,69 @@ export default function DashboardScreen() {
                     style={styles.addElderlyButtonGradient}
                   >
                     <Ionicons name="add-circle-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.addElderlyButtonText}>Thêm hồ sơ người thân</Text>
+                    <Text style={styles.addElderlyButtonText}>Thêm người thân</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
             ) : (
-              <ElderlyProfiles profiles={elderlyProfiles} />
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.elderlyScrollView}
+              >
+                {elderlyProfiles.map((profile) => (
+                  <TouchableOpacity
+                    key={profile.id}
+                    style={styles.elderlyCard}
+                    onPress={() => router.push({
+                      pathname: '/careseeker/elderly-detail',
+                      params: { profileId: profile.id }
+                    })}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.elderlyImageContainer}>
+                      <View style={[
+                        styles.elderlyAvatar,
+                        { backgroundColor: profile.gender === 'female' ? '#E91E63' : '#2196F3' }
+                      ]}>
+                        <Text style={styles.elderlyAvatarText}>
+                          {profile.fullName?.split(' ').pop()?.charAt(0) || '?'}
+                        </Text>
+                      </View>
+                      <View style={[
+                        styles.genderBadge,
+                        { backgroundColor: profile.gender === 'female' ? '#E91E63' : '#2196F3' }
+                      ]}>
+                        <Ionicons 
+                          name={profile.gender === 'female' ? 'female' : 'male'} 
+                          size={12} 
+                          color="#FFFFFF" 
+                        />
+                      </View>
+                    </View>
+                    
+                    <View style={styles.elderlyInfo}>
+                      <Text style={styles.elderlyName}>{profile.fullName}</Text>
+                      <Text style={styles.elderlyAge}>
+                        {profile.dateOfBirth ? `${new Date().getFullYear() - new Date(profile.dateOfBirth).getFullYear()} tuổi` : 'N/A'}
+                      </Text>
+                      
+                      <View style={styles.elderlyHealthContainer}>
+                        <View style={[
+                          styles.elderlyHealthDot,
+                          { backgroundColor: profile.mobilityLevel === 'independent' ? '#27AE60' : '#F39C12' }
+                        ]} />
+                        <Text style={[
+                          styles.elderlyHealthText,
+                          { color: profile.mobilityLevel === 'independent' ? '#27AE60' : '#F39C12' }
+                        ]}>
+                          {profile.mobilityLevel === 'independent' ? 'Độc lập' : 'Cần hỗ trợ'}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             )}
           </View>
 
@@ -566,6 +674,16 @@ export default function DashboardScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Lịch hẹn hôm nay</Text>
             </View>
+            
+            {(() => {
+              console.log('[Dashboard] 🔍 Appointments state:', {
+                isLoading: isLoadingAppointments,
+                count: appointments.length,
+                appointments: appointments
+              });
+              return null;
+            })()}
+            
             {isLoadingAppointments ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#FF6B35" />
@@ -576,17 +694,44 @@ export default function DashboardScreen() {
                 <View style={styles.emptyIconCircle}>
                   <Ionicons name="calendar-outline" size={56} color="#FF6B35" />
                 </View>
-                <Text style={styles.emptyTitle}>Chưa có lịch hẹn nào</Text>
+                <Text style={styles.emptyTitle}>Hôm nay chưa có lịch hẹn nào</Text>
                 <Text style={styles.emptyDescription}>
-                  Tìm kiếm và đặt lịch với người chăm sóc để bắt đầu
+                  Bạn có muốn đặt lịch với người chăm sóc không? Chọn người phù hợp và đặt lịch ngay bây giờ
                 </Text>
-                <TouchableOpacity 
-                  style={styles.emptyActionButton}
-                  onPress={() => router.push('/careseeker/caregiver-search')}
-                >
-                  <Text style={styles.emptyActionText}>Tìm người chăm sóc</Text>
-                  <Ionicons name="search" size={16} color="#FF6B35" />
-                </TouchableOpacity>
+                <View style={styles.emptyActionsRow}>
+                  <TouchableOpacity 
+                    style={styles.emptyActionButtonPrimary}
+                    onPress={() => {
+                      // Scroll to caregivers section or navigate to search
+                      router.push('/careseeker/caregiver-search');
+                    }}
+                  >
+                    <LinearGradient
+                      colors={['#FF6B35', '#FF8E53']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.emptyActionGradient}
+                    >
+                      <Ionicons name="calendar" size={18} color="#FFF" />
+                      <Text style={styles.emptyActionTextPrimary}>Đặt lịch ngay</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                  
+                  {recommendedCaregivers.length > 0 && (
+                    <TouchableOpacity 
+                      style={styles.emptyActionButton}
+                      onPress={() => {
+                        // Quick book with first recommended caregiver
+                        if (recommendedCaregivers[0]) {
+                          handleBookPress(recommendedCaregivers[0]);
+                        }
+                      }}
+                    >
+                      <Text style={styles.emptyActionText}>Chọn gợi ý</Text>
+                      <Ionicons name="arrow-forward" size={16} color="#FF6B35" />
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
             ) : (
               <AppointmentScheduleToday appointments={appointments} />
@@ -979,6 +1124,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 12,
   },
+  sectionTitleWithBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  aiPoweredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  aiPoweredText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#3B82F6',
+  },
+  titleWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   sectionActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1092,8 +1261,24 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
     textAlign: 'center',
     lineHeight: 20,
-    marginBottom: 20,
+    marginBottom: 16,
     paddingHorizontal: 20,
+  },
+  featureList: {
+    alignSelf: 'stretch',
+    paddingHorizontal: 30,
+    marginBottom: 20,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 10,
+  },
+  featureText: {
+    fontSize: 13,
+    color: '#4B5563',
+    flex: 1,
   },
   emptyActionButton: {
     flex: 1,
@@ -1146,6 +1331,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 40,
     alignItems: 'center',
+    marginHorizontal: 20,
     marginTop: 12,
     borderWidth: 1,
     borderColor: '#F0F0F0',
@@ -1172,11 +1358,87 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  elderlyScrollView: {
+    paddingHorizontal: 20,
+  },
+  elderlyCard: {
+    width: 240,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 16,
+    padding: 16,
+    marginRight: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8EBED',
+  },
+  elderlyImageContainer: {
+    marginRight: 12,
+    position: 'relative',
+  },
+  elderlyAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  elderlyAvatarText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  genderBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  elderlyInfo: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  elderlyName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 4,
+  },
+  elderlyAge: {
+    fontSize: 13,
+    color: '#7F8C8D',
+    marginBottom: 6,
+  },
+  elderlyHealthContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  elderlyHealthDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
+  },
+  elderlyHealthText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
   emptyAppointmentContainer: {
     backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 40,
     alignItems: 'center',
+    marginHorizontal: 20,
     marginTop: 12,
     borderWidth: 1,
     borderColor: '#F0F0F0',
@@ -1215,6 +1477,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
+  },
+  matchBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(59, 130, 246, 0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  matchText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   ratingText: {
     fontSize: 12,

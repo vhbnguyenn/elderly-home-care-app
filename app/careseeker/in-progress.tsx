@@ -40,7 +40,7 @@ export default function InProgressScreen() {
         
         <TouchableOpacity 
           style={styles.backHomeButton}
-          onPress={() => router.push('/careseeker/dashboard')}
+          onPress={() => router.push('/careseeker/(tabs)/dashboard')}
         >
           <Ionicons name="home" size={20} color="white" />
           <ThemedText style={styles.backHomeButtonText}>Về trang chủ</ThemedText>

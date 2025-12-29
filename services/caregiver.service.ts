@@ -59,9 +59,10 @@ export class CaregiverService {
   async getAllCaregivers(): Promise<CaregiverProfile[]> {
     try {
       console.log('🔍 Fetching all caregivers...');
-      const response = await apiClient.get<CaregiverApiResponse>('/api/match/caregivers');
-      console.log(`✅ Found ${response.data.total} caregivers`);
-      return response.data.caregivers;
+      const response = await apiClient.get<any>('/api/caregivers/profiles');
+      console.log(`✅ Found ${response.data.length} caregivers`);
+      // API trả về array trực tiếp, không phải object với caregivers property
+      return response.data;
     } catch (error: any) {
       console.error('❌ Get caregivers error:', error);
       throw new Error(`Failed to fetch caregivers: ${error.message}`);

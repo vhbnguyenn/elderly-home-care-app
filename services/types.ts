@@ -1,19 +1,4 @@
 /**
- * API Configuration
- */
-export const API_CONFIG = {
-  BASE_URL: 'http://192.168.2.224:8000',
-  ENDPOINTS: {
-    MATCH_MOBILE: '/api/match-mobile',
-    MATCH: '/api/match',
-    CAREGIVERS: '/api/caregivers',
-    REQUESTS: '/api/requests',
-    HEALTH: '/health'
-  },
-  TIMEOUT: 30000, // 30 seconds
-};
-
-/**
  * API Response Types
  */
 export interface CaregiverRecommendation {

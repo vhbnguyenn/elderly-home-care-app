@@ -8,6 +8,12 @@ export type {
   ResetPasswordPayload,
 } from './auth.api';
 
+export { UserAPI } from './user.api';
+export type { 
+  UserProfile,
+  UpdateUserProfilePayload,
+} from './user.api';
+
 export { CaregiverAPI } from './caregiver.api';
 export type { 
   CaregiverProfile, 
