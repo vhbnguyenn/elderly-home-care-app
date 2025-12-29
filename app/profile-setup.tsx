@@ -1,4 +1,5 @@
 import { SuccessModal } from '@/components/ui/SuccessModal';
+import { AddressSelector } from '@/components/ui/AddressSelector';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -31,7 +32,7 @@ export default function ProfileSetupScreen() {
   useEffect(() => {
     if (user?.hasCompletedProfile) {
       // User already has profile, redirect to dashboard
-      router.replace('/careseeker/dashboard');
+      router.replace('/careseeker/(tabs)/dashboard');
     } else if (user?.name) {
       // Pre-fill form with existing data if any
       setName(user.name);
@@ -83,7 +84,7 @@ export default function ProfileSetupScreen() {
 
       // Close modal and navigate to dashboard
       setShowSuccessModal(false);
-      router.replace('/careseeker/dashboard');
+      router.replace('/careseeker/(tabs)/dashboard');
     } catch (error) {
       Alert.alert('Lỗi', 'Có lỗi xảy ra khi lưu thông tin');
     } finally {
@@ -171,26 +172,11 @@ export default function ProfileSetupScreen() {
             />
           </View>
 
+          {/* Address Selector */}
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: colors.text }]}>
-              Địa chỉ *
-            </Text>
-            <TextInput
-              style={[
-                styles.textArea,
-                {
-                  backgroundColor: colors.background,
-                  borderColor: colors.border,
-                  color: colors.text,
-                },
-              ]}
-              placeholder="Nhập địa chỉ của bạn"
-              placeholderTextColor={colors.text + '80'}
-              value={address}
-              onChangeText={setAddress}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
+            <AddressSelector
+              onAddressChange={setAddress}
+              initialAddress={address}
             />
           </View>
         </View>

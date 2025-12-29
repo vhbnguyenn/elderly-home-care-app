@@ -59,10 +59,23 @@ export const ElderlyAPI = {
    * Get all elderly profiles of current user
    */
   getAll: async (): Promise<ElderlyProfile[]> => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'elderly.api.ts:62',message:'getAll called',data:{endpoint:API_CONFIG.ENDPOINTS.ELDERLY.GET_ALL},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H1,H3'})}).catch(()=>{});
+    // #endregion
     const response = await axiosInstance.get(
       API_CONFIG.ENDPOINTS.ELDERLY.GET_ALL
     );
-    return response.data;
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/0c807517-a964-4a11-887b-91a3baa99795',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'elderly.api.ts:65',message:'API response received',data:{responseData:response.data,responseDataType:typeof response.data,isArray:Array.isArray(response.data),hasDataProperty:!!response.data?.data,dataArrayLength:response.data?.data?.length,responseStatus:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H1,H3'})}).catch(()=>{});
+    // #endregion
+    
+    // Fix: Backend returns {data: [], success: true}, extract the data array
+    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      return response.data.data || [];
+    }
+    
+    // Fallback: if response.data is already an array
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   /**

@@ -25,7 +25,6 @@ interface PersonalInfo {
   fullName: string;
   phone: string;
   permanentAddress: string;
-  temporaryAddress: string;
   dateOfBirth: string;
   gender: string;
   idCard: string;
@@ -77,7 +76,6 @@ export default function CompleteProfileScreen() {
     fullName: params?.fullName || "",
     phone: "",
     permanentAddress: "",
-    temporaryAddress: "",
     dateOfBirth: "",
     gender: "",
     idCard: "",
@@ -432,28 +430,15 @@ export default function CompleteProfileScreen() {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>
-          Địa chỉ thường trú <Text style={styles.required}>*</Text>
+          Địa chỉ <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={styles.input}
-          placeholder="Nhập địa chỉ thường trú"
+          placeholder="Nhập địa chỉ"
           placeholderTextColor="#9CA3AF"
           value={personalInfo.permanentAddress}
           onChangeText={(text) =>
             setPersonalInfo({ ...personalInfo, permanentAddress: text })
-          }
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Địa chỉ tạm trú</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập địa chỉ tạm trú (nếu có)"
-          placeholderTextColor="#9CA3AF"
-          value={personalInfo.temporaryAddress}
-          onChangeText={(text) =>
-            setPersonalInfo({ ...personalInfo, temporaryAddress: text })
           }
         />
       </View>

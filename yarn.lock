@@ -3059,6 +3059,11 @@ dunder-proto@^1.0.0, dunder-proto@^1.0.1:
     es-errors "^1.3.0"
     gopd "^1.2.0"
 
+dvhcvn@^1.2.20250301:
+  version "1.2.20250301"
+  resolved "https://registry.npmjs.org/dvhcvn/-/dvhcvn-1.2.20250301.tgz"
+  integrity sha512-3/RtQd15aI3INn141+5h5/kQrrd8rb9UlBp3jrMhGAVUsivP6inAbU7adk5NdZ/703Wj7ONCzLNkvkDdNajMvQ==
+
 eastasianwidth@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz"
@@ -6957,6 +6962,13 @@ vaul@^1.1.2:
   integrity sha512-ZFkClGpWyI2WUQjdLJ/BaGuV6AVQiJ3uELGk3OYtP+B6yCO7Cmn9vPFXVJkRaGkOJu3m8bQMgtyzNHixULceQA==
   dependencies:
     "@radix-ui/react-dialog" "^1.1.1"
+
+vietnam-provinces@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.npmjs.org/vietnam-provinces/-/vietnam-provinces-0.0.4.tgz"
+  integrity sha512-d97WdfZWaPUD89QTRurT3goHmbNLBCw47ttJ6f4zKQwqQjN5G13/3ykYAeCE3YyUmXN+8vbAwOxBEuks9SpZYw==
+  optionalDependencies:
+    fsevents "*"
 
 vlq@^1.0.0:
   version "1.0.1"

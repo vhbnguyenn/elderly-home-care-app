@@ -15,32 +15,32 @@ export function SimpleNavBar() {
       id: 'home',
       icon: 'home',
       label: 'Trang chủ',
-      route: '/careseeker/dashboard',
+      route: '/careseeker/(tabs)/dashboard',
     },
     {
       id: 'schedule',
       icon: 'calendar',
       label: 'Lịch hẹn',
-      route: '/careseeker/appointments',
+      route: '/careseeker/(tabs)/appointments',
     },
     {
       id: 'hired',
       icon: 'people',
       label: 'Đã thuê',
-      route: '/careseeker/hired-caregivers',
+      route: '/careseeker/(tabs)/hired-caregivers',
     },
     {
       id: 'profile',
       icon: 'person',
       label: 'Cá nhân',
-      route: '/careseeker/profile',
+      route: '/careseeker/(tabs)/profile',
     },
   ];
 
   const handleTabPress = (tabId: string, route: string) => {
     if (tabId !== activeTab) {
       setActiveTab(tabId);
-      router.push(route as any);
+      router.replace(route as any);
       // Ẩn emergency alert khi chuyển sang tab khác
       hideEmergencyAlert();
     }
