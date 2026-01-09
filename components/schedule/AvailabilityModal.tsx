@@ -1,8 +1,11 @@
+import { updateAppointmentStatus } from "@/data/appointmentStore";
+import axiosInstance from "@/services/axiosInstance";
+import { API_CONFIG } from "@/services/config/api.config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { updateAppointmentStatus } from "@/data/appointmentStore";
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Modal,
     Platform,
@@ -34,7 +37,8 @@ export default function AvailabilityModal({
   const [showFrequencyPicker, setShowFrequencyPicker] = useState(false);
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const [isFullDay, setIsFullDay] = useState(false);
-  const [isBusy, setIsBusy] = useState(false); // Checkbox để set bận cả ngày
+  const [isBusy, setIsBusy] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([
     { startTime: "08:00", endTime: "12:00" },
     { startTime: "14:00", endTime: "18:00" },
@@ -254,10 +258,10 @@ export default function AvailabilityModal({
   };
 
   const formatDate = (date: Date) => {
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   const handleSave = () => {
@@ -407,18 +411,112 @@ export default function AvailabilityModal({
     return conflictingAppointments;
   };
 
-  const saveAvailability = () => {
-    const data = {
-      isBusy, // true if user wants to mark as busy
-      frequency,
-      selectedDays,
-      timeSlots: isBusy ? [] : timeSlots,
-      startDate,
-      endDate,
-      isFullDay: isBusy ? false : isFullDay,
+  const formatDateToAPI = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const mapDayNumberToName = (dayNumber: number): string => {
+    const dayMap: { [key: number]: string } = {
+      0: 'sunday',
+      1: 'monday',
+      2: 'tuesday',
+      3: 'wednesday',
+      4: 'thursday',
+      5: 'friday',
+      6: 'saturday',
     };
-    onSave(data);
-    onClose();
+    return dayMap[dayNumber] || '';
+  };
+
+  const saveAvailability = async () => {
+    // Validation
+    if (frequency === "Hằng tuần" && selectedDays.length === 0) {
+      Alert.alert("Lỗi", "Vui lòng chọn ít nhất một ngày trong tuần");
+      return;
+    }
+
+    if (!startDate) {
+      Alert.alert("Lỗi", "Vui lòng chọn ngày áp dụng");
+      return;
+    }
+
+    if (!isBusy && !isFullDay && timeSlots.length === 0) {
+      Alert.alert("Lỗi", "Vui lòng thêm ít nhất một khung giờ");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Build API payload
+      const payload: any = {
+        startDate: formatDateToAPI(startDate),
+        endDate: endDate ? formatDateToAPI(endDate) : null,
+        recurrenceType: frequency === "Không lặp lại" ? "once" : "weekly",
+      };
+
+      if (payload.recurrenceType === 'weekly' && selectedDays.length > 0) {
+        payload.daysOfWeek = selectedDays.map(mapDayNumberToName);
+      }
+
+      if (isBusy) {
+        payload.isAllDay = false;
+        payload.isActive = false;
+        payload.notes = "Bận";
+      } else if (isFullDay) {
+        payload.isAllDay = true;
+        payload.isActive = true;
+        payload.notes = "Rảnh";
+      } else {
+        payload.isAllDay = false;
+        payload.isActive = true;
+        payload.timeSlots = timeSlots.map(slot => ({
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+        }));
+        payload.notes = "Rảnh";
+      }
+
+      // Call API
+      await axiosInstance.post(API_CONFIG.ENDPOINTS.CAREGIVER_AVAILABILITY.CREATE, payload);
+
+      // Wait a bit for backend to process
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Prepare data for parent callback
+      const data = {
+        isBusy,
+        frequency,
+        selectedDays,
+        timeSlots: isBusy ? [] : timeSlots,
+        startDate,
+        endDate,
+        isFullDay: isBusy ? false : isFullDay,
+      };
+
+      // Call parent callback first to refresh data
+      await onSave(data);
+
+      // Then show success and close
+      Alert.alert(
+        "Thành công",
+        isBusy ? "Đã đánh dấu bận" : "Lịch rảnh đã được lưu thành công",
+        [{ text: "OK" }]
+      );
+      
+      onClose();
+    } catch (error: any) {
+      console.error("Error saving availability:", error);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Không thể lưu lịch rảnh. Vui lòng thử lại."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -751,18 +849,25 @@ export default function AvailabilityModal({
           {/* Footer */}
           <View style={styles.modalFooter}>
             <TouchableOpacity
-              style={styles.saveButton}
+              style={[styles.saveButton, isLoading && { opacity: 0.6 }]}
               onPress={handleSave}
               activeOpacity={0.8}
+              disabled={isLoading}
             >
-              <MaterialCommunityIcons
-                name="content-save"
-                size={20}
-                color="#FFFFFF"
-              />
-              <Text style={styles.saveButtonText}>
-                {isBusy ? "Lưu lịch bận" : "Lưu lịch rảnh"}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons
+                    name="content-save"
+                    size={20}
+                    color="#FFFFFF"
+                  />
+                  <Text style={styles.saveButtonText}>
+                    {isBusy ? "Lưu lịch bận" : "Lưu lịch rảnh"}
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </View>

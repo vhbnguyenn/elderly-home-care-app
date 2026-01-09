@@ -1,17 +1,22 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import axiosInstance from "@/services/axiosInstance";
+import { API_CONFIG } from "@/services/config/api.config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Image,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 // Mock data
@@ -59,13 +64,38 @@ const MOCK_SKILLS = [
   { id: 10, name: "Hỗ trợ y tế", description: "Đi khám, mua thuốc", icon: "hospital-box", selected: false },
 ];
 
+// Danh sách loại chứng chỉ
+const CERTIFICATE_TYPES = [
+  "Chứng chỉ chăm sóc người già",
+  "Chứng chỉ y tá",
+  "Chứng chỉ điều dưỡng",
+  "Chứng chỉ sơ cấp cứu",
+  "Chứng chỉ dinh dưỡng",
+  "Chứng chỉ vật lý trị liệu",
+  "Chứng chỉ tâm lý học",
+  "Chứng chỉ chăm sóc bệnh nhân Alzheimer",
+  "Chứng chỉ chăm sóc bệnh nhân đột quỵ",
+  "Chứng chỉ massage trị liệu",
+  "Chứng chỉ khác",
+];
+
 export default function CertificatesScreen() {
   const [activeTab, setActiveTab] = useState<"certificates" | "skills">("certificates");
-  const [certificates, setCertificates] = useState<any[]>(MOCK_CERTIFICATES);
+  const [certificates, setCertificates] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>(MOCK_SKILLS);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editingCertificateId, setEditingCertificateId] = useState<string | null>(null);
   const [imageSourceModal, setImageSourceModal] = useState(false);
   const [skillModalVisible, setSkillModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedCertificate, setSelectedCertificate] = useState<any>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [showIssueDatePicker, setShowIssueDatePicker] = useState(false);
+  const [showExpiryDatePicker, setShowExpiryDatePicker] = useState(false);
+  const [showCertificateTypePicker, setShowCertificateTypePicker] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -73,6 +103,7 @@ export default function CertificatesScreen() {
     issueDate: "",
     expiryDate: "",
     certificateNumber: "",
+    certificateType: "",
     image: null as any,
   });
 
@@ -89,8 +120,60 @@ export default function CertificatesScreen() {
     organization: "",
     issueDate: "",
     expiryDate: "",
+    certificateType: "",
     image: "",
   });
+
+  // Fetch certificates from API
+  const fetchCertificates = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.CERTIFICATES.MY_CERTIFICATES);
+      const data = response.data.data || [];
+      
+      // Map API response to component format
+      const mappedCertificates = data.map((cert: any) => ({
+        id: cert._id,
+        name: cert.name,
+        organization: cert.issuingOrganization,
+        issueDate: new Date(cert.issueDate).toLocaleDateString('vi-VN'),
+        expiryDate: cert.expirationDate 
+          ? new Date(cert.expirationDate).toLocaleDateString('vi-VN')
+          : "Vô thời hạn",
+        certificateNumber: cert.certificateNumber || "Chưa có",
+        status: cert.status === 'approved' ? 'verified' : cert.status,
+        image: cert.certificateImage,
+        rejectReason: cert.rejectionReason,
+      }));
+      
+      setCertificates(mappedCertificates);
+    } catch (error: any) {
+      console.error("Error fetching certificates:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCertificates();
+  }, [fetchCertificates]);
+
+  // Fetch certificate detail by ID
+  const fetchCertificateDetail = async (certificateId: string) => {
+    try {
+      setLoadingDetail(true);
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.CERTIFICATES.GET_BY_ID(certificateId));
+      const data = response.data.data || response.data;
+      
+      setSelectedCertificate(data);
+      setDetailModalVisible(true);
+    } catch (error: any) {
+      console.error("Error fetching certificate detail:", error);
+      Alert.alert("Đã có lỗi", "Không thể tải chi tiết chứng chỉ. Vui lòng thử lại.");
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: any = {};
@@ -133,9 +216,9 @@ export default function CertificatesScreen() {
       }
     }
 
-    // Số chứng chỉ (optional)
-    if (form.certificateNumber && form.certificateNumber.length > 50) {
-      newErrors.certificateNumber = "Số chứng chỉ không được quá 50 ký tự";
+    // Loại chứng chỉ
+    if (!form.certificateType) {
+      newErrors.certificateType = "Loại chứng chỉ là bắt buộc";
     }
 
     // Hình ảnh
@@ -147,40 +230,163 @@ export default function CertificatesScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAdd = () => {
+  const uploadImageToCloudinary = async (imageUri: string) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'certificate.jpg',
+      } as any);
+      formData.append('upload_preset', 'elderly-care');
+      formData.append('folder', 'elderly-care/certificates');
+
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/ddgjpfrqz/image/upload',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      throw error;
+    }
+  };
+
+  const handleAdd = async () => {
     if (!validateForm()) {
       return;
     }
-    
-    const newCert = {
-      id: certificates.length + 1,
-      name: form.name,
-      organization: form.organization,
-      issueDate: form.issueDate,
-      expiryDate: form.expiryDate || "Vô thời hạn",
-      certificateNumber: form.certificateNumber || "Chưa có",
-      status: "pending",
-      image: form.image,
-    };
-    
-    setCertificates([...certificates, newCert]);
-    setModalVisible(false);
-    setForm({ 
-      name: "", 
-      organization: "", 
-      issueDate: "", 
-      expiryDate: "", 
-      certificateNumber: "", 
-      image: null 
+
+    try {
+      setSubmitting(true);
+
+      // Upload image to Cloudinary if new image selected
+      let certificateImageUrl = '';
+      if (form.image?.uri) {
+        certificateImageUrl = await uploadImageToCloudinary(form.image.uri);
+      } else if (editMode && form.image) {
+        // Keep existing image URL if in edit mode and no new image
+        certificateImageUrl = form.image;
+      }
+
+      // Prepare data for API
+      // Convert dates from DD/MM/YYYY to YYYY-MM-DD format
+      const convertDateToISO = (dateStr: string) => {
+        if (!dateStr) return null;
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
+        }
+        return dateStr; // Return as-is if already in correct format
+      };
+
+      const certificateData = {
+        name: form.name,
+        issueDate: convertDateToISO(form.issueDate),
+        expirationDate: form.expiryDate ? convertDateToISO(form.expiryDate) : null,
+        issuingOrganization: form.organization,
+        certificateType: form.certificateType,
+        certificateImage: certificateImageUrl,
+      };
+
+      if (editMode && editingCertificateId) {
+        // Update existing certificate
+        await axiosInstance.put(
+          API_CONFIG.ENDPOINTS.CERTIFICATES.UPDATE(editingCertificateId),
+          certificateData
+        );
+        Alert.alert('Thành công', 'Chứng chỉ đã được cập nhật!');
+      } else {
+        // Create new certificate
+        await axiosInstance.post(
+          API_CONFIG.ENDPOINTS.CERTIFICATES.CREATE,
+          certificateData
+        );
+        Alert.alert('Thành công', 'Chứng chỉ đã được gửi để xác minh!');
+      }
+
+      // Refresh certificate list
+      await fetchCertificates();
+
+      // Close modal and reset form
+      setModalVisible(false);
+      setEditMode(false);
+      setEditingCertificateId(null);
+      setForm({
+        name: '',
+        organization: '',
+        issueDate: '',
+        expiryDate: '',
+        certificateNumber: '',
+        certificateType: '',
+        image: null,
+      });
+      setErrors({
+        name: '',
+        organization: '',
+        issueDate: '',
+        expiryDate: '',
+        certificateType: '',
+        image: '',
+      });
+    } catch (error: any) {
+      console.error('Error saving certificate:', error);
+      const errorMessage = error.response?.data?.message || 'Không thể lưu chứng chỉ. Vui lòng thử lại.';
+      Alert.alert('Lỗi', errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditCertificate = (cert: any) => {
+    setEditMode(true);
+    setEditingCertificateId(cert.id);
+    setForm({
+      name: cert.name,
+      organization: cert.organization,
+      issueDate: cert.issueDate,
+      expiryDate: cert.expiryDate === 'Vô thời hạn' ? '' : cert.expiryDate,
+      certificateNumber: cert.certificateNumber || '',
+      certificateType: cert.certificateType || '',
+      image: cert.image, // Store existing image URL
     });
-    setErrors({
-      name: "",
-      organization: "",
-      issueDate: "",
-      expiryDate: "",
-      image: "",
-    });
-    alert("Chứng chỉ đã được gửi để xác minh!");
+    setModalVisible(true);
+  };
+
+  const handleDeleteCertificate = async (certificateId: string, certificateName: string) => {
+    Alert.alert(
+      "Xác nhận xóa",
+      `Bạn có chắc muốn xóa chứng chỉ "${certificateName}"?\n\nHành động này không thể hoàn tác.`,
+      [
+        {
+          text: "Hủy",
+          style: "cancel"
+        },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await axiosInstance.delete(API_CONFIG.ENDPOINTS.CERTIFICATES.DELETE(certificateId));
+              
+              // Refresh certificate list
+              await fetchCertificates();
+              
+              Alert.alert("Đã xóa", "Chứng chỉ đã được xóa thành công");
+            } catch (error: any) {
+              console.error("Error deleting certificate:", error);
+              const errorMessage = error.response?.data?.message || "Không thể xóa chứng chỉ. Vui lòng thử lại.";
+              Alert.alert("Lỗi", errorMessage);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handlePickImage = async () => {
@@ -408,7 +614,19 @@ export default function CertificatesScreen() {
               </TouchableOpacity>
             </View>
             
-            {certificates.map((cert) => {
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3FD2CD" />
+                <Text style={styles.loadingText}>Đang tải chứng chỉ...</Text>
+              </View>
+            ) : certificates.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <MaterialCommunityIcons name="certificate-outline" size={64} color="#CBD5E1" />
+                <Text style={styles.emptyText}>Chưa có chứng chỉ nào</Text>
+                <Text style={styles.emptySubText}>Nhấn nút + để thêm chứng chỉ mới</Text>
+              </View>
+            ) : (
+              certificates.map((cert) => {
               const isVerified = cert.status === "verified";
               const isPending = cert.status === "pending";
               const isRejected = cert.status === "rejected";
@@ -423,14 +641,32 @@ export default function CertificatesScreen() {
                     isRejected && styles.certRejected,
                   ]}
                 >
+                  {/* Delete button - only show for pending certificates */}
+                  {isPending && (
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleDeleteCertificate(cert.id, cert.name)}
+                    >
+                      <MaterialCommunityIcons name="close" size={20} color="#F44336" />
+                    </TouchableOpacity>
+                  )}
+
                   <View style={styles.certHeader}>
-                    <View style={styles.certIcon}>
-                      <MaterialCommunityIcons 
-                        name={isVerified ? "certificate" : "alert-circle"} 
-                        size={36} 
-                        color={isVerified ? "#4CAF50" : "#FF9800"} 
+                    {cert.image ? (
+                      <Image 
+                        source={{ uri: cert.image }} 
+                        style={styles.certImage}
+                        resizeMode="cover"
                       />
-                    </View>
+                    ) : (
+                      <View style={styles.certIcon}>
+                        <MaterialCommunityIcons 
+                          name={isVerified ? "certificate" : "alert-circle"} 
+                          size={36} 
+                          color={isVerified ? "#4CAF50" : "#FF9800"} 
+                        />
+                      </View>
+                    )}
                     <View style={styles.certInfo}>
                       <Text style={styles.certName}>{cert.name}</Text>
                       <Text style={styles.certDetail}>
@@ -439,12 +675,11 @@ export default function CertificatesScreen() {
                       <Text style={styles.certDetail}>
                         <MaterialCommunityIcons name="calendar" size={14} color="#666" /> Cấp: {cert.issueDate}
                       </Text>
-                      <Text style={styles.certDetail}>
-                        <MaterialCommunityIcons name="clock-outline" size={14} color="#666" /> HSD: {cert.expiryDate}
-                      </Text>
-                      <Text style={styles.certDetail}>
-                        <MaterialCommunityIcons name="identifier" size={14} color="#666" /> Số CC: {cert.certificateNumber}
-                      </Text>
+                      {cert.expiryDate && cert.expiryDate !== "Vô thời hạn" && (
+                        <Text style={styles.certDetail}>
+                          <MaterialCommunityIcons name="clock-outline" size={14} color="#666" /> HSD: {cert.expiryDate}
+                        </Text>
+                      )}
                     </View>
                   </View>
 
@@ -478,19 +713,31 @@ export default function CertificatesScreen() {
                     </>
                   )}
 
-                  <View style={styles.certActions}>
-                    <TouchableOpacity style={styles.btnView}>
-                      <Text style={styles.btnViewText}>👁️ Xem ảnh</Text>
+                  <View style={styles.certActionButtons}>
+                    <TouchableOpacity 
+                      style={styles.btnDetail}
+                      onPress={() => fetchCertificateDetail(cert.id)}
+                      disabled={loadingDetail}
+                    >
+                      <MaterialCommunityIcons name="information-outline" size={18} color="#2196F3" />
+                      <Text style={styles.btnDetailText}>Xem chi tiết</Text>
                     </TouchableOpacity>
-                    {isRejected && (
-                      <TouchableOpacity style={styles.btnDelete}>
-                        <Text style={styles.btnDeleteText}>🗑️ Xóa</Text>
+
+                    {isPending && (
+                      <TouchableOpacity 
+                        style={styles.btnEdit}
+                        onPress={() => handleEditCertificate(cert)}
+                      >
+                        <MaterialCommunityIcons name="pencil" size={18} color="#FF9800" />
+                        <Text style={styles.btnEditText}>Chỉnh sửa</Text>
                       </TouchableOpacity>
                     )}
                   </View>
+
                 </View>
               );
-            })}
+            })
+            )}
           </View>
         ) : (
           <View>
@@ -560,11 +807,16 @@ export default function CertificatesScreen() {
             <View style={styles.modalBox}>
               <View style={styles.modalHeader}>
                 <MaterialCommunityIcons name="certificate" size={24} color="#3FD2CD" />
-                <Text style={styles.modalTitle}>Thêm chứng chỉ mới</Text>
+                <Text style={styles.modalTitle}>
+                  {editMode ? 'Chỉnh sửa chứng chỉ' : 'Thêm chứng chỉ mới'}
+                </Text>
               </View>
               
               <Text style={styles.modalSubtitle}>
-                Vui lòng điền đầy đủ thông tin và tải lên hình ảnh chứng chỉ.
+                {editMode 
+                  ? 'Cập nhật thông tin chứng chỉ của bạn.'
+                  : 'Vui lòng điền đầy đủ thông tin và tải lên hình ảnh chứng chỉ.'
+                }
               </Text>
 
               {/* Tên chứng chỉ */}
@@ -601,20 +853,54 @@ export default function CertificatesScreen() {
                 {errors.organization ? <Text style={styles.errorText}>{errors.organization}</Text> : null}
               </View>
 
+              {/* Loại chứng chỉ */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  Loại chứng chỉ <Text style={styles.required}>*</Text>
+                </Text>
+                <TouchableOpacity
+                  style={[styles.input, styles.dateInput, errors.certificateType && styles.inputError]}
+                  onPress={() => setShowCertificateTypePicker(true)}
+                >
+                  <MaterialCommunityIcons name="certificate" size={20} color="#666" />
+                  <Text style={form.certificateType ? styles.dateText : styles.datePlaceholder}>
+                    {form.certificateType || "Chọn loại chứng chỉ"}
+                  </Text>
+                </TouchableOpacity>
+                {errors.certificateType ? <Text style={styles.errorText}>{errors.certificateType}</Text> : null}
+              </View>
+
               {/* Ngày cấp */}
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>
                   Ngày cấp <Text style={styles.required}>*</Text>
                 </Text>
-                <TextInput
-                  placeholder="10/20/2023"
-                  value={form.issueDate}
-                  onChangeText={(t) => {
-                    setForm({ ...form, issueDate: t });
-                    if (errors.issueDate) setErrors({ ...errors, issueDate: "" });
-                  }}
-                  style={[styles.input, errors.issueDate && styles.inputError]}
-                />
+                <TouchableOpacity
+                  style={[styles.input, styles.dateInput, errors.issueDate && styles.inputError]}
+                  onPress={() => setShowIssueDatePicker(true)}
+                >
+                  <MaterialCommunityIcons name="calendar" size={20} color="#666" />
+                  <Text style={form.issueDate ? styles.dateText : styles.datePlaceholder}>
+                    {form.issueDate || "Chọn ngày cấp"}
+                  </Text>
+                </TouchableOpacity>
+                {showIssueDatePicker && (
+                  <DateTimePicker
+                    value={form.issueDate ? new Date(form.issueDate.split('/').reverse().join('-')) : new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowIssueDatePicker(false);
+                      if (selectedDate) {
+                        const day = String(selectedDate.getDate()).padStart(2, '0');
+                        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                        const year = selectedDate.getFullYear();
+                        setForm({ ...form, issueDate: `${day}/${month}/${year}` });
+                        if (errors.issueDate) setErrors({ ...errors, issueDate: "" });
+                      }
+                    }}
+                  />
+                )}
                 {errors.issueDate ? <Text style={styles.errorText}>{errors.issueDate}</Text> : null}
               </View>
 
@@ -623,30 +909,33 @@ export default function CertificatesScreen() {
                 <Text style={styles.inputLabel}>
                   Ngày hết hạn <Text style={styles.optional}>(nếu có)</Text>
                 </Text>
-                <TextInput
-                  placeholder="mm/dd/yyyy"
-                  value={form.expiryDate}
-                  onChangeText={(t) => {
-                    setForm({ ...form, expiryDate: t });
-                    if (errors.expiryDate) setErrors({ ...errors, expiryDate: "" });
-                  }}
-                  style={[styles.input, errors.expiryDate && styles.inputError]}
-                />
+                <TouchableOpacity
+                  style={[styles.input, styles.dateInput, errors.expiryDate && styles.inputError]}
+                  onPress={() => setShowExpiryDatePicker(true)}
+                >
+                  <MaterialCommunityIcons name="calendar" size={20} color="#666" />
+                  <Text style={form.expiryDate ? styles.dateText : styles.datePlaceholder}>
+                    {form.expiryDate || "Chọn ngày hết hạn"}
+                  </Text>
+                </TouchableOpacity>
+                {showExpiryDatePicker && (
+                  <DateTimePicker
+                    value={form.expiryDate ? new Date(form.expiryDate.split('/').reverse().join('-')) : new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowExpiryDatePicker(false);
+                      if (selectedDate) {
+                        const day = String(selectedDate.getDate()).padStart(2, '0');
+                        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                        const year = selectedDate.getFullYear();
+                        setForm({ ...form, expiryDate: `${day}/${month}/${year}` });
+                        if (errors.expiryDate) setErrors({ ...errors, expiryDate: "" });
+                      }
+                    }}
+                  />
+                )}
                 {errors.expiryDate ? <Text style={styles.errorText}>{errors.expiryDate}</Text> : null}
-              </View>
-
-              {/* Số chứng chỉ */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>
-                  Số chứng chỉ <Text style={styles.optional}>(nếu có)</Text>
-                </Text>
-                <TextInput
-                  placeholder="VD: CC-2023-12345"
-                  value={form.certificateNumber}
-                  onChangeText={(t) => setForm({ ...form, certificateNumber: t })}
-                  style={styles.input}
-                  maxLength={50}
-                />
               </View>
 
               {/* Hình ảnh chứng chỉ */}
@@ -669,8 +958,13 @@ export default function CertificatesScreen() {
                 {form.image && (
                   <View style={styles.filePreview}>
                     <MaterialCommunityIcons name="check-circle" size={20} color="#4CAF50" />
-                    <Text style={styles.fileName}>{form.image.name}</Text>
+                    <Text style={styles.fileName}>
+                      {form.image.name || (editMode ? 'Ảnh hiện tại' : 'File đã chọn')}
+                    </Text>
                   </View>
+                )}
+                {editMode && form.image && !form.image.uri && (
+                  <Text style={styles.uploadHint}>Nhấn "Chọn file" để thay đổi ảnh mới</Text>
                 )}
                 {errors.image ? <Text style={styles.errorText}>{errors.image}</Text> : null}
                 
@@ -682,20 +976,45 @@ export default function CertificatesScreen() {
               </View>
 
               {/* Actions */}
-              <TouchableOpacity style={styles.submitBtn} onPress={handleAdd}>
-                <MaterialCommunityIcons name="check" size={20} color="#FFF" />
-                <Text style={styles.submitBtnText}>Gửi chứng chỉ để xác minh</Text>
+              <TouchableOpacity 
+                style={[styles.submitBtn, submitting && styles.submitBtnDisabled]} 
+                onPress={handleAdd}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <MaterialCommunityIcons name="check" size={20} color="#FFF" />
+                )}
+                <Text style={styles.submitBtnText}>
+                  {submitting 
+                    ? (editMode ? 'Đang cập nhật...' : 'Đang gửi...') 
+                    : (editMode ? 'Cập nhật chứng chỉ' : 'Gửi chứng chỉ để xác minh')
+                  }
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.cancelBtn}
                 onPress={() => {
                   setModalVisible(false);
+                  setEditMode(false);
+                  setEditingCertificateId(null);
+                  setForm({
+                    name: "",
+                    organization: "",
+                    issueDate: "",
+                    expiryDate: "",
+                    certificateNumber: "",
+                    certificateType: "",
+                    image: null,
+                  });
                   setErrors({
                     name: "",
                     organization: "",
                     issueDate: "",
                     expiryDate: "",
+                    certificateType: "",
                     image: "",
                   });
                 }}
@@ -704,6 +1023,48 @@ export default function CertificatesScreen() {
               </TouchableOpacity>
             </View>
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal chọn loại chứng chỉ */}
+      <Modal visible={showCertificateTypePicker} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.skillModalContent}>
+            <View style={styles.skillModalHeader}>
+              <MaterialCommunityIcons name="certificate" size={24} color="#2196F3" />
+              <Text style={styles.skillModalTitle}>Chọn loại chứng chỉ</Text>
+              <TouchableOpacity onPress={() => setShowCertificateTypePicker(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {CERTIFICATE_TYPES.map((type, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.certificateTypeOption,
+                    form.certificateType === type && styles.certificateTypeOptionSelected
+                  ]}
+                  onPress={() => {
+                    setForm({ ...form, certificateType: type });
+                    if (errors.certificateType) setErrors({ ...errors, certificateType: "" });
+                    setShowCertificateTypePicker(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.certificateTypeText,
+                    form.certificateType === type && styles.certificateTypeTextSelected
+                  ]}>
+                    {type}
+                  </Text>
+                  {form.certificateType === type && (
+                    <MaterialCommunityIcons name="check-circle" size={24} color="#2196F3" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
         </View>
       </Modal>
 
@@ -868,6 +1229,127 @@ export default function CertificatesScreen() {
         </View>
       </Modal>
 
+      {/* Certificate Detail Modal */}
+      <Modal visible={detailModalVisible} animationType="slide" transparent>
+        <View style={styles.detailModalOverlay}>
+          <View style={styles.detailModalContent}>
+            <View style={styles.detailModalHeader}>
+              <Text style={styles.detailModalTitle}>Chi tiết chứng chỉ</Text>
+              <TouchableOpacity onPress={() => setDetailModalVisible(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {loadingDetail ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3FD2CD" />
+                <Text style={styles.loadingText}>Đang tải...</Text>
+              </View>
+            ) : selectedCertificate ? (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {selectedCertificate.certificateImage && (
+                  <Image 
+                    source={{ uri: selectedCertificate.certificateImage }}
+                    style={styles.detailCertImage}
+                    resizeMode="contain"
+                  />
+                )}
+
+                <View style={styles.detailInfoSection}>
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons name="certificate" size={20} color="#2196F3" />
+                    <View style={styles.detailRowContent}>
+                      <Text style={styles.detailLabel}>Tên chứng chỉ</Text>
+                      <Text style={styles.detailValue}>{selectedCertificate.name}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons name="office-building" size={20} color="#2196F3" />
+                    <View style={styles.detailRowContent}>
+                      <Text style={styles.detailLabel}>Tổ chức cấp</Text>
+                      <Text style={styles.detailValue}>{selectedCertificate.issuingOrganization}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons name="tag" size={20} color="#2196F3" />
+                    <View style={styles.detailRowContent}>
+                      <Text style={styles.detailLabel}>Loại chứng chỉ</Text>
+                      <Text style={styles.detailValue}>{selectedCertificate.certificateType}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons name="calendar" size={20} color="#2196F3" />
+                    <View style={styles.detailRowContent}>
+                      <Text style={styles.detailLabel}>Ngày cấp</Text>
+                      <Text style={styles.detailValue}>
+                        {new Date(selectedCertificate.issueDate).toLocaleDateString('vi-VN')}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {selectedCertificate.expirationDate && (
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="clock-outline" size={20} color="#2196F3" />
+                      <View style={styles.detailRowContent}>
+                        <Text style={styles.detailLabel}>Ngày hết hạn</Text>
+                        <Text style={styles.detailValue}>
+                          {new Date(selectedCertificate.expirationDate).toLocaleDateString('vi-VN')}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons 
+                      name={selectedCertificate.status === 'approved' ? 'check-circle' : 'clock-outline'} 
+                      size={20} 
+                      color={selectedCertificate.status === 'approved' ? '#4CAF50' : '#FF9800'} 
+                    />
+                    <View style={styles.detailRowContent}>
+                      <Text style={styles.detailLabel}>Trạng thái</Text>
+                      <Text style={[
+                        styles.detailValue,
+                        selectedCertificate.status === 'approved' && styles.statusApproved,
+                        selectedCertificate.status === 'pending' && styles.statusPendingText,
+                        selectedCertificate.status === 'rejected' && styles.statusRejectedText
+                      ]}>
+                        {selectedCertificate.status === 'approved' ? 'Đã xác minh' : 
+                         selectedCertificate.status === 'pending' ? 'Đang chờ duyệt' : 'Bị từ chối'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {selectedCertificate.reviewedBy && (
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="account-check" size={20} color="#2196F3" />
+                      <View style={styles.detailRowContent}>
+                        <Text style={styles.detailLabel}>Người duyệt</Text>
+                        <Text style={styles.detailValue}>{selectedCertificate.reviewedBy.name}</Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {selectedCertificate.reviewedAt && (
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="calendar-check" size={20} color="#2196F3" />
+                      <View style={styles.detailRowContent}>
+                        <Text style={styles.detailLabel}>Ngày duyệt</Text>
+                        <Text style={styles.detailValue}>
+                          {new Date(selectedCertificate.reviewedAt).toLocaleString('vi-VN')}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </View>
+              </ScrollView>
+            ) : null}
+          </View>
+        </View>
+      </Modal>
+
       {/* Bottom Navigation */}
       <CaregiverBottomNav activeTab="profile" />
     </View>
@@ -970,6 +1452,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
+  },
+  certImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    marginRight: 12,
+    backgroundColor: "#F5F5F5",
   },
   certIconText: {
     fontSize: 30,
@@ -1226,6 +1715,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     backgroundColor: "#F9F9F9",
   },
+  dateInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  dateText: {
+    fontSize: 15,
+    color: "#333",
+  },
+  datePlaceholder: {
+    fontSize: 15,
+    color: "#999",
+  },
   inputError: {
     borderColor: "#F44336",
     backgroundColor: "#FFEBEE",
@@ -1306,6 +1808,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 8,
     gap: 8,
+  },
+  submitBtnDisabled: {
+    backgroundColor: "#A5D6A7",
+    opacity: 0.7,
   },
   submitBtnText: {
     color: "#FFF",
@@ -1525,5 +2031,178 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 16,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    paddingVertical: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: "#666",
+  },
+  emptyContainer: {
+    paddingVertical: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
+  },
+  emptySubText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#999",
+  },
+  uploadHint: {
+    fontSize: 12,
+    color: "#64748B",
+    marginTop: 8,
+    fontStyle: "italic",
+  },
+  certificateTypeOption: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#F9F9F9",
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#E0E0E0",
+  },
+  certificateTypeOptionSelected: {
+    backgroundColor: "#E3F2FD",
+    borderColor: "#2196F3",
+  },
+  certificateTypeText: {
+    fontSize: 15,
+    color: "#333",
+    fontWeight: "500",
+    flex: 1,
+  },
+  certificateTypeTextSelected: {
+    color: "#2196F3",
+    fontWeight: "600",
+  },
+  certActionButtons: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  deleteButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "#FFEBEE",
+    borderRadius: 20,
+    padding: 8,
+    zIndex: 10,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  btnDetail: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E3F2FD",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  btnDetailText: {
+    color: "#2196F3",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  btnEdit: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF3E0",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  btnEditText: {
+    color: "#FF9800",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  detailModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  detailModalContent: {
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "90%",
+    paddingTop: 20,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+  },
+  detailModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  detailModalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
+  },
+  detailCertImage: {
+    width: "100%",
+    height: 300,
+    borderRadius: 12,
+    backgroundColor: "#F5F5F5",
+    marginBottom: 20,
+  },
+  detailInfoSection: {
+    gap: 16,
+  },
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  detailRowContent: {
+    flex: 1,
+  },
+  detailLabel: {
+    fontSize: 13,
+    color: "#64748B",
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1E293B",
+  },
+  statusApproved: {
+    color: "#4CAF50",
+  },
+  statusPendingText: {
+    color: "#FF9800",
+  },
+  statusRejectedText: {
+    color: "#F44336",
   },
 });

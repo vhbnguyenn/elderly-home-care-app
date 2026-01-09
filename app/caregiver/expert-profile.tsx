@@ -1,9 +1,12 @@
 // ExpertProfileScreen.js
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import { useAuth } from "@/contexts/AuthContext";
+import axiosInstance from "@/services/axiosInstance";
+import { API_CONFIG } from "@/services/config/api.config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -30,24 +33,30 @@ const EDUCATION_OPTIONS = [
 
 export default function ExpertProfileScreen() {
   const navigation = useNavigation<any>();
+  const { user } = useAuth();
+  
+  // Loading and error states
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   
   // avatar & cccd images
-  const [avatarUri, setAvatarUri] = useState(null);
-  const [cccdFrontUri, setCccdFrontUri] = useState("https://via.placeholder.com/300x200?text=CCCD+Front"); // Mock data - will be replaced by API
-  const [cccdBackUri, setCccdBackUri] = useState("https://via.placeholder.com/300x200?text=CCCD+Back"); // Mock data - will be replaced by API
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [cccdFrontUri, setCccdFrontUri] = useState<string | null>(null);
+  const [cccdBackUri, setCccdBackUri] = useState<string | null>(null);
 
   // basic info (non-editable)
-  const [fullName] = useState("Lê Văn C"); // Not editable
-  const [email, setEmail] = useState("caregiver2@gmail.com");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
 
   // personal & contact
   const [dob, setDob] = useState(""); // mm/dd/yyyy
   const [gender, setGender] = useState("");
   const [showGenderModal, setShowGenderModal] = useState(false);
 
-  const [idNumber] = useState("079203012345"); // Not editable - mock data
+  const [idNumber, setIdNumber] = useState("");
   const [phone, setPhone] = useState("");
-  const [permanentAddress] = useState("123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP.HCM"); // Not editable - mock data
+  const [permanentAddress, setPermanentAddress] = useState("");
   const [temporaryAddress, setTemporaryAddress] = useState("");
 
   // career
@@ -55,8 +64,74 @@ export default function ExpertProfileScreen() {
   const [workPlace, setWorkPlace] = useState("");
   const [education, setEducation] = useState("");
   const [showEducationModal, setShowEducationModal] = useState(false);
-  const [universityDegreeUri, setUniversityDegreeUri] = useState("https://via.placeholder.com/400x300?text=University+Degree"); // Mock data for university degree
+  const [universityDegreeUri, setUniversityDegreeUri] = useState<string | null>(null);
   const [selfIntroduction, setSelfIntroduction] = useState("");
+
+  // Fetch profile data from API
+  const fetchProfileData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.CAREGIVER.GET_OWN_PROFILE);
+      const profileData = response.data.data || response.data;
+
+      // Map API data to state
+      if (profileData) {
+        // Basic info
+        setFullName(profileData.user?.name || user?.name || "");
+        setEmail(profileData.user?.email || user?.email || "");
+        
+        // Personal info
+        if (profileData.dateOfBirth) {
+          const date = new Date(profileData.dateOfBirth);
+          const formatted = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+          setDob(formatted);
+        }
+        setGender(profileData.gender || "");
+        setIdNumber(profileData.idCardNumber || "");
+        setPhone(profileData.phoneNumber || "");
+        setPermanentAddress(profileData.permanentAddress || "");
+        setTemporaryAddress(profileData.temporaryAddress || "");
+        
+        // Career info
+        setYearsExp(String(profileData.yearsOfExperience || 0));
+        setWorkPlace(profileData.workHistory || "");
+        
+        // Map education from API to display format
+        const educationMap: { [key: string]: string } = {
+          "trung học cơ sở": "Trung học cơ sở",
+          "trung học phổ thông": "Trung học phổ thông",
+          "cao đẳng": "Cao đẳng",
+          "đại học": "Đại học",
+          "sau đại học": "Sau đại học",
+        };
+        setEducation(educationMap[profileData.education?.toLowerCase()] || profileData.education || "");
+        
+        setSelfIntroduction(profileData.bio || "");
+        
+        // Images
+        setAvatarUri(profileData.profileImage || null);
+        setCccdFrontUri(profileData.idCardFrontImage || null);
+        setCccdBackUri(profileData.idCardBackImage || null);
+        setUniversityDegreeUri(profileData.universityDegreeImage || null);
+      }
+    } catch (err: any) {
+      console.error("Error fetching profile:", err);
+      if (err.response?.status === 404) {
+        setError("Chưa có hồ sơ. Vui lòng hoàn thiện hồ sơ.");
+      } else {
+        setError("Không thể tải thông tin hồ sơ. Vui lòng thử lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.name, user?.email]);
+
+  // Fetch profile on mount
+  useEffect(() => {
+    fetchProfileData();
+  }, [fetchProfileData]);
 
   // request permission for image picker
   useEffect(() => {
@@ -74,7 +149,7 @@ export default function ExpertProfileScreen() {
     })();
   }, []);
 
-  const pickImage = async (setter) => {
+  const pickImage = async (setter: (uri: string | null) => void) => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -82,15 +157,15 @@ export default function ExpertProfileScreen() {
         allowsEditing: true,
       });
 
-      if (!result.cancelled) {
-        setter(result.uri);
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setter(result.assets[0].uri);
       }
     } catch (err) {
       console.warn("ImagePicker error:", err);
     }
   };
 
-  const takePhoto = async (setter) => {
+  const takePhoto = async (setter: (uri: string | null) => void) => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
@@ -102,39 +177,121 @@ export default function ExpertProfileScreen() {
         quality: 0.8,
         allowsEditing: true,
       });
-      if (!result.cancelled) {
-        setter(result.uri);
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setter(result.assets[0].uri);
       }
     } catch (err) {
       console.warn("Camera error:", err);
     }
   };
 
-  const onSave = () => {
-    // TODO: call API to save profile
-    const payload = {
-      fullName, // Read-only
-      email,
-      dob,
-      gender,
-      idNumber, // Read-only
-      phone,
-      permanentAddress, // Read-only
-      temporaryAddress,
-      yearsExp,
-      workPlace,
-      education,
-      selfIntroduction,
-      avatarUri,
-      cccdFrontUri, // Read-only
-      cccdBackUri, // Read-only
-      universityDegreeUri: education === "Đại học" || education === "Sau đại học" ? universityDegreeUri : null,
-    };
-    console.log("Save payload:", payload);
-    Alert.alert("Lưu hồ sơ", "Thông tin đã được lưu (demo).");
+  // Upload image to Cloudinary
+  const uploadImageToCloudinary = async (imageUri: string): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      
+      // Create file object from URI
+      const filename = imageUri.split('/').pop() || 'image.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+      
+      formData.append('file', {
+        uri: imageUri,
+        name: filename,
+        type,
+      } as any);
+      
+      formData.append('upload_preset', 'elderly-care');
+      formData.append('folder', 'elderly-care');
+
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/douyvufca/image/upload',
+        {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const data = await response.json();
+      return data.secure_url || null;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
   };
 
-  const renderModalList = (data, onSelect) => (
+  const onSave = async () => {
+    try {
+      setSaving(true);
+      
+      // Upload images to Cloudinary if they are new (local URIs)
+      let profileImageUrl = avatarUri;
+      let universityDegreeUrl = universityDegreeUri;
+
+      // Upload avatar if it's a local file
+      if (avatarUri && !avatarUri.startsWith('http')) {
+        const uploadedUrl = await uploadImageToCloudinary(avatarUri);
+        if (uploadedUrl) {
+          profileImageUrl = uploadedUrl;
+        } else {
+          Alert.alert("Lỗi", "Không thể tải ảnh đại diện lên. Vui lòng thử lại.");
+          setSaving(false);
+          return;
+        }
+      }
+
+      // Upload university degree if it's a local file and education is university level
+      if (universityDegreeUri && !universityDegreeUri.startsWith('http') && 
+          (education === "Đại học" || education === "Sau đại học")) {
+        const uploadedUrl = await uploadImageToCloudinary(universityDegreeUri);
+        if (uploadedUrl) {
+          universityDegreeUrl = uploadedUrl;
+        } else {
+          Alert.alert("Lỗi", "Không thể tải ảnh bằng đại học lên. Vui lòng thử lại.");
+          setSaving(false);
+          return;
+        }
+      }
+
+      const payload: any = {
+        phoneNumber: phone,
+        temporaryAddress,
+        yearsOfExperience: Number(yearsExp),
+        workHistory: workPlace,
+        education: education.toLowerCase(),
+        bio: selfIntroduction,
+      };
+
+      // Add profileImage if changed
+      if (profileImageUrl && !avatarUri?.startsWith('http')) {
+        payload.profileImage = profileImageUrl;
+      }
+
+      // Add universityDegreeImage only if education is university level
+      if ((education === "Đại học" || education === "Sau đại học") && universityDegreeUrl) {
+        payload.universityDegreeImage = universityDegreeUrl;
+      }
+
+      await axiosInstance.put(API_CONFIG.ENDPOINTS.CAREGIVER.UPDATE_PROFILE, payload);
+      
+      Alert.alert("Thành công", "Thông tin hồ sơ đã được cập nhật.", [
+        { text: "OK", onPress: () => fetchProfileData() }
+      ]);
+    } catch (err: any) {
+      console.error("Error saving profile:", err);
+      Alert.alert(
+        "Lỗi",
+        err.response?.data?.message || "Không thể lưu thông tin. Vui lòng thử lại."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const renderModalList = (data: string[], onSelect: (val: string) => void) => (
     <FlatList
       data={data}
       keyExtractor={(i) => i}
@@ -156,6 +313,24 @@ export default function ExpertProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ fontSize: 16, color: "#64748B" }}>Đang tải thông tin...</Text>
+        </View>
+      ) : error ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
+          <MaterialCommunityIcons name="alert-circle" size={48} color="#EF4444" />
+          <Text style={{ fontSize: 16, color: "#EF4444", marginTop: 12, textAlign: "center" }}>
+            {error}
+          </Text>
+          <TouchableOpacity
+            style={[styles.primaryBtn, { marginTop: 20 }]}
+            onPress={fetchProfileData}
+          >
+            <Text style={styles.primaryBtnText}>Thử lại</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -213,10 +388,10 @@ export default function ExpertProfileScreen() {
               <Text style={styles.label}>Email</Text>
               <TextInput
                 value={email}
-                onChangeText={setEmail}
                 placeholder="Email"
                 keyboardType="email-address"
-                style={styles.input}
+                style={[styles.input, styles.disabledInput]}
+                editable={false}
               />
             </View>
           </View>
@@ -234,21 +409,20 @@ export default function ExpertProfileScreen() {
               <TextInput
                 placeholder="mm/dd/yyyy"
                 value={dob}
-                onChangeText={setDob}
-                style={styles.input}
+                style={[styles.input, styles.disabledInput]}
+                editable={false}
               />
             </View>
 
             <View style={{ flex: 1, marginLeft: 8 }}>
               <Text style={styles.label}>Giới tính</Text>
-              <TouchableOpacity
-                style={[styles.input, { justifyContent: "center" }]}
-                onPress={() => setShowGenderModal(true)}
+              <View
+                style={[styles.input, styles.disabledInput, { justifyContent: "center" }]}
               >
-                <Text style={{ color: gender ? "#000" : "#9CA3AF" }}>
-                  {gender || "Chọn giới tính"}
+                <Text style={{ color: gender ? "#9CA3AF" : "#9CA3AF" }}>
+                  {gender || "Chưa cập nhật"}
                 </Text>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
 
@@ -299,8 +473,11 @@ export default function ExpertProfileScreen() {
         {/* CCCD images */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Ảnh CCCD/CMND</Text>
+          <Text style={styles.disabledNote}>
+            Ảnh CCCD không thể chỉnh sửa sau khi đã xác thực
+          </Text>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 12 }}
           >
             <View style={styles.cccdBlock}>
               <Text style={styles.smallLabel}>Ảnh CCCD mặt trước</Text>
@@ -396,6 +573,20 @@ export default function ExpertProfileScreen() {
                   </Text>
                 )}
               </View>
+              <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+                <TouchableOpacity
+                  style={[styles.ghostBtn, { flex: 1 }]}
+                  onPress={() => pickImage(setUniversityDegreeUri)}
+                >
+                  <Text style={styles.ghostBtnText}>Chọn ảnh</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.ghostBtn, { flex: 1 }]}
+                  onPress={() => takePhoto(setUniversityDegreeUri)}
+                >
+                  <Text style={styles.ghostBtnText}>Chụp ảnh</Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
 
@@ -438,10 +629,13 @@ export default function ExpertProfileScreen() {
           }}
         >
           <TouchableOpacity
-            style={[styles.btn, { backgroundColor: "#10B981", paddingHorizontal: 32 }]}
+            style={[styles.btn, { backgroundColor: saving ? "#9CA3AF" : "#10B981", paddingHorizontal: 32 }]}
             onPress={onSave}
+            disabled={saving}
           >
-            <Text style={{ color: "#fff", fontWeight: "700" }}>Lưu</Text>
+            <Text style={{ color: "#fff", fontWeight: "700" }}>
+              {saving ? "Đang lưu..." : "Lưu"}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -487,6 +681,7 @@ export default function ExpertProfileScreen() {
           </View>
         </Modal>
       </ScrollView>
+      )}
       
       {/* Bottom Navigation */}
       <CaregiverBottomNav activeTab="profile" />

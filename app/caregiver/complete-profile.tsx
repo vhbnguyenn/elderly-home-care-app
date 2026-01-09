@@ -7,56 +7,60 @@ import React, { useEffect, useState } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { submitProfileForReview } from "@/data/profileStore";
+import { CaregiverAPI } from "@/services/api/caregiver.api";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface PersonalInfo {
   fullName: string;
-  phone: string;
+  phoneNumber: string;
   permanentAddress: string;
+  temporaryAddress: string;
   dateOfBirth: string;
   gender: string;
-  idCard: string;
-  idCardFront: string | null;
-  idCardBack: string | null;
+  idCardNumber: string;
+  idCardFrontImage: string | null;
+  idCardBackImage: string | null;
 }
 
 interface Certificate {
   name: string;
   issueDate: string;
+  expiryDate: string;
   issuingOrganization: string;
-  type: string;
-  image: string | null;
+  certificateType: string;
+  certificateImage: string | null;
 }
 
 interface ProfessionalInfo {
-  yearsOfExperience: string;
-  previousWorkplace: string;
+  yearsOfExperience: number;
+  workHistory: string;
   education: string;
-  educationCertificate: string | null;
+  universityDegreeImage: string | null;
   certificates: Certificate[];
 }
 
 interface AdditionalInfo {
   profileImage: string | null;
-  videoLink: string;
-  introduction: string;
+  bio: string;
 }
 
 interface CommitmentInfo {
-  ethicalCommitment: boolean;
-  termsAgreement: boolean;
+  agreeToEthics: boolean;
+  agreeToTerms: boolean;
 }
 
 export default function CompleteProfileScreen() {
@@ -74,32 +78,37 @@ export default function CompleteProfileScreen() {
   // Personal info
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     fullName: params?.fullName || "",
-    phone: "",
+    phoneNumber: "",
     permanentAddress: "",
+    temporaryAddress: "",
     dateOfBirth: "",
     gender: "",
-    idCard: "",
-    idCardFront: null,
-    idCardBack: null,
+    idCardNumber: "",
+    idCardFrontImage: null,
+    idCardBackImage: null,
   });
 
   // Professional info
   const [professionalInfo, setProfessionalInfo] = useState<ProfessionalInfo>({
-    yearsOfExperience: "0",
-    previousWorkplace: "",
+    yearsOfExperience: 0,
+    workHistory: "",
     education: "",
-    educationCertificate: null,
+    universityDegreeImage: null,
     certificates: [],
   });
 
   // Date picker states
   const [showDateOfBirthPicker, setShowDateOfBirthPicker] = useState(false);
   const [showCertificateDatePicker, setShowCertificateDatePicker] = useState(false);
+  const [showCertificateExpiryDatePicker, setShowCertificateExpiryDatePicker] = useState(false);
   const [currentCertificateIndex, setCurrentCertificateIndex] = useState<number | null>(null);
   const [tempDateOfBirth, setTempDateOfBirth] = useState<Date>(
     personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth) : new Date(new Date().setFullYear(new Date().getFullYear() - 20))
   );
   const [tempCertificateDate, setTempCertificateDate] = useState<Date>(new Date());
+  const [tempCertificateExpiryDate, setTempCertificateExpiryDate] = useState<Date>(
+    new Date(new Date().setFullYear(new Date().getFullYear() + 2))
+  );
 
   // Picker modals
   const [showEducationPicker, setShowEducationPicker] = useState(false);
@@ -109,23 +118,27 @@ export default function CompleteProfileScreen() {
   const [newCertificate, setNewCertificate] = useState<Certificate>({
     name: "",
     issueDate: "",
+    expiryDate: "",
     issuingOrganization: "",
-    type: "",
-    image: null,
+    certificateType: "",
+    certificateImage: null,
   });
 
   // Additional info
   const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo>({
     profileImage: null,
-    videoLink: "",
-    introduction: "",
+    bio: "",
   });
 
   // Commitment info
   const [commitmentInfo, setCommitmentInfo] = useState<CommitmentInfo>({
-    ethicalCommitment: false,
-    termsAgreement: false,
+    agreeToEthics: false,
+    agreeToTerms: false,
   });
+
+  // Loading and error states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasExistingProfile, setHasExistingProfile] = useState(false);
 
   const educationLevels = [
     "Chọn trình độ",
@@ -154,7 +167,7 @@ export default function CompleteProfileScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: type === "profile",
       aspect: type === "profile" ? [1, 1] : undefined,
       quality: 0.8,
@@ -169,16 +182,16 @@ export default function CompleteProfileScreen() {
       } else if (type === "idCardFront") {
         setPersonalInfo({
           ...personalInfo,
-          idCardFront: result.assets[0].uri,
+          idCardFrontImage: result.assets[0].uri,
         });
       } else if (type === "idCardBack") {
         setPersonalInfo({
           ...personalInfo,
-          idCardBack: result.assets[0].uri,
+          idCardBackImage: result.assets[0].uri,
         });
       } else if (type === "certificate" && certificateIndex !== undefined) {
         const updatedCertificates = [...professionalInfo.certificates];
-        updatedCertificates[certificateIndex].image = result.assets[0].uri;
+        updatedCertificates[certificateIndex].certificateImage = result.assets[0].uri;
         setProfessionalInfo({
           ...professionalInfo,
           certificates: updatedCertificates,
@@ -186,32 +199,42 @@ export default function CompleteProfileScreen() {
       } else if (type === "certificate" && certificateIndex === undefined) {
         setNewCertificate({
           ...newCertificate,
-          image: result.assets[0].uri,
+          certificateImage: result.assets[0].uri,
         });
       } else if (type === "education") {
         setProfessionalInfo({
           ...professionalInfo,
-          educationCertificate: result.assets[0].uri,
+          universityDegreeImage: result.assets[0].uri,
         });
       }
     }
   };
 
   const handleAddCertificate = () => {
-    if (!newCertificate.name.trim() || !newCertificate.issueDate || !newCertificate.issuingOrganization.trim() || !newCertificate.type || newCertificate.type === certificateTypes[0]) {
-      Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin chứng chỉ");
+    if (!newCertificate.name.trim() || !newCertificate.issueDate || !newCertificate.expiryDate || !newCertificate.issuingOrganization.trim() || !newCertificate.certificateType || newCertificate.certificateType === certificateTypes[0]) {
+      Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin chứng chỉ (bao gồm ngày cấp và ngày hết hạn)");
       return;
     }
+    console.log("=== ADDING CERTIFICATE ===");
+    console.log("New certificate:", newCertificate);
+    console.log("Current certificates count:", professionalInfo.certificates.length);
+    
+    const updatedCertificates = [...professionalInfo.certificates, { ...newCertificate }];
     setProfessionalInfo({
       ...professionalInfo,
-      certificates: [...professionalInfo.certificates, { ...newCertificate }],
+      certificates: updatedCertificates,
     });
+    
+    console.log("Updated certificates count:", updatedCertificates.length);
+    console.log("All certificates:", updatedCertificates);
+    
     setNewCertificate({
       name: "",
       issueDate: "",
+      expiryDate: "",
       issuingOrganization: "",
-      type: "",
-      image: null,
+      certificateType: "",
+      certificateImage: null,
     });
   };
 
@@ -295,24 +318,276 @@ export default function CompleteProfileScreen() {
     handleDateSelect(dateString, "certificate", currentCertificateIndex ?? undefined);
   };
 
+  const handleCertificateExpiryDateChange = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === "android") {
+      setShowCertificateExpiryDatePicker(false);
+      if (selectedDate) {
+        const dateString = selectedDate.toISOString().split("T")[0];
+        setNewCertificate({ ...newCertificate, expiryDate: dateString });
+      }
+    } else {
+      if (selectedDate) {
+        setTempCertificateExpiryDate(selectedDate);
+      }
+    }
+  };
+
+  const handleCertificateExpiryDateConfirm = () => {
+    const dateString = tempCertificateExpiryDate.toISOString().split("T")[0];
+    setNewCertificate({ ...newCertificate, expiryDate: dateString });
+    setShowCertificateExpiryDatePicker(false);
+  };
+
   const handleBack = () => {
     navigation.goBack();
   };
 
-  const handleComplete = () => {
-    if (!commitmentInfo.ethicalCommitment || !commitmentInfo.termsAgreement) {
+  // Upload image to Cloudinary
+  const uploadImageToCloudinary = async (imageUri: string): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'image.jpg',
+      } as any);
+      formData.append('upload_preset', 'elderly-care');
+      formData.append('folder', 'elderly-care/caregivers');
+
+      console.log('Uploading to Cloudinary:', imageUri);
+
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/ddgjpfrqz/image/upload',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      console.log('Cloudinary response:', data);
+      
+      if (!data.secure_url) {
+        console.error('Cloudinary error:', data.error);
+        throw new Error(data.error?.message || 'Failed to get image URL from Cloudinary');
+      }
+      
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      throw error;
+    }
+  };
+
+  const handleComplete = async () => {
+    console.log("=== STARTING PROFILE SUBMISSION ===");
+    console.log("Professional info certificates:", professionalInfo.certificates);
+    console.log("Number of certificates to submit:", professionalInfo.certificates.length);
+    
+    // Validate commitments
+    if (!commitmentInfo.agreeToEthics || !commitmentInfo.agreeToTerms) {
       Alert.alert("Thiếu thông tin", "Vui lòng đồng ý với tất cả các cam kết");
       return;
     }
 
-    // TODO: Call API to save profile
-    // Set profile status to pending
-    if (user?.id) {
-      submitProfileForReview(user.id);
+    // Validate required fields
+    if (!personalInfo.fullName || !personalInfo.phoneNumber || !personalInfo.dateOfBirth || !personalInfo.gender) {
+      Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin cá nhân");
+      return;
     }
 
-    // Navigate to profile status screen
-    navigation.navigate("Trạng thái hồ sơ");
+    if (!personalInfo.permanentAddress) {
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập địa chỉ thường trú");
+      return;
+    }
+
+    if (!personalInfo.idCardNumber || !personalInfo.idCardFrontImage || !personalInfo.idCardBackImage) {
+      Alert.alert("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin CMND/CCCD và tải lên ảnh mặt trước, mặt sau");
+      return;
+    }
+
+    if (!professionalInfo.education || professionalInfo.education === educationLevels[0]) {
+      Alert.alert("Thiếu thông tin", "Vui lòng chọn trình độ học vấn");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // TEMPORARY: Skip Cloudinary upload, use local URIs directly for testing certificates
+      console.log("⚠️ SKIPPING CLOUDINARY UPLOAD - Using local URIs for testing");
+      
+      let idCardFrontUrl = personalInfo.idCardFrontImage || "";
+      let idCardBackUrl = personalInfo.idCardBackImage || "";
+      let universityDegreeUrl = professionalInfo.universityDegreeImage || "";
+      let profileImageUrl = additionalInfo.profileImage || "";
+      const uploadedCertificates: Certificate[] = [];
+
+      // Helper function to check if URL is already a Cloudinary URL
+      const isCloudinaryUrl = (url: string) => url && url.includes('cloudinary.com');
+
+      // COMMENTED OUT - Cloudinary upload causing "Unknown API key" error
+      // TODO: Fix Cloudinary upload preset configuration
+      /*
+      // Upload ID card front image
+      if (personalInfo.idCardFrontImage) {
+        if (isCloudinaryUrl(personalInfo.idCardFrontImage)) {
+          console.log("ID card front already on Cloudinary, skipping upload");
+          idCardFrontUrl = personalInfo.idCardFrontImage;
+        } else {
+          console.log("Uploading ID card front image...");
+          idCardFrontUrl = await uploadImageToCloudinary(personalInfo.idCardFrontImage);
+          console.log("ID card front uploaded:", idCardFrontUrl);
+        }
+      }
+
+      // Upload ID card back image
+      if (personalInfo.idCardBackImage) {
+        if (isCloudinaryUrl(personalInfo.idCardBackImage)) {
+          console.log("ID card back already on Cloudinary, skipping upload");
+          idCardBackUrl = personalInfo.idCardBackImage;
+        } else {
+          console.log("Uploading ID card back image...");
+          idCardBackUrl = await uploadImageToCloudinary(personalInfo.idCardBackImage);
+          console.log("ID card back uploaded:", idCardBackUrl);
+        }
+      }
+
+      // Upload university degree image
+      if (professionalInfo.universityDegreeImage) {
+        if (isCloudinaryUrl(professionalInfo.universityDegreeImage)) {
+          console.log("University degree already on Cloudinary, skipping upload");
+          universityDegreeUrl = professionalInfo.universityDegreeImage;
+        } else {
+          console.log("Uploading university degree image...");
+          universityDegreeUrl = await uploadImageToCloudinary(professionalInfo.universityDegreeImage);
+          console.log("University degree uploaded:", universityDegreeUrl);
+        }
+      }
+
+      // Upload profile image
+      if (additionalInfo.profileImage) {
+        if (isCloudinaryUrl(additionalInfo.profileImage)) {
+          console.log("Profile image already on Cloudinary, skipping upload");
+          profileImageUrl = additionalInfo.profileImage;
+        } else {
+          console.log("Uploading profile image...");
+          profileImageUrl = await uploadImageToCloudinary(additionalInfo.profileImage);
+          console.log("Profile image uploaded:", profileImageUrl);
+        }
+      }
+      */
+
+      // Process certificates - use local URIs directly
+      if (professionalInfo.certificates.length > 0) {
+        console.log("=== PROCESSING CERTIFICATES ===");
+        console.log("Number of certificates to process:", professionalInfo.certificates.length);
+        console.log("Certificates data:", professionalInfo.certificates);
+        
+        for (let i = 0; i < professionalInfo.certificates.length; i++) {
+          const cert = professionalInfo.certificates[i];
+          console.log(`Processing certificate ${i + 1}:`, cert.name);
+          
+          // Use local URI directly (skip Cloudinary for now)
+          const certImageUrl = cert.certificateImage || "";
+          
+          uploadedCertificates.push({
+            ...cert,
+            certificateImage: certImageUrl,
+          });
+          console.log(`Certificate ${i + 1} processed and added to uploadedCertificates`);
+        }
+        console.log("All certificates processed. Total:", uploadedCertificates.length);
+      } else {
+        console.log("⚠️ NO CERTIFICATES TO PROCESS - professionalInfo.certificates is empty!");
+      }
+
+      console.log("All images processed (using local URIs)");
+      console.log("Uploaded certificates array:", uploadedCertificates);
+      console.log("Number of certificates:", uploadedCertificates.length);
+
+      // Prepare payload according to BE API schema
+      const payload = {
+        phoneNumber: personalInfo.phoneNumber,
+        dateOfBirth: personalInfo.dateOfBirth,
+        gender: personalInfo.gender,
+        permanentAddress: personalInfo.permanentAddress,
+        temporaryAddress: personalInfo.temporaryAddress || personalInfo.permanentAddress,
+        idCardNumber: personalInfo.idCardNumber,
+        idCardFrontImage: idCardFrontUrl,
+        idCardBackImage: idCardBackUrl,
+        universityDegreeImage: universityDegreeUrl,
+        profileImage: profileImageUrl,
+        yearsOfExperience: professionalInfo.yearsOfExperience,
+        workHistory: professionalInfo.workHistory,
+        education: professionalInfo.education,
+        bio: additionalInfo.bio || "Người chăm sóc tận tâm, chu đáo",
+        agreeToEthics: commitmentInfo.agreeToEthics,
+        agreeToTerms: commitmentInfo.agreeToTerms,
+        certificates: uploadedCertificates.map((cert) => ({
+          name: cert.name,
+          issueDate: cert.issueDate,
+          expiryDate: cert.expiryDate,
+          issuingOrganization: cert.issuingOrganization,
+          certificateType: cert.certificateType,
+          certificateImage: cert.certificateImage || "",
+        })),
+      };
+
+      console.log("=== PAYLOAD DETAILS ===");
+      console.log("Submitting profile with certificates:", JSON.stringify(payload.certificates, null, 2));
+      console.log("Full payload:", JSON.stringify(payload, null, 2));
+
+      // Call API to create or update profile
+      let response;
+      if (hasExistingProfile) {
+        console.log("📝 UPDATING existing profile...");
+        response = await CaregiverAPI.updateProfile(payload as any);
+        console.log("Profile updated successfully:", response);
+      } else {
+        console.log("✨ CREATING new profile...");
+        response = await CaregiverAPI.createProfile(payload as any);
+        console.log("Profile created successfully:", response);
+      }
+
+      // Set profile status to pending in local store
+      if (user?.id) {
+        submitProfileForReview(user.id);
+      }
+
+      // Show success message
+      Alert.alert(
+        "Thành công",
+        hasExistingProfile 
+          ? "Hồ sơ của bạn đã được cập nhật. Chúng tôi sẽ xem xét và phản hồi sớm nhất có thể."
+          : "Hồ sơ của bạn đã được gửi đi. Chúng tôi sẽ xem xét và phản hồi sớm nhất có thể.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // Navigate to profile status screen
+              navigation.navigate("Trạng thái hồ sơ");
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error("Error creating profile:", error);
+      
+      let errorMessage = "Đã xảy ra lỗi khi tạo hồ sơ. Vui lòng thử lại.";
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.message || error.response.data?.error || errorMessage;
+      } else if (error.request) {
+        // Request was made but no response
+        errorMessage = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";
+      }
+      
+      Alert.alert("Lỗi", errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Initialize date picker when opening
@@ -341,6 +616,90 @@ export default function CompleteProfileScreen() {
     }
   }, [showCertificateDatePicker, currentCertificateIndex, professionalInfo.certificates, newCertificate.issueDate]);
 
+  useEffect(() => {
+    if (showCertificateExpiryDatePicker) {
+      if (newCertificate.expiryDate) {
+        setTempCertificateExpiryDate(new Date(newCertificate.expiryDate));
+      } else {
+        setTempCertificateExpiryDate(new Date(new Date().setFullYear(new Date().getFullYear() + 2)));
+      }
+    }
+  }, [showCertificateExpiryDatePicker, newCertificate.expiryDate]);
+
+  // Load user data from auth context and existing profile from database
+  useEffect(() => {
+    const loadExistingProfile = async () => {
+      if (user) {
+        // Pre-fill registration info
+        setRegistrationInfo({
+          fullName: user.name || params?.fullName || "",
+          email: user.email || params?.email || "",
+        });
+
+        // Pre-fill personal info from user data
+        setPersonalInfo((prev) => ({
+          ...prev,
+          fullName: user.name || params?.fullName || prev.fullName,
+          phoneNumber: user.phone || prev.phoneNumber,
+          dateOfBirth: user.dateOfBirth || prev.dateOfBirth,
+        }));
+
+        // Try to load existing caregiver profile from database
+        try {
+          const response = await CaregiverAPI.getOwnProfile();
+          
+          if (response && response.data) {
+            const existingProfile = response.data;
+            console.log("Loaded existing profile from database:", existingProfile);
+            setHasExistingProfile(true); // Mark that profile exists
+            
+            // Pre-fill personal info from database
+            setPersonalInfo((prev) => ({
+              ...prev,
+              phoneNumber: existingProfile.phoneNumber || prev.phoneNumber,
+              dateOfBirth: existingProfile.dateOfBirth ? new Date(existingProfile.dateOfBirth).toISOString().split('T')[0] : prev.dateOfBirth,
+              gender: existingProfile.gender || prev.gender,
+              permanentAddress: existingProfile.permanentAddress || prev.permanentAddress,
+              temporaryAddress: existingProfile.temporaryAddress || prev.temporaryAddress,
+              idCardNumber: existingProfile.idCardNumber || prev.idCardNumber,
+              idCardFrontImage: existingProfile.idCardFrontImage || prev.idCardFrontImage,
+              idCardBackImage: existingProfile.idCardBackImage || prev.idCardBackImage,
+            }));
+
+            // Pre-fill professional info from database
+            setProfessionalInfo((prev) => ({
+              ...prev,
+              yearsOfExperience: existingProfile.yearsOfExperience || prev.yearsOfExperience,
+              workHistory: existingProfile.workHistory || prev.workHistory,
+              education: existingProfile.education || prev.education,
+              universityDegreeImage: existingProfile.universityDegreeImage || prev.universityDegreeImage,
+              certificates: existingProfile.certificates || prev.certificates,
+            }));
+
+            // Pre-fill additional info from database
+            setAdditionalInfo((prev) => ({
+              ...prev,
+              bio: existingProfile.bio || prev.bio,
+              profileImage: existingProfile.profileImage || prev.profileImage,
+            }));
+
+            // Pre-fill commitment info from database
+            setCommitmentInfo((prev) => ({
+              ...prev,
+              agreeToEthics: existingProfile.agreeToEthics ?? prev.agreeToEthics,
+              agreeToTerms: existingProfile.agreeToTerms ?? prev.agreeToTerms,
+            }));
+          }
+        } catch (error: any) {
+          // If profile doesn't exist or error occurs, just continue with user data
+          console.log("No existing profile found or error loading profile:", error.response?.status === 404 ? "Profile not found" : error.message);
+        }
+      }
+    };
+
+    loadExistingProfile();
+  }, [user, params?.fullName, params?.email]);
+
 
   const renderPersonalInfo = () => (
     <View style={[styles.contentCard, styles.firstContentCard]}>
@@ -358,9 +717,9 @@ export default function CompleteProfileScreen() {
             style={styles.input}
             placeholder="Nhập số điện thoại"
             placeholderTextColor="#9CA3AF"
-            value={personalInfo.phone}
+            value={personalInfo.phoneNumber}
             onChangeText={(text) =>
-              setPersonalInfo({ ...personalInfo, phone: text })
+              setPersonalInfo({ ...personalInfo, phoneNumber: text })
             }
             keyboardType="phone-pad"
           />
@@ -430,15 +789,30 @@ export default function CompleteProfileScreen() {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>
-          Địa chỉ <Text style={styles.required}>*</Text>
+          Địa chỉ thường trú <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={styles.input}
-          placeholder="Nhập địa chỉ"
+          placeholder="Nhập địa chỉ thường trú"
           placeholderTextColor="#9CA3AF"
           value={personalInfo.permanentAddress}
           onChangeText={(text) =>
             setPersonalInfo({ ...personalInfo, permanentAddress: text })
+          }
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>
+          Địa chỉ tạm trú
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nhập địa chỉ tạm trú (nếu khác địa chỉ thường trú)"
+          placeholderTextColor="#9CA3AF"
+          value={personalInfo.temporaryAddress}
+          onChangeText={(text) =>
+            setPersonalInfo({ ...personalInfo, temporaryAddress: text })
           }
         />
       </View>
@@ -451,9 +825,9 @@ export default function CompleteProfileScreen() {
           style={styles.input}
           placeholder="Nhập số CMND/CCCD"
           placeholderTextColor="#9CA3AF"
-          value={personalInfo.idCard}
+          value={personalInfo.idCardNumber}
           onChangeText={(text) =>
-            setPersonalInfo({ ...personalInfo, idCard: text })
+            setPersonalInfo({ ...personalInfo, idCardNumber: text })
           }
           keyboardType="numeric"
         />
@@ -463,6 +837,13 @@ export default function CompleteProfileScreen() {
         <Text style={styles.label}>
           Ảnh CCCD mặt trước <Text style={styles.required}>*</Text>
         </Text>
+        {personalInfo.idCardFrontImage && (
+          <Image 
+            source={{ uri: personalInfo.idCardFrontImage }} 
+            style={styles.imagePreview}
+            resizeMode="cover"
+          />
+        )}
         <TouchableOpacity
           style={styles.fileUploadContainer}
           onPress={() => handleImagePicker("idCardFront")}
@@ -470,21 +851,21 @@ export default function CompleteProfileScreen() {
         >
           <View style={styles.fileUploadContent}>
             <MaterialCommunityIcons
-              name={personalInfo.idCardFront ? "check-circle" : "id-card"}
+              name={personalInfo.idCardFrontImage ? "check-circle" : "id-card"}
               size={24}
-              color={personalInfo.idCardFront ? "#10B981" : "#6B7280"}
+              color={personalInfo.idCardFrontImage ? "#10B981" : "#6B7280"}
             />
             <Text
               style={[
                 styles.fileText,
-                personalInfo.idCardFront && styles.fileTextSuccess,
+                personalInfo.idCardFrontImage && styles.fileTextSuccess,
               ]}
             >
-              {personalInfo.idCardFront ? "Đã chọn ảnh" : "Chọn ảnh CCCD mặt trước"}
+              {personalInfo.idCardFrontImage ? "Đã chọn ảnh" : "Chọn ảnh CCCD mặt trước"}
             </Text>
           </View>
           <View style={styles.fileButton}>
-            <Text style={styles.fileButtonText}>Chọn tệp</Text>
+            <Text style={styles.fileButtonText}>{personalInfo.idCardFrontImage ? "Đổi ảnh" : "Chọn tệp"}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -493,6 +874,13 @@ export default function CompleteProfileScreen() {
         <Text style={styles.label}>
           Ảnh CCCD mặt sau <Text style={styles.required}>*</Text>
         </Text>
+        {personalInfo.idCardBackImage && (
+          <Image 
+            source={{ uri: personalInfo.idCardBackImage }} 
+            style={styles.imagePreview}
+            resizeMode="cover"
+          />
+        )}
         <TouchableOpacity
           style={styles.fileUploadContainer}
           onPress={() => handleImagePicker("idCardBack")}
@@ -500,21 +888,21 @@ export default function CompleteProfileScreen() {
         >
           <View style={styles.fileUploadContent}>
             <MaterialCommunityIcons
-              name={personalInfo.idCardBack ? "check-circle" : "id-card"}
+              name={personalInfo.idCardBackImage ? "check-circle" : "id-card"}
               size={24}
-              color={personalInfo.idCardBack ? "#10B981" : "#6B7280"}
+              color={personalInfo.idCardBackImage ? "#10B981" : "#6B7280"}
             />
             <Text
               style={[
                 styles.fileText,
-                personalInfo.idCardBack && styles.fileTextSuccess,
+                personalInfo.idCardBackImage && styles.fileTextSuccess,
               ]}
             >
-              {personalInfo.idCardBack ? "Đã chọn ảnh" : "Chọn ảnh CCCD mặt sau"}
+              {personalInfo.idCardBackImage ? "Đã chọn ảnh" : "Chọn ảnh CCCD mặt sau"}
             </Text>
           </View>
           <View style={styles.fileButton}>
-            <Text style={styles.fileButtonText}>Chọn tệp</Text>
+            <Text style={styles.fileButtonText}>{personalInfo.idCardBackImage ? "Đổi ảnh" : "Chọn tệp"}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -574,27 +962,27 @@ export default function CompleteProfileScreen() {
             style={styles.input}
             placeholder="0"
             placeholderTextColor="#9CA3AF"
-            value={professionalInfo.yearsOfExperience}
+            value={professionalInfo.yearsOfExperience.toString()}
             onChangeText={(text) =>
               setProfessionalInfo({
                 ...professionalInfo,
-                yearsOfExperience: text,
+                yearsOfExperience: parseInt(text) || 0,
               })
             }
             keyboardType="numeric"
           />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nơi từng làm việc</Text>
+          <Text style={styles.label}>Lịch sử công việc</Text>
           <TextInput
             style={styles.input}
-            placeholder="Nhập nơi từng làm việc"
+            placeholder="Đã làm việc tại bệnh viện X, Y"
             placeholderTextColor="#9CA3AF"
-            value={professionalInfo.previousWorkplace}
+            value={professionalInfo.workHistory}
             onChangeText={(text) =>
               setProfessionalInfo({
                 ...professionalInfo,
-                previousWorkplace: text,
+                workHistory: text,
               })
             }
           />
@@ -627,6 +1015,13 @@ export default function CompleteProfileScreen() {
             <Text style={styles.label}>
               Bằng đại học <Text style={styles.required}>*</Text>
             </Text>
+            {professionalInfo.universityDegreeImage && (
+              <Image 
+                source={{ uri: professionalInfo.universityDegreeImage }} 
+                style={styles.imagePreview}
+                resizeMode="cover"
+              />
+            )}
             <TouchableOpacity
               style={styles.fileUploadContainer}
               onPress={() => handleImagePicker("education")}
@@ -634,21 +1029,21 @@ export default function CompleteProfileScreen() {
             >
               <View style={styles.fileUploadContent}>
                 <MaterialCommunityIcons
-                  name={professionalInfo.educationCertificate ? "check-circle" : "file-document-outline"}
+                  name={professionalInfo.universityDegreeImage ? "check-circle" : "file-document-outline"}
                   size={24}
-                  color={professionalInfo.educationCertificate ? "#10B981" : "#6B7280"}
+                  color={professionalInfo.universityDegreeImage ? "#10B981" : "#6B7280"}
                 />
                 <Text
                   style={[
                     styles.fileText,
-                    professionalInfo.educationCertificate && styles.fileTextSuccess,
+                    professionalInfo.universityDegreeImage && styles.fileTextSuccess,
                   ]}
                 >
-                  {professionalInfo.educationCertificate ? "Đã chọn ảnh" : "Chọn ảnh bằng đại học"}
+                  {professionalInfo.universityDegreeImage ? "Đã chọn ảnh" : "Chọn ảnh bằng đại học"}
                 </Text>
               </View>
               <View style={styles.fileButton}>
-                <Text style={styles.fileButtonText}>Chọn tệp</Text>
+                <Text style={styles.fileButtonText}>{professionalInfo.universityDegreeImage ? "Đổi ảnh" : "Chọn tệp"}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -682,6 +1077,20 @@ export default function CompleteProfileScreen() {
             <MaterialCommunityIcons name="calendar" size={20} color="#6B7280" />
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={[styles.input, styles.dateInputContainer]}
+            onPress={() => {
+              setCurrentCertificateIndex(null);
+              setShowCertificateExpiryDatePicker(true);
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.dateInputText, !newCertificate.expiryDate && styles.dateInputPlaceholder]}>
+              {newCertificate.expiryDate ? formatDate(newCertificate.expiryDate) : "Ngày hết hạn *"}
+            </Text>
+            <MaterialCommunityIcons name="calendar" size={20} color="#6B7280" />
+          </TouchableOpacity>
+
           <TextInput
             style={styles.input}
             placeholder="Tổ chức cấp *"
@@ -690,7 +1099,7 @@ export default function CompleteProfileScreen() {
             onChangeText={(text) => setNewCertificate({ ...newCertificate, issuingOrganization: text })}
           />
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.pickerContainer} 
             activeOpacity={0.7}
             onPress={() => setShowCertificateTypePicker(true)}
@@ -698,10 +1107,10 @@ export default function CompleteProfileScreen() {
             <Text
               style={[
                 styles.pickerText,
-                (!newCertificate.type || newCertificate.type === certificateTypes[0]) && styles.pickerTextPlaceholder,
+                (!newCertificate.certificateType || newCertificate.certificateType === certificateTypes[0]) && styles.pickerTextPlaceholder,
               ]}
             >
-              {newCertificate.type || certificateTypes[0]}
+              {newCertificate.certificateType || certificateTypes[0]}
             </Text>
             <MaterialCommunityIcons
               name="chevron-down"
@@ -710,6 +1119,13 @@ export default function CompleteProfileScreen() {
             />
           </TouchableOpacity>
 
+          {newCertificate.certificateImage && (
+            <Image 
+              source={{ uri: newCertificate.certificateImage }} 
+              style={styles.imagePreview}
+              resizeMode="cover"
+            />
+          )}
           <TouchableOpacity
             style={styles.fileUploadContainer}
             onPress={() => handleImagePicker("certificate")}
@@ -717,21 +1133,21 @@ export default function CompleteProfileScreen() {
           >
             <View style={styles.fileUploadContent}>
               <MaterialCommunityIcons
-                name={newCertificate.image ? "check-circle" : "file-image-outline"}
+                name={newCertificate.certificateImage ? "check-circle" : "file-image-outline"}
                 size={24}
-                color={newCertificate.image ? "#10B981" : "#6B7280"}
+                color={newCertificate.certificateImage ? "#10B981" : "#6B7280"}
               />
               <Text
                 style={[
                   styles.fileText,
-                  newCertificate.image && styles.fileTextSuccess,
+                  newCertificate.certificateImage && styles.fileTextSuccess,
                 ]}
               >
-                {newCertificate.image ? "Đã chọn ảnh" : "Ảnh chứng chỉ *"}
+                {newCertificate.certificateImage ? "Đã chọn ảnh" : "Chọn ảnh chứng chỉ"}
               </Text>
             </View>
             <View style={styles.fileButton}>
-              <Text style={styles.fileButtonText}>Chọn tệp</Text>
+              <Text style={styles.fileButtonText}>{newCertificate.certificateImage ? "Đổi ảnh" : "Chọn tệp"}</Text>
             </View>
           </TouchableOpacity>
 
@@ -769,13 +1185,21 @@ export default function CompleteProfileScreen() {
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.certificateDetail}>Ngày cấp: {formatDate(cert.issueDate)}</Text>
+                <Text style={styles.certificateDetail}>Ngày hết hạn: {formatDate(cert.expiryDate)}</Text>
                 <Text style={styles.certificateDetail}>Tổ chức: {cert.issuingOrganization}</Text>
-                <Text style={styles.certificateDetail}>Loại: {cert.type}</Text>
-                {cert.image && (
-                  <View style={styles.certificateImageContainer}>
-                    <MaterialCommunityIcons name="check-circle" size={16} color="#10B981" />
-                    <Text style={styles.certificateImageText}>Đã có ảnh</Text>
-                  </View>
+                <Text style={styles.certificateDetail}>Loại: {cert.certificateType}</Text>
+                {cert.certificateImage && (
+                  <>
+                    <Image 
+                      source={{ uri: cert.certificateImage }} 
+                      style={styles.certificateImagePreview}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.certificateImageContainer}>
+                      <MaterialCommunityIcons name="check-circle" size={16} color="#10B981" />
+                      <Text style={styles.certificateImageText}>Đã có ảnh</Text>
+                    </View>
+                  </>
                 )}
               </View>
             ))}
@@ -820,6 +1244,47 @@ export default function CompleteProfileScreen() {
               display="default"
               onChange={handleCertificateDateChange}
               maximumDate={new Date()}
+            />
+          )
+        )}
+
+        {/* Certificate Expiry Date Calendar Picker */}
+        {Platform.OS === "ios" ? (
+          <Modal visible={showCertificateExpiryDatePicker} transparent={true} animationType="slide">
+            <View style={styles.calendarModalOverlay}>
+              <View style={styles.calendarModalContent}>
+                <View style={styles.calendarModalHeader}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowCertificateExpiryDatePicker(false);
+                      setCurrentCertificateIndex(null);
+                    }}
+                  >
+                    <Text style={styles.calendarModalCancel}>Hủy</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.calendarModalTitle}>Chọn ngày hết hạn</Text>
+                  <TouchableOpacity onPress={handleCertificateExpiryDateConfirm}>
+                    <Text style={styles.calendarModalConfirm}>Xong</Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  value={tempCertificateExpiryDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={handleCertificateExpiryDateChange}
+                  minimumDate={new Date()}
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          showCertificateExpiryDatePicker && (
+            <DateTimePicker
+              value={tempCertificateExpiryDate}
+              mode="date"
+              display="default"
+              onChange={handleCertificateExpiryDateChange}
+              minimumDate={new Date()}
             />
           )
         )}
@@ -876,7 +1341,7 @@ export default function CompleteProfileScreen() {
                   key={type}
                   style={styles.modalOption}
                   onPress={() => {
-                    setNewCertificate({ ...newCertificate, type });
+                    setNewCertificate({ ...newCertificate, certificateType: type });
                     setShowCertificateTypePicker(false);
                   }}
                   activeOpacity={0.7}
@@ -884,12 +1349,12 @@ export default function CompleteProfileScreen() {
                   <Text
                     style={[
                       styles.modalOptionText,
-                      newCertificate.type === type && styles.modalOptionTextSelected,
+                      newCertificate.certificateType === type && styles.modalOptionTextSelected,
                     ]}
                   >
                     {type}
                   </Text>
-                  {newCertificate.type === type && (
+                  {newCertificate.certificateType === type && (
                     <MaterialCommunityIcons name="check" size={20} color="#70C1F1" />
                   )}
                 </TouchableOpacity>
@@ -910,6 +1375,13 @@ export default function CompleteProfileScreen() {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Ảnh đại diện</Text>
+        {additionalInfo.profileImage && (
+          <Image 
+            source={{ uri: additionalInfo.profileImage }} 
+            style={styles.profileImagePreview}
+            resizeMode="cover"
+          />
+        )}
         <TouchableOpacity
           style={styles.fileUploadContainer}
           onPress={() => handleImagePicker("profile")}
@@ -933,43 +1405,20 @@ export default function CompleteProfileScreen() {
             </Text>
           </View>
           <View style={styles.fileButton}>
-            <Text style={styles.fileButtonText}>Chọn tệp</Text>
+            <Text style={styles.fileButtonText}>{additionalInfo.profileImage ? "Đổi ảnh" : "Chọn tệp"}</Text>
           </View>
         </TouchableOpacity>
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>
-          Video giới thiệu (link YouTube hoặc upload)
-        </Text>
-        <View style={styles.inputWithIcon}>
-          <MaterialCommunityIcons
-            name="video-outline"
-            size={20}
-            color="#6B7280"
-            style={styles.inputIcon}
-          />
-          <TextInput
-            style={styles.inputWithIconText}
-            placeholder="Nhập link YouTube, Vimeo hoặc Dailymotion"
-            placeholderTextColor="#9CA3AF"
-            value={additionalInfo.videoLink}
-            onChangeText={(text) =>
-              setAdditionalInfo({ ...additionalInfo, videoLink: text })
-            }
-          />
-        </View>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Giới thiệu</Text>
+        <Text style={styles.label}>Giới thiệu bản thân</Text>
         <TextInput
           style={styles.textArea}
           placeholder="Giới thiệu về bản thân, kinh nghiệm, điểm mạnh..."
           placeholderTextColor="#9CA3AF"
-          value={additionalInfo.introduction}
+          value={additionalInfo.bio}
           onChangeText={(text) =>
-            setAdditionalInfo({ ...additionalInfo, introduction: text })
+            setAdditionalInfo({ ...additionalInfo, bio: text })
           }
           multiline
           numberOfLines={6}
@@ -989,12 +1438,12 @@ export default function CompleteProfileScreen() {
       <TouchableOpacity
         style={[
           styles.commitmentOption,
-          commitmentInfo.ethicalCommitment && styles.commitmentOptionSelected,
+          commitmentInfo.agreeToEthics && styles.commitmentOptionSelected,
         ]}
         onPress={() =>
           setCommitmentInfo({
             ...commitmentInfo,
-            ethicalCommitment: !commitmentInfo.ethicalCommitment,
+            agreeToEthics: !commitmentInfo.agreeToEthics,
           })
         }
         activeOpacity={0.7}
@@ -1002,17 +1451,17 @@ export default function CompleteProfileScreen() {
         <View
           style={[
             styles.radioButton,
-            commitmentInfo.ethicalCommitment && styles.radioButtonSelected,
+            commitmentInfo.agreeToEthics && styles.radioButtonSelected,
           ]}
         >
-          {commitmentInfo.ethicalCommitment && (
+          {commitmentInfo.agreeToEthics && (
             <View style={styles.radioButtonInner} />
           )}
         </View>
         <Text
           style={[
             styles.commitmentText,
-            commitmentInfo.ethicalCommitment && styles.commitmentTextSelected,
+            commitmentInfo.agreeToEthics && styles.commitmentTextSelected,
           ]}
         >
           Tôi cam kết tuân thủ các nguyên tắc đạo đức nghề nghiệp và cung cấp
@@ -1024,12 +1473,12 @@ export default function CompleteProfileScreen() {
       <TouchableOpacity
         style={[
           styles.commitmentOption,
-          commitmentInfo.termsAgreement && styles.commitmentOptionSelected,
+          commitmentInfo.agreeToTerms && styles.commitmentOptionSelected,
         ]}
         onPress={() =>
           setCommitmentInfo({
             ...commitmentInfo,
-            termsAgreement: !commitmentInfo.termsAgreement,
+            agreeToTerms: !commitmentInfo.agreeToTerms,
           })
         }
         activeOpacity={0.7}
@@ -1037,17 +1486,17 @@ export default function CompleteProfileScreen() {
         <View
           style={[
             styles.radioButton,
-            commitmentInfo.termsAgreement && styles.radioButtonSelected,
+            commitmentInfo.agreeToTerms && styles.radioButtonSelected,
           ]}
         >
-          {commitmentInfo.termsAgreement && (
+          {commitmentInfo.agreeToTerms && (
             <View style={styles.radioButtonInner} />
           )}
         </View>
         <Text
           style={[
             styles.commitmentText,
-            commitmentInfo.termsAgreement && styles.commitmentTextSelected,
+            commitmentInfo.agreeToTerms && styles.commitmentTextSelected,
           ]}
         >
           Tôi đồng ý với các điều khoản và điều kiện sử dụng hệ thống{" "}
@@ -1135,17 +1584,28 @@ export default function CompleteProfileScreen() {
           style={styles.backButton}
           onPress={handleBack}
           activeOpacity={0.7}
+          disabled={isSubmitting}
         >
           <MaterialCommunityIcons name="arrow-left" size={20} color="#6B7280" />
           <Text style={styles.backButtonText}>Quay lại</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.completeButton}
+          style={[styles.completeButton, isSubmitting && styles.completeButtonDisabled]}
           onPress={handleComplete}
           activeOpacity={0.8}
+          disabled={isSubmitting}
         >
-          <MaterialCommunityIcons name="check" size={20} color="#fff" />
-          <Text style={styles.completeButtonText}>Hoàn tất hồ sơ</Text>
+          {isSubmitting ? (
+            <>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.completeButtonText}>Đang gửi...</Text>
+            </>
+          ) : (
+            <>
+              <MaterialCommunityIcons name="check" size={20} color="#fff" />
+              <Text style={styles.completeButtonText}>Hoàn tất hồ sơ</Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
       </KeyboardAvoidingView>
@@ -1565,6 +2025,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
+  completeButtonDisabled: {
+    backgroundColor: "#9CA3AF",
+    shadowColor: "#9CA3AF",
+  },
   completeButtonText: {
     fontSize: 16,
     fontWeight: "700",
@@ -1716,6 +2180,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#10B981",
     fontWeight: "500",
+  },
+  imagePreview: {
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+    marginBottom: 12,
+    backgroundColor: "#F3F4F6",
+  },
+  profileImagePreview: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 12,
+    backgroundColor: "#F3F4F6",
+    alignSelf: "center",
+  },
+  certificateImagePreview: {
+    width: "100%",
+    height: 150,
+    borderRadius: 8,
+    marginTop: 12,
+    marginBottom: 8,
+    backgroundColor: "#F3F4F6",
   },
   modalOverlay: {
     flex: 1,

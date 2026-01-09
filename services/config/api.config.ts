@@ -61,6 +61,7 @@ export const API_CONFIG = {
       CREATE: '/api/careseeker-reviews',
       GET_MY_REVIEWS: '/api/careseeker-reviews/my-reviews',
       GET_BY_CAREGIVER: (caregiverId: string) => `/api/careseeker-reviews/caregiver/${caregiverId}`,
+      GET_BY_BOOKING: (bookingId: string) => `/api/caregiver-reviews/booking/${bookingId}`,
       GET_BY_ID: (id: string) => `/api/careseeker-reviews/${id}`,
       UPDATE: (id: string) => `/api/careseeker-reviews/${id}`,
       DELETE: (id: string) => `/api/careseeker-reviews/${id}`,
@@ -70,6 +71,19 @@ export const API_CONFIG = {
       FIND_CAREGIVERS: '/api/groq-matching/find-caregivers',
       COMPARE: '/api/groq-matching/compare',
       TEST: '/api/groq-matching/test',
+    },
+    // Wallet
+    WALLET: {
+      MY_WALLET: '/api/wallet/my-wallet',
+      TRANSACTIONS: '/api/wallet/transactions',
+    },
+    // Certificates
+    CERTIFICATES: {
+      MY_CERTIFICATES: '/api/certificates/my',
+      GET_BY_ID: (id: string) => `/api/certificates/${id}`,
+      CREATE: '/api/certificates',
+      UPDATE: (id: string) => `/api/certificates/${id}`,
+      DELETE: (id: string) => `/api/certificates/${id}`,
     },
   },
 };

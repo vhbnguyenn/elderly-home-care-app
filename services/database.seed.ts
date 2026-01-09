@@ -1,7 +1,7 @@
-import { StorageService, STORAGE_KEYS } from './storage.service';
+import { createAvailability, createSchedule } from './availability.repository';
 import { createCaregiver } from './caregiver.repository';
 import { createElderlyProfile } from './elderly.repository';
-import { createAvailability, createSchedule } from './availability.repository';
+import { STORAGE_KEYS, StorageService } from './storage.service';
 
 /**
  * Seed sample caregivers
@@ -203,6 +203,8 @@ export const seedUsers = async (): Promise<string[]> => {
       phone: '0903333333',
       full_name: 'Trần Văn Nam',
       role: 'caregiver',
+      status: 'approved', // Caregiver profile is already approved
+      hasCompletedProfile: true,
       avatar: 'https://ui-avatars.com/api/?name=Tran+Van+Nam&background=4CAF50&color=fff',
     },
   ];

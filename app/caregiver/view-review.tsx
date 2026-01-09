@@ -1,47 +1,113 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getAppointmentReview } from "@/data/appointmentStore";
+import { BookingAPI } from "@/services/api/booking.api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
-    View,
+    View
 } from "react-native";
 
 const familySupportLabels: { [key: string]: string } = {
-  "very-good": "Rất tốt - Gia đình luôn hỗ trợ và phối hợp tích cực",
-  "good": "Tốt - Gia đình phối hợp khi cần thiết",
-  "average": "Trung bình - Ít hỗ trợ nhưng không gây trở ngại",
+  "very_supportive": "Rất tốt - Gia đình luôn hỗ trợ và phối hợp tích cực",
+  "supportive": "Tốt - Gia đình phối hợp khi cần thiết",
+  "neutral": "Trung bình - Ít hỗ trợ nhưng không gây trở ngại",
   "poor": "Kém - Thiếu sự quan tâm và hỗ trợ",
-  "difficult": "Khó khăn - Gia đình can thiệp tiêu cực hoặc gây khó khăn",
+  "not_supportive": "Khó khăn - Gia đình can thiệp tiêu cực hoặc gây khó khăn",
 };
 
 const recommendationLabels: { [key: string]: string } = {
-  "highly-recommend": "Rất muốn giới thiệu - Khách hàng lý tưởng, dễ chăm sóc",
-  "can-recommend": "Có thể giới thiệu - Khách hàng tốt với một số lưu ý nhỏ",
+  "highly_recommend": "Rất muốn giới thiệu - Khách hàng lý tưởng, dễ chăm sóc",
+  "recommend": "Có thể giới thiệu - Khách hàng tốt với một số lưu ý nhỏ",
   "neutral": "Trung lập - Tùy thuộc vào người chăm sóc",
-  "not-recommend": "Không giới thiệu - Có nhiều khó khăn",
+  "not_recommend": "Không khuyến nghị - Có nhiều khó khăn",
+  "strongly_not_recommend": "Tuyệt đối không giới thiệu - Môi trường không phù hợp",
 };
 
 const issuesLabels: { [key: string]: string } = {
-  "mobility": "Các vấn đề về di chuyển cần được chú ý đặc biệt",
-  "memory": "Các thách thức về trí nhớ/nhận thức",
-  "medication": "Các lo ngại về tuân thủ thuốc",
-  "dietary": "Tuân thủ các hạn chế về chế độ ăn uống",
-  "communication": "Khó khăn trong giao tiếp",
-  "safety": "Các mối nguy hiểm về an toàn trong môi trường gia đình",
+  "mobility_issues": "Các vấn đề về di chuyển cần được chú ý đặc biệt",
+  "memory_issues": "Các thách thức về trí nhớ/nhận thức",
+  "medication_issues": "Các lo ngại về tuân thủ thuốc",
+  "dietary_issues": "Tuân thủ các hạn chế về chế độ ăn uống",
+  "communication_issues": "Khó khăn trong giao tiếp",
+  "safety_issues": "Các mối nguy hiểm về an toàn trong môi trường gia đình",
+  "late_payment": "Thanh toán trễ",
 };
 
 export default function ViewReviewScreen() {
   const route = useRoute();
-  const params = route.params as { appointmentId?: string; elderlyName?: string; fromScreen?: string } | undefined;
+  const params = route.params as { appointmentId?: string; elderlyName?: string; fromScreen?: string; reviewId?: string } | undefined;
   const appointmentId = params?.appointmentId || "";
   const elderlyName = params?.elderlyName || "Người được chăm sóc";
-  const reviewData = getAppointmentReview(appointmentId);
+  const reviewId = params?.reviewId;
+  
+  // State for API data
+  const [reviewData, setReviewData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch review from API
+  useEffect(() => {
+    const fetchReview = async () => {
+      if (!reviewId) {
+        // Fallback to local storage if no reviewId
+        const localReview = getAppointmentReview(appointmentId);
+        setReviewData(localReview);
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        const response = await BookingAPI.getCaregiverReview(reviewId);
+        
+        if (response.success && response.data) {
+          // Transform API data to match UI format
+          const apiData = response.data;
+          setReviewData({
+            cooperation: apiData.ratings.cooperation,
+            communication: apiData.ratings.communication,
+            respect: apiData.ratings.respect,
+            readiness: apiData.ratings.readiness,
+            workingEnvironment: apiData.ratings.workingEnvironment,
+            familySupport: apiData.familySupport,
+            issues: apiData.issues,
+            recommendation: apiData.recommendation,
+            additionalNotes: apiData.additionalNotes,
+            submittedAt: apiData.createdAt,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching review:", error);
+        setError("Không thể tải đánh giá. Vui lòng thử lại.");
+        // Fallback to local storage
+        const localReview = getAppointmentReview(appointmentId);
+        setReviewData(localReview);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchReview();
+  }, [reviewId, appointmentId]);
+  
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text style={styles.emptyText}>Đang tải đánh giá...</Text>
+        </View>
+        <CaregiverBottomNav activeTab="jobs" />
+      </SafeAreaView>
+    );
+  }
 
   if (!reviewData) {
     return (

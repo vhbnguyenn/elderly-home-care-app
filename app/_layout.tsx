@@ -2,6 +2,9 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NavigationProvider } from "@/contexts/NavigationContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useDatabase } from "@/hooks/useDatabase";
+import { seedAll } from "@/services/database.seed";
+import { STORAGE_KEYS, StorageService } from "@/services/storage.service";
 import {
     DarkTheme,
     DefaultTheme,
@@ -9,12 +12,9 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useDatabase } from "@/hooks/useDatabase";
-import { View, ActivityIndicator, Text, StyleSheet } from "react-native";
-import "react-native-reanimated";
 import { useEffect, useState } from "react";
-import { seedAll } from "@/services/database.seed";
-import { StorageService, STORAGE_KEYS } from "@/services/storage.service";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import "react-native-reanimated";
 
 export const unstable_settings = {
   initialRouteName: "index",
@@ -35,6 +35,8 @@ function RootNavigator() {
   }
 
   if (user.role === "Caregiver") {
+    // Caregiver can access their screens
+    // Profile status check will happen in caregiver-dashboard.tsx
     return (
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="caregiver" options={{ headerShown: false }} />

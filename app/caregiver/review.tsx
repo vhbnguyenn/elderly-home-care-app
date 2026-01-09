@@ -1,5 +1,6 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { markAppointmentAsReviewed, ReviewData as ReviewDataType } from "@/data/appointmentStore";
+import { BookingAPI } from "@/services/api/booking.api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -102,20 +103,21 @@ export default function ReviewScreen() {
     recommendation: "",
     additionalNotes: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const familySupportOptions = [
     {
-      value: "very-good",
+      value: "very_supportive",
       label: "Rất tốt",
       description: "Gia đình luôn hỗ trợ và phối hợp tích cực",
     },
     {
-      value: "good",
+      value: "supportive",
       label: "Tốt",
       description: "Gia đình phối hợp khi cần thiết",
     },
     {
-      value: "average",
+      value: "neutral",
       label: "Trung bình",
       description: "Ít hỗ trợ nhưng không gây trở ngại",
     },
@@ -125,7 +127,7 @@ export default function ReviewScreen() {
       description: "Thiếu sự quan tâm và hỗ trợ",
     },
     {
-      value: "difficult",
+      value: "not_supportive",
       label: "Khó khăn",
       description: "Gia đình can thiệp tiêu cực hoặc gây khó khăn",
     },
@@ -133,39 +135,43 @@ export default function ReviewScreen() {
 
   const issuesOptions = [
     {
-      id: "mobility",
+      id: "mobility_issues",
       label: "Các vấn đề về di chuyển cần được chú ý đặc biệt",
     },
     {
-      id: "memory",
+      id: "memory_issues",
       label: "Các thách thức về trí nhớ/nhận thức",
     },
     {
-      id: "medication",
+      id: "medication_issues",
       label: "Các lo ngại về tuân thủ thuốc",
     },
     {
-      id: "dietary",
+      id: "dietary_issues",
       label: "Tuân thủ các hạn chế về chế độ ăn uống",
     },
     {
-      id: "communication",
+      id: "communication_issues",
       label: "Khó khăn trong giao tiếp",
     },
     {
-      id: "safety",
+      id: "safety_issues",
       label: "Các mối nguy hiểm về an toàn trong môi trường gia đình",
+    },
+    {
+      id: "late_payment",
+      label: "Thanh toán trễ",
     },
   ];
 
   const recommendationOptions = [
     {
-      value: "highly-recommend",
+      value: "highly_recommend",
       label: "Rất muốn giới thiệu",
       description: "Khách hàng lý tưởng, dễ chăm sóc",
     },
     {
-      value: "can-recommend",
+      value: "recommend",
       label: "Có thể giới thiệu",
       description: "Khách hàng tốt với một số lưu ý nhỏ",
     },
@@ -175,9 +181,14 @@ export default function ReviewScreen() {
       description: "Tùy thuộc vào người chăm sóc",
     },
     {
-      value: "not-recommend",
-      label: "Không giới thiệu",
+      value: "not_recommend",
+      label: "Không khuyến nghị",
       description: "Có nhiều khó khăn",
+    },
+    {
+      value: "strongly_not_recommend",
+      label: "Tuyệt đối không giới thiệu",
+      description: "Môi trường không phù hợp",
     },
   ];
 
@@ -187,6 +198,10 @@ export default function ReviewScreen() {
 
   const handleFamilySupportChange = (value: string) => {
     setReviewData((prev) => ({ ...prev, familySupport: value }));
+  };
+
+  const handleRecommendationChange = (value: string) => {
+    setReviewData((prev) => ({ ...prev, recommendation: value }));
   };
 
   const handleIssueToggle = (issueId: string) => {
@@ -200,10 +215,6 @@ export default function ReviewScreen() {
       }
       return { ...prev, issues };
     });
-  };
-
-  const handleRecommendationChange = (value: string) => {
-    setReviewData((prev) => ({ ...prev, recommendation: value }));
   };
 
   const handleSubmit = () => {
@@ -250,29 +261,50 @@ export default function ReviewScreen() {
         { text: "Hủy", style: "cancel" },
         {
           text: "Gửi đánh giá",
-          onPress: () => {
-            // TODO: Gửi đánh giá lên server ở đây
-            // Tạm thời chỉ lưu local
-            console.log("Review data:", reviewData);
-            
-            // Mark appointment as reviewed BEFORE showing success alert
-            if (appointmentId) {
-              const reviewDataToSave: ReviewDataType = {
-                ...reviewData,
-                submittedAt: new Date().toISOString(),
-              };
-              markAppointmentAsReviewed(appointmentId, reviewDataToSave);
-            }
-            
-            Alert.alert("Thành công", "Đánh giá đã được gửi thành công", [
-              {
-                text: "OK",
-                onPress: () => {
-                  // Navigate back to the previous screen
-                  handleNavigateBack();
+          onPress: async () => {
+            try {
+              setIsSubmitting(true);
+              
+              // Call API to submit review
+              const response = await BookingAPI.createCaregiverReview({
+                bookingId: appointmentId,
+                ratings: {
+                  cooperation: reviewData.cooperation,
+                  communication: reviewData.communication,
+                  respect: reviewData.respect,
+                  readiness: reviewData.readiness,
+                  workingEnvironment: reviewData.workingEnvironment,
                 },
-              },
-            ]);
+                familySupport: reviewData.familySupport,
+                issues: reviewData.issues,
+                recommendation: reviewData.recommendation,
+                additionalNotes: reviewData.additionalNotes,
+              });
+              
+              // Mark appointment as reviewed after successful API call
+              if (appointmentId && response.success && response.data) {
+                const reviewDataToSave: ReviewDataType = {
+                  ...reviewData,
+                  submittedAt: new Date().toISOString(),
+                  reviewId: response.data._id, // Save the review ID from API
+                };
+                markAppointmentAsReviewed(appointmentId, reviewDataToSave);
+              }
+              
+              Alert.alert("Thành công", "Đánh giá đã được gửi thành công", [
+                {
+                  text: "OK",
+                  onPress: () => {
+                    handleNavigateBack();
+                  },
+                },
+              ]);
+            } catch (error) {
+              console.error("Error submitting review:", error);
+              Alert.alert("Lỗi", "Không thể gửi đánh giá. Vui lòng thử lại.");
+            } finally {
+              setIsSubmitting(false);
+            }
           },
         },
       ]
@@ -475,8 +507,14 @@ export default function ReviewScreen() {
         </View>
 
         {/* Submit Button */}
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Gửi đánh giá</Text>
+        <TouchableOpacity 
+          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]} 
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.submitButtonText}>
+            {isSubmitting ? "Đang gửi..." : "Gửi đánh giá"}
+          </Text>
         </TouchableOpacity>
 
         <View style={{ height: 100 }} />
@@ -726,6 +764,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
+    backgroundColor: "#9CA3AF",
   },
   submitButtonText: {
     fontSize: 16,

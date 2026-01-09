@@ -16,6 +16,7 @@ export interface ReviewData {
   recommendation: string;
   additionalNotes: string;
   submittedAt: string;
+  reviewId?: string; // API review ID
 }
 
 // Global appointments data

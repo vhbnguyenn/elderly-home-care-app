@@ -1,23 +1,23 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  approveProfile,
-  getProfileStatus,
-  rejectProfile,
-  setProfileStatus,
+    approveProfile,
+    getProfileStatus,
+    rejectProfile,
+    setProfileStatus,
 } from "@/data/profileStore";
 
 type ProfileStatusType = "pending" | "rejected" | "approved";

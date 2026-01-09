@@ -1,19 +1,24 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { PaymentCode } from "@/components/caregiver/PaymentCode";
-import { getAppointmentHasComplained, getAppointmentHasReviewed, getAppointmentStatus, subscribeToStatusChanges, updateAppointmentStatus } from "@/data/appointmentStore";
+import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import { getAppointmentHasComplained, getAppointmentHasReviewed, getAppointmentReview, getAppointmentStatus, subscribeToStatusChanges, updateAppointmentStatus } from "@/data/appointmentStore";
+import { BookingAPI } from "@/services/api/booking.api";
+import { ChatAPI } from "@/services/api/chat.api";
+import { ReviewAPI } from "@/services/api/review.api";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Image,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 // Mock data - Multiple appointments
@@ -554,8 +559,143 @@ export default function AppointmentDetailScreen() {
   const appointmentId = params?.appointmentId || "1";
   const fromScreen = params?.fromScreen;
   
-  // Get appointment data based on appointmentId
-  const appointmentData = appointmentsDataMap[appointmentId] || appointmentsDataMap["1"];
+  // State for API data
+  const [appointmentData, setAppointmentData] = useState<any>(appointmentsDataMap[appointmentId] || appointmentsDataMap["1"]);
+  const [loading, setLoading] = useState(true);
+  
+  // Fetch appointment data from API
+  const fetchAppointmentData = async () => {
+    try {
+      setLoading(true);
+      const response = await BookingAPI.getById(appointmentId);
+      
+      if (response.success && response.data) {
+        // Transform API data to match UI format
+        const apiData = response.data;
+        const transformed = {
+          id: apiData._id,
+          status: mapApiStatusToUI(apiData.status),
+          date: new Date(apiData.bookingDate).toISOString().split('T')[0],
+          timeSlot: `${apiData.bookingTime} - ${calculateEndTime(apiData.bookingTime, apiData.duration)}`,
+          duration: `${apiData.duration} giờ`,
+          packageType: apiData.package.packageName,
+          
+          elderly: {
+            id: apiData.elderlyProfile._id,
+            name: apiData.elderlyProfile.fullName,
+            age: apiData.elderlyProfile.age,
+            gender: apiData.elderlyProfile.gender,
+            avatar: apiData.elderlyProfile.avatar || "https://via.placeholder.com/100",
+            address: apiData.elderlyProfile.address,
+            phone: apiData.elderlyProfile.phone,
+            bloodType: apiData.elderlyProfile.bloodType,
+            healthCondition: apiData.elderlyProfile.medicalConditions?.join(", "),
+            underlyingDiseases: apiData.elderlyProfile.medicalConditions || [],
+            medications: apiData.elderlyProfile.medications || [],
+            allergies: apiData.elderlyProfile.allergies ? [apiData.elderlyProfile.allergies] : [],
+            specialConditions: apiData.elderlyProfile.specialNotes ? [apiData.elderlyProfile.specialNotes] : [],
+            independenceLevel: {
+              eating: "assisted",
+              bathing: "dependent",
+              mobility: "assisted",
+              toileting: "assisted",
+              dressing: "dependent",
+            },
+            livingEnvironment: {
+              houseType: apiData.elderlyProfile.livingEnvironment?.type || "apartment",
+              livingWith: apiData.elderlyProfile.livingEnvironment?.hasFamily ? ["Gia đình"] : [],
+              accessibility: [],
+            },
+            hobbies: apiData.elderlyProfile.preferences?.hobbies || [],
+            favoriteActivities: [],
+            foodPreferences: apiData.elderlyProfile.preferences?.favoriteFoods || [],
+            emergencyContact: apiData.elderlyProfile.emergencyContact,
+          },
+          
+          tasks: {
+            fixed: apiData.tasks
+              .filter((t: any) => t.isCompleted !== undefined)
+              .map((t: any, index: number) => ({
+                id: t._id,
+                time: apiData.bookingTime,
+                title: t.taskName,
+                description: t.description || "",
+                completed: t.isCompleted,
+                required: true,
+              })),
+            flexible: [],
+            optional: [],
+          },
+          
+          services: apiData.tasks.map((s: any, index: number) => ({
+            id: s._id,
+            title: s.taskName,
+            description: s.description || "",
+            completed: s.isCompleted || false,
+          })),
+          
+          notes: [],
+          specialInstructions: apiData.specialRequests || apiData.elderlyProfile.specialNotes || "",
+          checkIn: apiData.checkIn,
+          payment: apiData.payment,
+        };
+        
+        setAppointmentData(transformed);
+        // Update services state with API data
+        setServices(transformed.services);
+        
+        // Fetch notes separately
+        try {
+          const notesResponse = await BookingAPI.getNotes(appointmentId);
+          if (notesResponse.success && notesResponse.data.notes) {
+            const transformedNotes = notesResponse.data.notes.map((note: any) => ({
+              id: note._id,
+              time: new Date(note.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+              author: note.caregiver.name || "Caregiver",
+              content: note.content,
+              type: "info",
+            }));
+            setNotes(transformedNotes);
+          }
+        } catch (noteError) {
+          console.error("Error fetching notes:", noteError);
+          // Continue without notes if fetch fails
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching appointment:", error);
+      Alert.alert("Lỗi", "Không thể tải chi tiết lịch hẹn");
+      // Fallback to mock data
+      setAppointmentData(appointmentsDataMap[appointmentId] || appointmentsDataMap["1"]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Map API status to UI status
+  const mapApiStatusToUI = (apiStatus: string): string => {
+    switch (apiStatus) {
+      case "pending": return "new";
+      case "confirmed": return "pending";
+      case "in-progress": return "in-progress";
+      case "completed": return "completed";
+      case "cancelled": return "cancelled";
+      case "rejected": return "rejected";
+      default: return apiStatus;
+    }
+  };
+  
+  // Calculate end time from start time and duration
+  const calculateEndTime = (startTime: string, duration: number): string => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const endHour = hours + duration;
+    return `${endHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+  
+  // Fetch on mount and when appointmentId changes
+  useEffect(() => {
+    fetchAppointmentData();
+  }, [appointmentId]);
   
   const [selectedTab, setSelectedTab] = useState<"tasks" | "notes">("tasks");
   
@@ -616,6 +756,12 @@ export default function AppointmentDetailScreen() {
   
   // Payment code modal state
   const [showPaymentCodeModal, setShowPaymentCodeModal] = useState(false);
+  
+  // Check-in modal state
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [checkInImage, setCheckInImage] = useState<string | null>(null);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [checkInTime, setCheckInTime] = useState<string>("");
 
   // Check if deadline is expired (simple check, no countdown)
   const isDeadlineExpired = appointmentData.responseDeadline 
@@ -672,23 +818,52 @@ export default function AppointmentDetailScreen() {
 
   // Update services and status when appointmentId changes
   useEffect(() => {
-    setServices(getServicesByPackage(appointmentData.packageType));
+    // Only use getServicesByPackage if services not provided from API
+    if (!appointmentData.services || appointmentData.services.length === 0) {
+      setServices(getServicesByPackage(appointmentData.packageType));
+    } else {
+      setServices(appointmentData.services);
+    }
     // Get status from global store first, fallback to appointmentData.status
     const globalStatus = getAppointmentStatus(appointmentId);
     setStatus(globalStatus || appointmentData.status);
     setNotes(appointmentData.notes);
-  }, [appointmentId, appointmentData.packageType, appointmentData.status, appointmentData.notes]);
+  }, [appointmentId, appointmentData.packageType, appointmentData.status, appointmentData.notes, appointmentData.services]);
 
   // Sync status and review status from global store when component mounts or refocuses
   useFocusEffect(
     React.useCallback(() => {
-      const syncData = () => {
+      const syncData = async () => {
+        // Sync status from global store
         const globalStatus = getAppointmentStatus(appointmentId);
         if (globalStatus) {
           setStatus(globalStatus);
         }
-        const globalHasReviewed = getAppointmentHasReviewed(appointmentId);
-        setHasReviewed(globalHasReviewed);
+        
+        // Check review status from API first
+        try {
+          const review = await ReviewAPI.getByBookingId(appointmentId);
+          const hasReviewFromAPI = !!review;
+          setHasReviewed(hasReviewFromAPI);
+          
+          // If different from local store, update local store
+          const globalHasReviewed = getAppointmentHasReviewed(appointmentId);
+          if (hasReviewFromAPI !== globalHasReviewed) {
+            if (hasReviewFromAPI && review) {
+              // Mark as reviewed in local store with review data
+              const { markAppointmentAsReviewed } = require("@/data/appointmentStore");
+              markAppointmentAsReviewed(appointmentId, {
+                reviewId: review.id,
+                // Add other review data if needed
+              });
+            }
+          }
+        } catch (error) {
+          // If API fails, fallback to local store
+          console.log("Failed to fetch review from API, using local store:", error);
+          const globalHasReviewed = getAppointmentHasReviewed(appointmentId);
+          setHasReviewed(globalHasReviewed);
+        }
       };
       
       syncData();
@@ -704,12 +879,26 @@ export default function AppointmentDetailScreen() {
     }, [appointmentId])
   );
 
-  const toggleServiceComplete = (serviceId: string) => {
-    setServices((prev) =>
-      prev.map((service) =>
-        service.id === serviceId ? { ...service, completed: !service.completed } : service
-      )
-    );
+  const toggleServiceComplete = async (serviceId: string) => {
+    const service = services.find(s => s.id === serviceId);
+    if (!service) return;
+
+    const newCompletedState = !service.completed;
+
+    try {
+      // Call API to update task status
+      await BookingAPI.updateTaskStatus(appointmentId, serviceId, newCompletedState);
+      
+      // Update local state on success
+      setServices((prev) =>
+        prev.map((s) =>
+          s.id === serviceId ? { ...s, completed: newCompletedState } : s
+        )
+      );
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      Alert.alert("Lỗi", "Không thể cập nhật trạng thái công việc. Vui lòng thử lại.");
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -719,7 +908,7 @@ export default function AppointmentDetailScreen() {
       case "pending":
         return "#F59E0B"; // Orange
       case "confirmed":
-        return "#10B981"; // Green
+        return "#10B981"; // Green - Chờ thực hiện
       case "in-progress":
         return "#8B5CF6"; // Purple
       case "completed":
@@ -738,9 +927,9 @@ export default function AppointmentDetailScreen() {
       case "new":
         return "Yêu cầu mới";
       case "pending":
-        return "Chờ thực hiện";
+        return "Chờ xác nhận";
       case "confirmed":
-        return "Đã xác nhận";
+        return "Chờ thực hiện";
       case "in-progress":
         return "Đang thực hiện";
       case "completed":
@@ -764,11 +953,17 @@ export default function AppointmentDetailScreen() {
       { text: "Hủy", style: "cancel" },
       {
         text: "Chấp nhận",
-        onPress: () => {
-          const newStatus = "pending";
-          setStatus(newStatus);
-          updateAppointmentStatus(appointmentId, newStatus);
-          Alert.alert("Thành công", "Đã chấp nhận lịch hẹn");
+        onPress: async () => {
+          try {
+            await BookingAPI.confirm(appointmentId);
+            const newStatus = "pending";
+            setStatus(newStatus);
+            updateAppointmentStatus(appointmentId, newStatus);
+            Alert.alert("Thành công", "Đã chấp nhận lịch hẹn");
+          } catch (error) {
+            console.error("Error accepting appointment:", error);
+            Alert.alert("Lỗi", "Không thể chấp nhận lịch hẹn. Vui lòng thử lại.");
+          }
         },
       },
     ]);
@@ -784,11 +979,17 @@ export default function AppointmentDetailScreen() {
       {
         text: "Từ chối",
         style: "destructive",
-        onPress: () => {
-          const newStatus = "rejected";
-          setStatus(newStatus);
-          updateAppointmentStatus(appointmentId, newStatus);
-          Alert.alert("Đã từ chối", "Lịch hẹn đã bị từ chối");
+        onPress: async () => {
+          try {
+            await BookingAPI.reject(appointmentId, "Không thể nhận lịch này");
+            const newStatus = "rejected";
+            setStatus(newStatus);
+            updateAppointmentStatus(appointmentId, newStatus);
+            Alert.alert("Đã từ chối", "Lịch hẹn đã bị từ chối");
+          } catch (error) {
+            console.error("Error rejecting appointment:", error);
+            Alert.alert("Lỗi", "Không thể từ chối lịch hẹn. Vui lòng thử lại.");
+          }
         },
       },
     ]);
@@ -838,37 +1039,93 @@ export default function AppointmentDetailScreen() {
   };
 
   const handleStart = () => {
-    // Validate: Check if there's another in-progress appointment
-    const conflict = checkStartConflict(appointmentId);
+    console.log('=== handleStart called ===');
+    console.log('showCheckInModal before:', showCheckInModal);
     
-    if (conflict) {
-      Alert.alert(
-        "Không thể bắt đầu lịch hẹn",
-        `Bạn đang thực hiện lịch hẹn với ${conflict.conflictingElderlyName} tại ${conflict.conflictingAddress}.\n\nBạn chỉ có thể bắt đầu lịch hẹn mới khi:\n• Cùng người đặt (liên hệ khẩn cấp)\n• Cùng địa chỉ\n\nVui lòng hoàn thành lịch hẹn hiện tại trước.`,
-        [{ text: "OK" }]
-      );
+    // Note: Conflict check removed since we're using API data now
+    // The backend should handle conflict validation
+    
+    // Show check-in modal
+    setShowCheckInModal(true);
+    console.log('setShowCheckInModal(true) called');
+  };
+
+  const handleTakeCheckInPhoto = async () => {
+    try {
+      // Request camera permissions
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Cần quyền truy cập', 'Vui lòng cấp quyền sử dụng camera để chụp ảnh check-in.');
+        return;
+      }
+
+      // Launch camera
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setCheckInImage(result.assets[0].uri);
+        // Capture current time
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        setCheckInTime(timeString);
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Alert.alert('Lỗi', 'Không thể chụp ảnh. Vui lòng thử lại.');
+    }
+  };
+
+  const handleConfirmCheckIn = async () => {
+    if (!checkInImage) {
+      Alert.alert('Thiếu ảnh', 'Vui lòng chụp ảnh xác nhận vị trí trước khi check-in.');
       return;
     }
 
-    Alert.alert("Bắt đầu công việc", "Xác nhận bắt đầu thực hiện công việc?", [
-      { text: "Hủy", style: "cancel" },
-      {
-        text: "Bắt đầu",
-        onPress: () => {
-          const newStatus = "in-progress";
-          setStatus(newStatus);
-          updateAppointmentStatus(appointmentId, newStatus);
-          alert("Đã bắt đầu thực hiện công việc");
-        },
-      },
-    ]);
+    try {
+      setIsCheckingIn(true);
+      
+      // Get current time in HH:mm format
+      const now = new Date();
+      const actualStartTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      
+      // Call check-in API (this also updates status to "in-progress")
+      await BookingAPI.checkIn(appointmentId, checkInImage, actualStartTime);
+      
+      // Update local state
+      const newStatus = "in-progress";
+      setStatus(newStatus);
+      updateAppointmentStatus(appointmentId, newStatus);
+      
+      // Close modal and reset
+      setShowCheckInModal(false);
+      setCheckInImage(null);
+      setCheckInTime("");
+      
+      Alert.alert('Thành công', 'Đã check-in và bắt đầu công việc!');
+    } catch (error) {
+      console.error('Error checking in:', error);
+      Alert.alert('Lỗi', 'Không thể check-in. Vui lòng thử lại.');
+    } finally {
+      setIsCheckingIn(false);
+    }
   };
 
-  const handleCancel = () => {
-    alert("Đã hủy lịch hẹn");
-    const newStatus = "cancelled";
-    setStatus(newStatus);
-    updateAppointmentStatus(appointmentId, newStatus);
+  const handleCancel = async () => {
+    try {
+      await BookingAPI.cancel(appointmentId, "Có việc đột xuất");
+      const newStatus = "cancelled";
+      setStatus(newStatus);
+      updateAppointmentStatus(appointmentId, newStatus);
+      alert("Đã hủy lịch hẹn");
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      Alert.alert("Lỗi", "Không thể hủy lịch hẹn. Vui lòng thử lại.");
+    }
   };
 
   const handleComplete = () => {
@@ -895,12 +1152,18 @@ export default function AppointmentDetailScreen() {
         { text: "Hủy", style: "cancel" },
         { 
           text: "Hoàn thành", 
-          onPress: () => {
-            const newStatus = "completed";
-            setStatus(newStatus);
-            updateAppointmentStatus(appointmentId, newStatus);
-            // Show payment code modal instead of alert
-            setShowPaymentCodeModal(true);
+          onPress: async () => {
+            try {
+              await BookingAPI.complete(appointmentId);
+              const newStatus = "completed";
+              setStatus(newStatus);
+              updateAppointmentStatus(appointmentId, newStatus);
+              // Show payment code modal instead of alert
+              setShowPaymentCodeModal(true);
+            } catch (error) {
+              console.error("Error completing appointment:", error);
+              Alert.alert("Lỗi", "Không thể hoàn thành công việc. Vui lòng thử lại.");
+            }
           }
         }
       ]
@@ -910,10 +1173,12 @@ export default function AppointmentDetailScreen() {
   const handleReview = () => {
     if (hasReviewed) {
       // Đã đánh giá rồi - Xem đánh giá
+      const reviewData = getAppointmentReview(appointmentId);
       (navigation.navigate as any)("View Review", {
         appointmentId: appointmentId,
         elderlyName: appointmentData.elderly?.name || "Người được chăm sóc",
         fromScreen: "appointment-detail",
+        reviewId: reviewData?.reviewId, // Pass reviewId to fetch from API
       });
     } else {
       // Chưa đánh giá - Đánh giá mới
@@ -948,27 +1213,48 @@ export default function AppointmentDetailScreen() {
     }
   };
 
-  const handleMessage = () => {
-    // Lấy thông tin người được chăm sóc (ưu tiên) hoặc người liên hệ khẩn cấp (fallback)
-    const contactName = appointmentData.elderly?.name || appointmentData.elderly?.emergencyContact?.name || "Người dùng";
-    
-    // Tạo avatar emoji dựa trên giới tính hoặc sử dụng emoji mặc định
-    let contactAvatar = "👤"; // Default
-    if (appointmentData.elderly?.gender === "Nam") {
-      contactAvatar = "👨";
-    } else if (appointmentData.elderly?.gender === "Nữ") {
-      contactAvatar = "👩";
+  const handleMessage = async () => {
+    try {
+      // Lấy thông tin người được chăm sóc (ưu tiên) hoặc người liên hệ khẩn cấp (fallback)
+      const contactName = appointmentData.elderly?.name || appointmentData.elderly?.emergencyContact?.name || "Người dùng";
+      
+      // Tạo avatar emoji dựa trên giới tính hoặc sử dụng emoji mặc định
+      let contactAvatar = "👤"; // Default
+      if (appointmentData.elderly?.gender === "Nam") {
+        contactAvatar = "👨";
+      } else if (appointmentData.elderly?.gender === "Nữ") {
+        contactAvatar = "👩";
+      }
+      
+      // Get participant ID from appointment data
+      const participantId = appointmentData.elderly?.id;
+      
+      if (!participantId) {
+        Alert.alert("Lỗi", "Không tìm thấy thông tin người dùng");
+        return;
+      }
+      
+      // Call API to create or get chat
+      const chatResponse = await ChatAPI.createOrGetChat(participantId);
+      
+      // Navigate to chat screen with contact information and chat ID
+      (navigation.navigate as any)("Tin nhắn", {
+        clientName: contactName,
+        clientAvatar: contactAvatar,
+        chatName: contactName, // Fallback for chat.tsx
+        chatAvatar: contactAvatar, // Fallback for chat.tsx
+        chatId: chatResponse._id,
+        participantId: participantId,
+        fromScreen: "appointment-detail",
+        appointmentId: appointmentId,
+      });
+    } catch (error: any) {
+      console.error("Error creating/getting chat:", error);
+      Alert.alert(
+        "Lỗi", 
+        error?.response?.data?.message || "Không thể tạo cuộc trò chuyện. Vui lòng thử lại."
+      );
     }
-    
-    // Navigate to chat screen with contact information
-    (navigation.navigate as any)("Tin nhắn", {
-      clientName: contactName,
-      clientAvatar: contactAvatar,
-      chatName: contactName, // Fallback for chat.tsx
-      chatAvatar: contactAvatar, // Fallback for chat.tsx
-      fromScreen: "appointment-detail",
-      appointmentId: appointmentId,
-    });
   };
 
   // Note handlers
@@ -987,26 +1273,37 @@ export default function AppointmentDetailScreen() {
     setNewNoteContent("");
   };
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (newNoteContent.trim() === "") {
-      alert("Vui lòng nhập nội dung ghi chú");
+      Alert.alert("Lỗi", "Vui lòng nhập nội dung ghi chú");
       return;
     }
 
-    const now = new Date();
-    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newNote = {
-      id: `N${notes.length + 1}`,
-      time: timeStr,
-      author: "Caregiver",
-      content: newNoteContent.trim(),
-      type: "info",
-    };
+    try {
+      // Call API to create note
+      const response = await BookingAPI.addNote(appointmentId, newNoteContent.trim());
+      
+      if (response.success) {
+        // Add note to local state
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        const newNote = {
+          id: response.data._id || `N${notes.length + 1}`,
+          time: timeStr,
+          author: "Caregiver",
+          content: newNoteContent.trim(),
+          type: "info",
+        };
 
-    setNotes([newNote, ...notes]);
-    handleCloseNoteModal();
-    alert("Đã thêm ghi chú mới");
+        setNotes([newNote, ...notes]);
+        handleCloseNoteModal();
+        Alert.alert("Thành công", "Đã thêm ghi chú mới");
+      }
+    } catch (error) {
+      console.error("Error adding note:", error);
+      Alert.alert("Lỗi", "Không thể thêm ghi chú. Vui lòng thử lại.");
+    }
   };
 
   // Check if can cancel booking (more than 3 days before appointment)
@@ -1055,7 +1352,8 @@ export default function AppointmentDetailScreen() {
         );
       
       case "pending":
-        // Chờ thực hiện: Nhắn tin / (Hủy nếu còn >= 3 ngày) / Bắt đầu
+      case "confirmed":
+        // Chờ thực hiện / Đã xác nhận: Nhắn tin / (Hủy nếu còn >= 3 ngày) / Bắt đầu
         const showCancelButton = canCancelBooking();
         return (
           <View style={styles.bottomActions}>
@@ -1085,7 +1383,6 @@ export default function AppointmentDetailScreen() {
           </View>
         );
       
-      case "confirmed":
       case "in-progress":
         // Đang thực hiện: Nhắn tin / Hoàn thành ca
         return (
@@ -1203,6 +1500,16 @@ export default function AppointmentDetailScreen() {
       </TouchableOpacity>
     );
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#1F6FEB" />
+        <Text style={styles.loadingText}>Đang tải chi tiết lịch hẹn...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -1642,6 +1949,112 @@ export default function AppointmentDetailScreen() {
       </View>
     </Modal>
 
+    {/* Check-in Modal */}
+    <Modal
+      visible={showCheckInModal}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setShowCheckInModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalContainer, { maxHeight: '85%' }]}>
+          <View style={styles.modalHeader}>
+            <View>
+              <Text style={styles.modalTitle}>Check-in Bắt Đầu Ca</Text>
+              <Text style={styles.modalSubtitle}>Xác nhận vị trí làm việc</Text>
+            </View>
+            <TouchableOpacity 
+              onPress={() => {
+                setShowCheckInModal(false);
+                setCheckInImage(null);
+                setCheckInTime("");
+              }}
+              style={styles.closeButton}
+            >
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+            {/* Time Display - Show first if available */}
+            {checkInTime && (
+              <View style={styles.timeCard}>
+                <View style={styles.timeIconContainer}>
+                  <Ionicons name="time" size={24} color="#10B981" />
+                </View>
+                <View style={styles.timeTextContainer}>
+                  <Text style={styles.timeLabel}>Thời gian chụp ảnh</Text>
+                  <Text style={styles.timeValue}>{checkInTime}</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Image preview or camera button */}
+            {checkInImage ? (
+              <View style={styles.imageSection}>
+                <Text style={styles.sectionLabel}>Ảnh xác nhận</Text>
+                <View style={styles.imagePreviewContainer}>
+                  <Image 
+                    source={{ uri: checkInImage }} 
+                    style={styles.checkInImagePreview}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity 
+                    style={styles.retakeButton}
+                    onPress={handleTakeCheckInPhoto}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="camera" size={18} color="#fff" />
+                    <Text style={styles.retakeButtonText}>Chụp lại</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.cameraSection}>
+                <Text style={styles.sectionLabel}>Chụp ảnh check-in</Text>
+                <TouchableOpacity 
+                  style={styles.cameraButton}
+                  onPress={handleTakeCheckInPhoto}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.cameraIconContainer}>
+                    <Ionicons name="camera" size={40} color="#3B82F6" />
+                  </View>
+                  <Text style={styles.cameraButtonTitle}>Chụp ảnh xác nhận</Text>
+                  <Text style={styles.cameraButtonSubtitle}>Chụp ảnh tại vị trí làm việc</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Confirm button */}
+            <TouchableOpacity
+              style={[
+                styles.confirmCheckInButton,
+                (!checkInImage || isCheckingIn) && styles.confirmCheckInButtonDisabled
+              ]}
+              onPress={handleConfirmCheckIn}
+              disabled={!checkInImage || isCheckingIn}
+              activeOpacity={0.8}
+            >
+              {isCheckingIn ? (
+                <>
+                  <ActivityIndicator color="#fff" />
+                  <Text style={styles.confirmCheckInButtonText}>Đang xử lý...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="checkmark-circle" size={24} color="#fff" />
+                  <Text style={styles.confirmCheckInButtonText}>Xác nhận check-in</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+
     {/* Payment Code Modal */}
     <PaymentCode
       visible={showPaymentCodeModal}
@@ -1659,6 +2072,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: "#666",
   },
   scrollView: {
     flex: 1,
@@ -1681,11 +2103,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   statusText: {
     color: "#fff",
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
   complaintWarningBadge: {
     flexDirection: "row",
@@ -1707,27 +2135,30 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   section: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
   firstSection: {
     marginTop: -8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 12,
+    color: "#111827",
+    marginBottom: 14,
+    letterSpacing: -0.3,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 18,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
   },
   infoRow: {
     flexDirection: "row",
@@ -1736,27 +2167,30 @@ const styles = StyleSheet.create({
   },
   infoContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 14,
   },
   infoLabel: {
     fontSize: 13,
     color: "#6B7280",
-    marginBottom: 2,
+    marginBottom: 4,
+    fontWeight: "500",
   },
   infoValue: {
     fontSize: 15,
-    color: "#1F2937",
+    color: "#111827",
     fontWeight: "600",
+    letterSpacing: -0.2,
   },
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: "#1F2937",
-    marginLeft: 12,
+    color: "#374151",
+    marginLeft: 14,
+    lineHeight: 20,
   },
   divider: {
     height: 1,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: "#F3F4F6",
     marginVertical: 12,
   },
   elderlyHeader: {
@@ -2028,21 +2462,23 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
   },
   noteCard: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
   },
   noteHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   noteAuthor: {
     flexDirection: "row",
@@ -2050,63 +2486,77 @@ const styles = StyleSheet.create({
   },
   noteAuthorText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#4B5563",
+    fontWeight: "700",
+    color: "#374151",
     marginLeft: 6,
   },
   noteTime: {
     fontSize: 12,
     color: "#9CA3AF",
+    fontWeight: "500",
   },
   noteContent: {
     fontSize: 14,
     color: "#1F2937",
-    lineHeight: 20,
+    lineHeight: 22,
+    letterSpacing: -0.1,
   },
   bottomActions: {
   position: "absolute",
   left: 0,
   right: 0,
-  bottom: 90, // nhích lên để không bị bottom nav che
+  bottom: 90,
   flexDirection: "row",
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-  backgroundColor: "#fff",
+  paddingHorizontal: 20,
+  paddingVertical: 16,
+  backgroundColor: "#FFFFFF",
   borderTopWidth: 1,
-  borderTopColor: "#E5E7EB",
+  borderTopColor: "#F3F4F6",
   gap: 12,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  elevation: 5,
   },
   actionButtonSecondary: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    borderWidth: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
     borderColor: "#10B981",
   },
   actionButtonSecondaryText: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#10B981",
-    marginLeft: 6,
+    marginLeft: 8,
+    letterSpacing: -0.2,
   },
   actionButtonPrimary: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
     backgroundColor: "#10B981",
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   actionButtonPrimaryText: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-    marginLeft: 6,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginLeft: 8,
+    letterSpacing: -0.2,
   },
   // New button styles
   actionButtonSuccess: {
@@ -2114,45 +2564,63 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
     backgroundColor: "#10B981",
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   actionButtonSuccessText: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-    marginLeft: 6,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginLeft: 8,
+    letterSpacing: -0.2,
   },
   actionButtonDanger: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
     backgroundColor: "#EF4444",
+    shadowColor: "#EF4444",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   actionButtonDangerText: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-    marginLeft: 6,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginLeft: 8,
+    letterSpacing: -0.2,
   },
   actionButtonWarning: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
     backgroundColor: "#F59E0B",
+    shadowColor: "#F59E0B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   actionButtonWarningText: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-    marginLeft: 6,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginLeft: 8,
+    letterSpacing: -0.2,
   },
   // New styles for elderly info
   diseaseTag: {
@@ -2509,5 +2977,180 @@ const styles = StyleSheet.create({
   },
   deadlineDisplayTextExpired: {
     color: "#991B1B",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    width: "100%",
+    maxWidth: 500,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+    overflow: "hidden",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: "#6B7280",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalContent: {
+    padding: 20,
+  },
+  timeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ECFDF5",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#A7F3D0",
+  },
+  timeIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  timeTextContainer: {
+    flex: 1,
+  },
+  timeLabel: {
+    fontSize: 13,
+    color: "#059669",
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  timeValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#047857",
+  },
+  sectionLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 12,
+  },
+  imageSection: {
+    marginBottom: 24,
+  },
+  cameraSection: {
+    marginBottom: 24,
+  },
+  cameraButton: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 16,
+    padding: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#E5E7EB",
+    borderStyle: "dashed",
+  },
+  cameraIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#EFF6FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  cameraButtonTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1F2937",
+    marginBottom: 6,
+  },
+  cameraButtonSubtitle: {
+    fontSize: 13,
+    color: "#6B7280",
+  },
+  imagePreviewContainer: {
+    position: "relative",
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#F3F4F6",
+  },
+  checkInImagePreview: {
+    width: "100%",
+    height: 280,
+  },
+  retakeButton: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    backgroundColor: "#3B82F6",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 10,
+    gap: 8,
+    shadowColor: "#3B82F6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  retakeButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  confirmCheckInButton: {
+    backgroundColor: "#10B981",
+    paddingVertical: 16,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  confirmCheckInButtonDisabled: {
+    backgroundColor: "#D1D5DB",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  confirmCheckInButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });
