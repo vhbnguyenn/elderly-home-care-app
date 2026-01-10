@@ -1,12 +1,17 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getAppointmentComplaint, getAppointmentHasComplained, getHasComplaintFeedback, markAppointmentAsComplained } from "@/data/appointmentStore";
+import { BookingAPI } from "@/services/api/booking.api";
+import { DisputesAPI } from "@/services/api/disputes.api";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
+  Modal,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -18,12 +23,10 @@ import {
 } from "react-native";
 
 const complaintTypes = [
-  { id: "behavior", label: "Thái độ không phù hợp", icon: "emoticon-angry" },
-  { id: "quality", label: "Chất lượng dịch vụ kém", icon: "star-off" },
-  { id: "unprofessional", label: "Thiếu chuyên nghiệp", icon: "account-alert" },
-  { id: "late", label: "Đến trễ/Bỏ ca", icon: "clock-alert" },
-  { id: "health", label: "Vấn đề sức khỏe người già", icon: "medical-bag" },
+  { id: "service_quality", label: "Chất lượng dịch vụ kém", icon: "star-off" },
   { id: "payment", label: "Vấn đề thanh toán", icon: "cash" },
+  { id: "cancellation", label: "Hủy dịch vụ", icon: "cancel" },
+  { id: "scheduling", label: "Vấn đề lịch hẹn", icon: "clock-alert" },
   { id: "other", label: "Khác", icon: "help-circle" },
 ];
 
@@ -36,6 +39,7 @@ export default function ComplaintScreen() {
     date?: string;
     time?: string;
     packageName?: string;
+    userId?: string;
     viewMode?: boolean;
     fromScreen?: string;
   } | undefined;
@@ -54,6 +58,9 @@ export default function ComplaintScreen() {
   const [urgency, setUrgency] = useState<"low" | "medium" | "high">("medium");
   const [uploadedFiles, setUploadedFiles] = useState<{ uri: string; type: string; name: string; size?: number }[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [disputeDetail, setDisputeDetail] = useState<any>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const [submittedComplaint, setSubmittedComplaint] = useState<{
     selectedTypes: string[];
     description: string;
@@ -66,6 +73,9 @@ export default function ComplaintScreen() {
   const [hasComplaintFeedback, setHasComplaintFeedback] = useState(
     appointmentInfo.id ? getHasComplaintFeedback(appointmentInfo.id) : false
   );
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+  const [withdrawReason, setWithdrawReason] = useState("");
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
   
   // Sync complaint feedback status when screen is focused
   useFocusEffect(
@@ -77,19 +87,37 @@ export default function ComplaintScreen() {
     }, [appointmentInfo.id])
   );
 
-  // Nếu có viewMode từ params và có complaint data, load complaint data
+  // Nếu có viewMode từ params, load dispute detail từ API
   React.useEffect(() => {
-    if (params?.viewMode && appointmentInfo.id) {
-      const hasComplained = getAppointmentHasComplained(appointmentInfo.id);
-      if (hasComplained) {
-        const complaintData = getAppointmentComplaint(appointmentInfo.id);
-        if (complaintData) {
-          setSubmittedComplaint(complaintData);
-          setIsSubmitted(true);
-          setViewMode(true);
+    const loadDisputeDetail = async () => {
+      if (params?.viewMode && appointmentInfo.id) {
+        setLoadingDetail(true);
+        try {
+          // Try to get dispute by booking ID
+          const response = await DisputesAPI.getDisputeByBooking(appointmentInfo.id);
+          if (response.success && response.data.dispute) {
+            setDisputeDetail(response.data.dispute);
+            setIsSubmitted(true);
+            setViewMode(true);
+          }
+        } catch (error) {
+          console.error('Error loading dispute detail:', error);
+          // Fallback to local data if API fails
+          const hasComplained = getAppointmentHasComplained(appointmentInfo.id);
+          if (hasComplained) {
+            const complaintData = getAppointmentComplaint(appointmentInfo.id);
+            if (complaintData) {
+              setSubmittedComplaint(complaintData);
+              setIsSubmitted(true);
+              setViewMode(true);
+            }
+          }
+        } finally {
+          setLoadingDetail(false);
         }
       }
-    }
+    };
+    loadDisputeDetail();
   }, [params?.viewMode, appointmentInfo.id]);
 
   const toggleComplaintType = (typeId: string) => {
@@ -97,6 +125,37 @@ export default function ComplaintScreen() {
       setSelectedTypes(selectedTypes.filter((id) => id !== typeId));
     } else {
       setSelectedTypes([...selectedTypes, typeId]);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getUrgencyText = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'Khẩn cấp';
+      case 'high': return 'Cao';
+      case 'medium': return 'Trung bình';
+      case 'low': return 'Thấp';
+      default: return 'Không xác định';
+    }
+  };
+
+  const getUrgencyColor = (severity: string) => {
+    switch (severity) {
+      case 'critical': return '#DC2626';
+      case 'high': return '#EF4444';
+      case 'medium': return '#F59E0B';
+      case 'low': return '#10B981';
+      default: return '#6B7280';
     }
   };
 
@@ -146,7 +205,7 @@ export default function ComplaintScreen() {
 
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        mediaTypes: ['images', 'videos'],
         allowsMultipleSelection: true,
         quality: 0.8,
       });
@@ -185,7 +244,7 @@ export default function ComplaintScreen() {
 
     try {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         quality: 0.8,
         allowsEditing: true,
       });
@@ -224,7 +283,7 @@ export default function ComplaintScreen() {
     return `${mb.toFixed(2)} MB`;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedTypes.length === 0) {
       Alert.alert("Lỗi", "Vui lòng chọn ít nhất một loại khiếu nại");
       return;
@@ -243,48 +302,192 @@ export default function ComplaintScreen() {
         {
           text: "Gửi",
           style: "destructive",
-          onPress: () => {
-            // TODO: Call API to submit complaint with uploadedFiles
-            console.log("Complaint data:", {
-              appointmentInfo,
-              selectedTypes,
-              description,
-              urgency,
-              uploadedFiles,
-            });
-            
-            // Lưu thông tin khiếu nại đã gửi
-            // Nếu đang sửa lại khiếu nại (có submittedComplaint và status là need_more_info), đổi về reviewing
-            // Nếu là khiếu nại mới, status mặc định là reviewing
-            const newStatus: "reviewing" = "reviewing";
-            
-            const complaintData = {
-              selectedTypes,
-              description,
-              urgency,
-              uploadedFiles,
-              submittedAt: submittedComplaint?.submittedAt || new Date().toISOString(), // Giữ nguyên thời gian gửi ban đầu nếu đang sửa
-              status: newStatus,
-            };
-            setSubmittedComplaint(complaintData);
-            setIsSubmitted(true);
-            // Đánh dấu appointment đã khiếu nại
-            if (appointmentInfo.id) {
-              markAppointmentAsComplained(appointmentInfo.id, complaintData);
+          onPress: async () => {
+            setIsSubmitting(true);
+            try {
+              // Get respondent ID (careseeker who booked the appointment)
+              let respondentId = params?.userId || '';
+              
+              // If no userId in params, try to fetch from booking API
+              if (!respondentId && appointmentInfo.id) {
+                try {
+                  console.log('Fetching booking details to get userId...');
+                  
+                  // Use BookingAPI.getById - it has token refresh interceptor
+                  const bookingData = await BookingAPI.getById(appointmentInfo.id);
+                  
+                  console.log('Booking data received:', bookingData);
+                  
+                  // careseeker is the ObjectId string (userId) directly
+                  respondentId = bookingData.data?.careseeker?._id || 
+                                 bookingData.data?.booking?.careseeker ||
+                                 '';
+                  console.log('Extracted respondentId (careseeker ID):', respondentId);
+                } catch (fetchError: any) {
+                  console.error('Error fetching booking details:', fetchError?.message || fetchError);
+                  // Continue with empty respondentId - will show error later
+                }
+              }
+              
+              console.log('Submitting dispute with data:', {
+                bookingId: appointmentInfo.id,
+                respondentId,
+                params,
+                appointmentInfo,
+              });
+              
+              if (!respondentId) {
+                Alert.alert("Lỗi", "Không tìm thấy thông tin người đặt lịch. Vui lòng thử lại từ trang chi tiết lịch hẹn.");
+                setIsSubmitting(false);
+                return;
+              }
+              
+              // Map UI complaint type to API dispute type
+              // Backend only accepts: service_quality, payment, scheduling, other
+              // Map 'cancellation' to 'other' since backend doesn't accept it
+              let disputeType = selectedTypes[0];
+              if (disputeType === 'cancellation') {
+                disputeType = 'other';
+              }
+              const apiDisputeType = disputeType as 'service_quality' | 'payment' | 'scheduling' | 'other';
+              
+              // Create title from selected types
+              const title = complaintTypes
+                .filter(t => selectedTypes.includes(t.id))
+                .map(t => t.label)
+                .join(', ');
+              
+              // Map urgency to severity
+              const severity = urgency as 'low' | 'medium' | 'high';
+              
+              // Get complainant ID (current caregiver user)
+              const userDataStr = await AsyncStorage.getItem('user_data');
+              
+              console.log('user_data from storage:', userDataStr);
+              
+              const userData = userDataStr ? JSON.parse(userDataStr) : null;
+              
+              console.log('Parsed user_data:', userData);
+              
+              const complainantId = userData?.userId || 
+                                   userData?.id || 
+                                   userData?._id || 
+                                   '';
+              
+              console.log('Extracted complainantId:', complainantId);
+              
+              if (!complainantId) {
+                Alert.alert(
+                  "Lỗi", 
+                  "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.",
+                  [{ text: "OK" }]
+                );
+                setIsSubmitting(false);
+                return;
+              }
+              
+              const requestData = {
+                bookingId: appointmentInfo.id,
+                complainantId,
+                respondentId,
+                disputeType: apiDisputeType,
+                severity,
+                title,
+                description: description.trim(),
+                evidence: uploadedFiles.map(file => ({
+                  type: file.type.startsWith('image') ? 'image' as const : 'document' as const,
+                  url: file.uri,
+                  description: file.name,
+                })),
+                requestedResolution: 'refund' as const,
+              };
+              
+              console.log('Request data to send:', JSON.stringify(requestData, null, 2));
+              console.log('Field values:', {
+                bookingId: requestData.bookingId,
+                complainantId: requestData.complainantId,
+                respondentId: requestData.respondentId,
+                disputeType: requestData.disputeType,
+                severity: requestData.severity,
+                title: requestData.title,
+                description: requestData.description,
+                requestedResolution: requestData.requestedResolution,
+              });
+              
+              // Check all required fields before sending
+              if (!requestData.bookingId || !requestData.complainantId || !requestData.respondentId || 
+                  !requestData.disputeType || !requestData.severity || !requestData.title || 
+                  !requestData.description || !requestData.requestedResolution) {
+                console.error('Missing required fields!', {
+                  hasBookingId: !!requestData.bookingId,
+                  hasComplainantId: !!requestData.complainantId,
+                  hasRespondentId: !!requestData.respondentId,
+                  hasDisputeType: !!requestData.disputeType,
+                  hasSeverity: !!requestData.severity,
+                  hasTitle: !!requestData.title,
+                  hasDescription: !!requestData.description,
+                  hasRequestedResolution: !!requestData.requestedResolution,
+                });
+                Alert.alert("Lỗi", "Thiếu thông tin bắt buộc. Vui lòng điền đầy đủ form.");
+                setIsSubmitting(false);
+                return;
+              }
+              
+              console.log('About to call DisputesAPI.createDispute...');
+              
+              // Submit dispute via API
+              const response = await DisputesAPI.createDispute(requestData);
+              
+              if (response.success) {
+                // Lưu thông tin khiếu nại đã gửi
+                const complaintData = {
+                  selectedTypes,
+                  description,
+                  urgency,
+                  uploadedFiles,
+                  submittedAt: new Date().toISOString(),
+                  status: "reviewing" as const,
+                  disputeId: response.data.dispute._id,
+                };
+                setSubmittedComplaint(complaintData);
+                setIsSubmitted(true);
+                
+                // Load dispute detail
+                setDisputeDetail(response.data.dispute);
+                
+                // Đánh dấu appointment đã khiếu nại
+                if (appointmentInfo.id) {
+                  markAppointmentAsComplained(appointmentInfo.id, complaintData);
+                }
+                
+                Alert.alert(
+                  "Đã gửi khiếu nại",
+                  response.message || "Khiếu nại của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và phản hồi trong vòng 24-48 giờ.",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => {
+                        // Chuyển sang view mode để xem khiếu nại
+                        setViewMode(true);
+                      },
+                    },
+                  ]
+                );
+              }
+            } catch (error: any) {
+              console.error("Error submitting dispute:", error);
+              console.error("Error details:", {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+              });
+              Alert.alert(
+                "Lỗi gửi khiếu nại",
+                error.response?.data?.message || error.message || "Không thể gửi khiếu nại. Vui lòng kiểm tra kết nối và thử lại."
+              );
+            } finally {
+              setIsSubmitting(false);
             }
-            // Không tự động chuyển sang view mode, để user có thể thấy nút "Xem khiếu nại"
-            // setViewMode(true);
-            
-            Alert.alert(
-              "Đã gửi khiếu nại",
-              "Khiếu nại của bạn đã được ghi nhận. Chúng tôi sẽ xem xét và phản hồi trong vòng 24-48 giờ.",
-              [
-                {
-                  text: "OK",
-                  onPress: () => {},
-                },
-              ]
-            );
           },
         },
       ]
@@ -325,32 +528,57 @@ export default function ComplaintScreen() {
   };
 
   const handleCancelComplaint = () => {
-    Alert.alert(
-      "Hủy khiếu nại",
-      "Bạn có chắc chắn muốn hủy khiếu nại này?",
-      [
-        { text: "Không", style: "cancel" },
-        {
-          text: "Hủy khiếu nại",
-          style: "destructive",
-          onPress: () => {
-            // Xóa khiếu nại khỏi store
-            if (appointmentInfo.id) {
-              // TODO: Call API to cancel complaint
-              // Tạm thời chỉ xóa khỏi local state
-              setIsSubmitted(false);
-              setSubmittedComplaint(null);
-              setSelectedTypes([]);
-              setDescription("");
-              setUploadedFiles([]);
-              setViewMode(false);
-              // Có thể cần thêm hàm để xóa khỏi store
-              Alert.alert("Thành công", "Đã hủy khiếu nại");
-            }
-          },
-        },
-      ]
-    );
+    setShowWithdrawDialog(true);
+  };
+
+  const handleWithdrawSubmit = async () => {
+    if (!withdrawReason.trim()) {
+      Alert.alert("Lỗi", "Vui lòng nhập lý do hủy khiếu nại");
+      return;
+    }
+
+    setIsWithdrawing(true);
+    try {
+      const disputeId = disputeDetail?._id || submittedComplaint?.disputeId;
+      if (!disputeId) {
+        Alert.alert("Lỗi", "Không tìm thấy thông tin khiếu nại");
+        return;
+      }
+
+      const response = await DisputesAPI.withdrawDispute(disputeId, withdrawReason.trim());
+      
+      if (response.success) {
+        // Xóa khiếu nại khỏi local state
+        setIsSubmitted(false);
+        setSubmittedComplaint(null);
+        setDisputeDetail(null);
+        setSelectedTypes([]);
+        setDescription("");
+        setUploadedFiles([]);
+        setViewMode(false);
+        setShowWithdrawDialog(false);
+        setWithdrawReason("");
+        
+        Alert.alert(
+          "Thành công", 
+          response.message || "Đã hủy khiếu nại thành công",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      }
+    } catch (error: any) {
+      console.error("Error withdrawing dispute:", error);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Không thể hủy khiếu nại. Vui lòng thử lại."
+      );
+    } finally {
+      setIsWithdrawing(false);
+    }
   };
 
   const handleEditComplaint = () => {
@@ -383,42 +611,6 @@ export default function ComplaintScreen() {
         fromScreen: "complaint",
       });
     }
-  };
-
-  const getUrgencyColor = (level: string) => {
-    switch (level) {
-      case "low":
-        return "#10B981";
-      case "medium":
-        return "#F59E0B";
-      case "high":
-        return "#EF4444";
-      default:
-        return "#6B7280";
-    }
-  };
-
-  const getUrgencyText = (level: string) => {
-    switch (level) {
-      case "low":
-        return "Thấp";
-      case "medium":
-        return "Trung bình";
-      case "high":
-        return "Cao";
-      default:
-        return "";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
   const getComplaintStatusText = (status?: string) => {
@@ -485,8 +677,175 @@ export default function ComplaintScreen() {
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
       >
-        {viewMode && submittedComplaint ? (
-          /* View Mode - Hiển thị khiếu nại đã gửi */
+        {loadingDetail ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#EF4444" />
+            <Text style={styles.loadingText}>Đang tải thông tin khiếu nại...</Text>
+          </View>
+        ) : viewMode && disputeDetail ? (
+          /* View Mode - Hiển thị chi tiết dispute từ API */
+          <>
+            {/* Success Banner */}
+            <View style={styles.successBanner}>
+              <MaterialCommunityIcons name="check-circle" size={32} color="#10B981" />
+              <View style={styles.successContent}>
+                <Text style={styles.successTitle}>Khiếu nại đã được gửi</Text>
+                <Text style={styles.successText}>
+                  Mã khiếu nại: #{disputeDetail._id?.slice(-8)?.toUpperCase()}
+                </Text>
+              </View>
+            </View>
+
+            {/* Status Badge */}
+            <View style={styles.section}>
+              <View style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: getComplaintStatusBgColor(disputeDetail.status),
+                  borderColor: getComplaintStatusColor(disputeDetail.status),
+                }
+              ]}>
+                <View style={[
+                  styles.statusDot,
+                  { backgroundColor: getComplaintStatusColor(disputeDetail.status) }
+                ]} />
+                <Text style={[
+                  styles.statusText,
+                  { color: getComplaintStatusColor(disputeDetail.status) }
+                ]}>
+                  {getComplaintStatusText(disputeDetail.status)}
+                </Text>
+              </View>
+            </View>
+
+            {/* Dispute Info */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Thông tin khiếu nại</Text>
+              
+              <View style={styles.card}>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons name="alert-circle" size={18} color="#EF4444" />
+                  <Text style={styles.detailLabel}>Loại:</Text>
+                  <Text style={styles.detailValue}>{disputeDetail.title}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons name="speedometer" size={18} color="#F59E0B" />
+                  <Text style={styles.detailLabel}>Mức độ:</Text>
+                  <Text style={[styles.detailValue, { color: getUrgencyColor(disputeDetail.severity) }]}>
+                    {getUrgencyText(disputeDetail.severity)}
+                  </Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <MaterialCommunityIcons name="calendar" size={18} color="#6B7280" />
+                  <Text style={styles.detailLabel}>Ngày tạo:</Text>
+                  <Text style={styles.detailValue}>{formatDate(disputeDetail.createdAt)}</Text>
+                </View>
+                {disputeDetail.deadline && (
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons name="clock-alert" size={18} color="#EF4444" />
+                    <Text style={styles.detailLabel}>Hạn xử lý:</Text>
+                    <Text style={styles.detailValue}>{formatDate(disputeDetail.deadline)}</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Description */}
+              <View style={styles.section}>
+                <Text style={styles.sectionSubtitle}>Mô tả chi tiết</Text>
+                <View style={[styles.textArea, styles.textAreaReadOnly]}>
+                  <Text style={styles.descriptionText}>{disputeDetail.description}</Text>
+                </View>
+              </View>
+
+              {/* Evidence */}
+              {disputeDetail.evidence && disputeDetail.evidence.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionSubtitle}>Bằng chứng đính kèm</Text>
+                  <View style={styles.uploadedFilesContainer}>
+                    {disputeDetail.evidence.map((evidence: any, index: number) => (
+                      <View key={index} style={styles.fileItem}>
+                        {evidence.type === "image" ? (
+                          <Image source={{ uri: evidence.url }} style={styles.filePreview} />
+                        ) : (
+                          <View style={styles.videoPreview}>
+                            <MaterialCommunityIcons name="file-document" size={32} color="#6B7280" />
+                          </View>
+                        )}
+                        <View style={styles.fileInfo}>
+                          <Text style={styles.fileName} numberOfLines={1}>
+                            {evidence.description || `Evidence ${index + 1}`}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Admin Decision */}
+              {disputeDetail.adminDecision && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Quyết định của Admin</Text>
+                  <View style={[styles.card, { backgroundColor: '#FEF3C7', borderColor: '#F59E0B' }]}>
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="gavel" size={18} color="#F59E0B" />
+                      <Text style={styles.detailLabel}>Quyết định:</Text>
+                      <Text style={[styles.detailValue, { fontWeight: '700' }]}>
+                        {disputeDetail.adminDecision.decision === 'favor_complainant' ? 'Ủng hộ người khiếu nại' :
+                         disputeDetail.adminDecision.decision === 'favor_respondent' ? 'Ủng hộ người bị khiếu nại' :
+                         'Thỏa thuận'}
+                      </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="account" size={18} color="#F59E0B" />
+                      <Text style={styles.detailLabel}>Người quyết định:</Text>
+                      <Text style={styles.detailValue}>{disputeDetail.adminDecision.decidedBy?.name}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <MaterialCommunityIcons name="calendar-check" size={18} color="#F59E0B" />
+                      <Text style={styles.detailLabel}>Ngày quyết định:</Text>
+                      <Text style={styles.detailValue}>{formatDate(disputeDetail.adminDecision.decidedAt)}</Text>
+                    </View>
+                    {disputeDetail.adminDecision.resolution && (
+                      <View style={styles.section}>
+                        <Text style={styles.sectionSubtitle}>Giải pháp:</Text>
+                        <Text style={styles.descriptionText}>{disputeDetail.adminDecision.resolution}</Text>
+                      </View>
+                    )}
+                    {disputeDetail.adminDecision.notes && (
+                      <View style={styles.section}>
+                        <Text style={styles.sectionSubtitle}>Ghi chú:</Text>
+                        <Text style={styles.descriptionText}>{disputeDetail.adminDecision.notes}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              )}
+
+              {/* Timeline */}
+              {disputeDetail.timeline && disputeDetail.timeline.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Lịch sử xử lý</Text>
+                  {disputeDetail.timeline.slice().reverse().slice(0, 5).map((event: any, index: number) => (
+                    <View key={event._id} style={styles.timelineItem}>
+                      <View style={styles.timelineDot} />
+                      <View style={styles.timelineContent}>
+                        <Text style={styles.timelineAction}>{event.description}</Text>
+                        <Text style={styles.timelineDate}>{formatDate(event.performedAt)}</Text>
+                        {event.performedBy && (
+                          <Text style={styles.timelineUser}>Bởi: {event.performedBy.name}</Text>
+                        )}
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            <View style={{ height: 100 }} />
+          </>
+        ) : viewMode && submittedComplaint ? (
+          /* View Mode - Hiển thị khiếu nại local khi không load được API */
           <>
             {/* Success Banner */}
             <View style={styles.successBanner}>
@@ -966,13 +1325,89 @@ export default function ComplaintScreen() {
             >
               <Text style={styles.cancelButtonText}>Hủy</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-              <MaterialCommunityIcons name="send" size={20} color="#fff" />
-              <Text style={styles.submitButtonText}>Gửi khiếu nại</Text>
+            <TouchableOpacity 
+              style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]} 
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text style={styles.submitButtonText}>Đang gửi...</Text>
+                </>
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="send" size={20} color="#fff" />
+                  <Text style={styles.submitButtonText}>Gửi khiếu nại</Text>
+                </>
+              )}
             </TouchableOpacity>
           </>
         )}
       </View>
+
+      {/* Withdraw Dialog */}
+      <Modal
+        visible={showWithdrawDialog}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowWithdrawDialog(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <MaterialCommunityIcons name="alert-circle" size={40} color="#EF4444" />
+              <Text style={styles.modalTitle}>Hủy khiếu nại</Text>
+            </View>
+
+            <Text style={styles.modalDescription}>
+              Vui lòng cho biết lý do bạn muốn hủy khiếu nại này:
+            </Text>
+
+            <TextInput
+              style={styles.withdrawReasonInput}
+              placeholder="Nhập lý do hủy khiếu nại..."
+              placeholderTextColor="#9CA3AF"
+              multiline
+              numberOfLines={4}
+              value={withdrawReason}
+              onChangeText={setWithdrawReason}
+              textAlignVertical="top"
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={() => {
+                  setShowWithdrawDialog(false);
+                  setWithdrawReason("");
+                }}
+                disabled={isWithdrawing}
+              >
+                <Text style={styles.modalCancelButtonText}>Đóng</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalSubmitButton, isWithdrawing && styles.submitButtonDisabled]}
+                onPress={handleWithdrawSubmit}
+                disabled={isWithdrawing}
+              >
+                {isWithdrawing ? (
+                  <>
+                    <ActivityIndicator size="small" color="#fff" />
+                    <Text style={styles.modalSubmitButtonText}>Đang xử lý...</Text>
+                  </>
+                ) : (
+                  <>
+                    <MaterialCommunityIcons name="close-circle" size={18} color="#fff" />
+                    <Text style={styles.modalSubmitButtonText}>Xác nhận hủy</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Bottom Navigation */}
       <CaregiverBottomNav activeTab="jobs" />
@@ -1248,6 +1683,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
+  submitButtonDisabled: {
+    backgroundColor: "#9CA3AF",
+    opacity: 0.7,
+  },
   submitButtonText: {
     fontSize: 15,
     fontWeight: "600",
@@ -1308,5 +1747,152 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: "700",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    minHeight: 200,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  detailLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '600',
+    minWidth: 80,
+  },
+  detailValue: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1F2937',
+    fontWeight: '500',
+  },
+  timelineItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    paddingLeft: 8,
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#EF4444',
+    marginTop: 4,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#FEE2E2',
+  },
+  timelineContent: {
+    flex: 1,
+    paddingBottom: 16,
+    borderLeftWidth: 2,
+    borderLeftColor: '#F3F4F6',
+    paddingLeft: 12,
+    marginLeft: -6,
+  },
+  timelineAction: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  timelineDate: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  timelineUser: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginTop: 12,
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  withdrawReasonInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#1F2937',
+    minHeight: 100,
+    backgroundColor: '#F9FAFB',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 6,
+  },
+  modalCancelButton: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  modalCancelButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  modalSubmitButton: {
+    backgroundColor: '#EF4444',
+  },
+  modalSubmitButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
   },
 });

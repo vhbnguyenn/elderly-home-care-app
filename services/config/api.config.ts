@@ -85,6 +85,42 @@ export const API_CONFIG = {
       UPDATE: (id: string) => `/api/certificates/${id}`,
       DELETE: (id: string) => `/api/certificates/${id}`,
     },
+    // Caregiver Skills
+    CAREGIVER_SKILLS: {
+      CREATE: '/api/caregiver-skills',
+      GET_MY_SKILLS: '/api/caregiver-skills/my-skills',
+      UPDATE: (id: string) => `/api/caregiver-skills/${id}`,
+      DELETE: (id: string) => `/api/caregiver-skills/${id}`,
+      TOGGLE_DISPLAY: (id: string) => `/api/caregiver-skills/${id}/toggle-display`,
+    },
+    // Courses
+    COURSES: {
+      GET_ALL: '/api/courses',
+      GET_BY_ID: (id: string) => `/api/courses/${id}`,
+      ENROLL: (id: string) => `/api/courses/${id}/enroll`,
+      MY_ENROLLMENTS: '/api/courses/my-enrollments',
+      GET_PROGRESS: (id: string) => `/api/courses/${id}/progress`,
+    },
+    // Lessons
+    LESSONS: {
+      GET_BY_ID: (id: string) => `/api/courses/lesson/${id}`,
+      COMPLETE: (id: string) => `/api/courses/lesson/${id}/complete`,
+    },
+    // Feedback
+    FEEDBACK: {
+      SUBMIT: '/api/system-feedback',
+    },
+    // Reviews
+    REVIEWS: {
+      RECEIVED: '/api/careseeker-reviews/received',
+    },
+    // Disputes
+    DISPUTES: {
+      CREATE: '/api/disputes',
+      GET_MY_DISPUTES: '/api/disputes/my-disputes',
+      GET_BY_BOOKING: (bookingId: string) => `/api/disputes/booking/${bookingId}`,
+      WITHDRAW: (id: string) => `/api/disputes/${id}/withdraw`,
+    },
   },
 };
 

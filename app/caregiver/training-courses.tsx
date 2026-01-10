@@ -1,8 +1,11 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import { Course as APICourse, CoursesAPI } from "@/services/api/courses.api";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   Platform,
@@ -19,88 +22,119 @@ interface Course {
   id: string;
   title: string;
   description: string;
-  category: "Cơ bản" | "Trung cấp" | "Nâng cao";
-  participants: number;
-  duration: string; // "8 tuần", "6 tuần", "4 tuần"
-  instructor: string;
-  image: string; // Image URI
+  level: string;
+  enrollmentCount: number;
+  duration: number; // in minutes
+  instructor: {
+    name: string;
+    title: string;
+    avatar: string;
+  };
+  thumbnail: string;
+  category: string;
+  isEnrolled: boolean;
 }
 
-const courses: Course[] = [
-  {
-    id: "1",
-    title: "Chăm Sóc Cơ Bản Người Cao Tuổi",
-    description: "Học các kỹ năng chăm sóc cơ bản, an toàn và hiệu quả cho người cao tuổi tại nhà và cơ sở y tế.",
-    category: "Cơ bản",
-    participants: 1254,
-    duration: "8 tuần",
-    instructor: "BS. Nguyễn Thị Mai",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=200&fit=crop",
-  },
-  {
-    id: "2",
-    title: "Dinh Dưỡng Cho Người Cao Tuổi",
-    description: "Kiến thức chuyên sâu về dinh dưỡng, lập thực đơn và chế biến món ăn phù hợp cho người cao tuổi.",
-    category: "Trung cấp",
-    participants: 892,
-    duration: "6 tuần",
-    instructor: "TS. Trần Văn Hùng",
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=200&fit=crop",
-  },
-  {
-    id: "3",
-    title: "Chăm Sóc Sức Khỏe Tinh Thần",
-    description: "Hỗ trợ sức khỏe tinh thần, phòng ngừa trầm cảm và các vấn đề tâm lý ở người cao tuổi.",
-    category: "Nâng cao",
-    participants: 645,
-    duration: "4 tuần",
-    instructor: "ThS. Lê Thị Hoa",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=200&fit=crop",
-  },
-];
+// Helper function to format duration from minutes to readable format
+const formatDuration = (minutes: number): string => {
+  // Dưới 1 giờ
+  if (minutes < 60) {
+    return `${minutes} phút`;
+  }
+  
+  // Dưới 1 ngày (1440 phút = 24h)
+  if (minutes < 1440) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    
+    return `${hours}h ${remainingMinutes}phút`;
+  }
+  
+  // Dưới 1 tháng (43200 phút = 30 ngày)
+  if (minutes < 43200) {
+    const days = Math.floor(minutes / 1440);
+    const remainingHours = Math.floor((minutes % 1440) / 60);
+    
+    if (remainingHours === 0) {
+      return `${days} ngày`;
+    }
+    
+    return `${days} ngày ${remainingHours}h`;
+  }
+  
+  // Dưới 1 năm (525600 phút = 365 ngày)
+  if (minutes < 525600) {
+    const months = Math.floor(minutes / 43200);
+    const remainingDays = Math.floor((minutes % 43200) / 1440);
+    
+    if (remainingDays === 0) {
+      return `${months} tháng`;
+    }
+    
+    return `${months} tháng ${remainingDays} ngày`;
+  }
+  
+  // Từ 1 năm trở lên
+  const years = Math.floor(minutes / 525600);
+  const remainingMonths = Math.floor((minutes % 525600) / 43200);
+  
+  if (remainingMonths === 0) {
+    return `${years} năm`;
+  }
+  
+  return `${years} năm ${remainingMonths} tháng`;
+};
 
-export default function TrainingCoursesMobile({ navigation }: any) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    course.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "Cơ bản":
+// Course Card Component
+const CourseCard = ({ item, onPress }: { item: Course; onPress: () => void }) => {
+  const getCategoryColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case "cơ bản":
         return "#10B981";
-      case "Trung cấp":
-        return "#10B981";
-      case "Nâng cao":
-        return "#10B981";
+      case "trung cấp":
+        return "#F59E0B";
+      case "nâng cao":
+        return "#EF4444";
       default:
         return "#10B981";
     }
   };
 
-  const renderCourseCard = ({ item }: { item: Course }) => (
+  const hasValidAvatar = item.instructor?.avatar && 
+    typeof item.instructor.avatar === 'string' && 
+    item.instructor.avatar.trim().length > 0;
+
+  return (
     <TouchableOpacity
       style={styles.courseCard}
-      onPress={() => navigation.navigate("Chi tiết khóa học", { id: item.id })}
+      onPress={onPress}
       activeOpacity={0.7}
     >
       {/* Course Image */}
       <View style={styles.courseImageContainer}>
         <Image
-          source={{ uri: item.image }}
+          source={{ uri: item.thumbnail }}
           style={styles.courseImage}
           resizeMode="cover"
         />
+        {item.isEnrolled && (
+          <View style={styles.enrolledBadge}>
+            <MaterialCommunityIcons name="check-circle" size={16} color="#FFF" />
+            <Text style={styles.enrolledText}>Đã đăng ký</Text>
+          </View>
+        )}
       </View>
 
       {/* Course Content */}
       <View style={styles.courseContent}>
         {/* Category Tag */}
         <View style={styles.courseHeader}>
-          <View style={[styles.categoryTag, { backgroundColor: getCategoryColor(item.category) }]}>
-            <Text style={styles.categoryText}>{item.category}</Text>
+          <View style={[styles.categoryTag, { backgroundColor: getCategoryColor(item.level) }]}>
+            <Text style={styles.categoryText}>{item.level}</Text>
           </View>
         </View>
 
@@ -116,18 +150,89 @@ export default function TrainingCoursesMobile({ navigation }: any) {
         <View style={styles.courseMeta}>
           <View style={styles.metaItem}>
             <MaterialCommunityIcons name="account-group" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{item.participants.toLocaleString()}</Text>
+            <Text style={styles.metaText}>{item.enrollmentCount.toLocaleString()} học viên</Text>
           </View>
           <View style={styles.metaItem}>
             <Ionicons name="time-outline" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{item.duration}</Text>
+            <Text style={styles.metaText}>{formatDuration(item.duration)}</Text>
           </View>
         </View>
 
         {/* Instructor */}
-        <Text style={styles.instructorText}>{item.instructor}</Text>
+        <View style={styles.instructorContainer}>
+          {hasValidAvatar ? (
+            <Image 
+              source={{ uri: item.instructor.avatar }} 
+              style={styles.instructorAvatar}
+              defaultSource={require('@/assets/images/partial-react-logo.png')}
+            />
+          ) : (
+            <View style={[styles.instructorAvatar, styles.avatarPlaceholder]}>
+              <MaterialCommunityIcons name="account" size={24} color="#9CA3AF" />
+            </View>
+          )}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.instructorName}>{item.instructor?.name || 'Giảng viên'}</Text>
+            <Text style={styles.instructorTitle}>{item.instructor?.title || 'Chuyên gia'}</Text>
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
+  );
+};
+
+export default function TrainingCoursesMobile({ navigation }: any) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch courses from API
+  const fetchCourses = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await CoursesAPI.getCourses();
+      
+      // Map API data to component format
+      const mappedCourses: Course[] = response.data.map((course: APICourse) => ({
+        id: course._id,
+        title: course.title,
+        description: course.description,
+        level: course.level,
+        enrollmentCount: course.enrollmentCount,
+        duration: course.duration,
+        instructor: course.instructor,
+        thumbnail: course.thumbnail,
+        category: course.category,
+        isEnrolled: course.isEnrolled,
+      }));
+      
+      setCourses(mappedCourses);
+    } catch (error: any) {
+      console.error("Error fetching courses:", error);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Không thể tải danh sách khóa học. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
+
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    course.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const renderCourseCard = ({ item }: { item: Course }) => (
+    <CourseCard
+      item={item}
+      onPress={() => navigation.navigate("Chi tiết khóa học", { id: item.id })}
+    />
   );
 
   return (
@@ -170,13 +275,27 @@ export default function TrainingCoursesMobile({ navigation }: any) {
             Khám phá các khóa học được đánh giá cao nhất
           </Text>
 
-          <FlatList
-            data={filteredCourses}
-            renderItem={renderCourseCard}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={styles.coursesList}
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#2563EB" />
+              <Text style={styles.loadingText}>Đang tải khóa học...</Text>
+            </View>
+          ) : filteredCourses.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <MaterialCommunityIcons name="book-open-variant" size={64} color="#CBD5E1" />
+              <Text style={styles.emptyText}>
+                {searchQuery ? "Không tìm thấy khóa học phù hợp" : "Chưa có khóa học nào"}
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredCourses}
+              renderItem={renderCourseCard}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+              contentContainerStyle={styles.coursesList}
+            />
+          )}
         </View>
 
         <View style={{ height: 100 }} />
@@ -275,10 +394,28 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     backgroundColor: "#E5E7EB",
+    position: "relative",
   },
   courseImage: {
     width: "100%",
     height: "100%",
+  },
+  enrolledBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "rgba(16, 185, 129, 0.9)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  enrolledText: {
+    color: "#FFF",
+    fontSize: 12,
+    fontWeight: "600",
   },
   courseContent: {
     padding: 16,
@@ -326,10 +463,54 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6B7280",
   },
-  instructorText: {
+  instructorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+  },
+  instructorAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#E5E7EB",
+  },
+  avatarPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  instructorName: {
     fontSize: 13,
     fontWeight: "600",
     color: "#1F2937",
-    marginTop: 4,
+  },
+  instructorTitle: {
+    fontSize: 12,
+    color: "#6B7280",
+    marginTop: 2,
+  },
+  loadingContainer: {
+    paddingVertical: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  emptyContainer: {
+    paddingVertical: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
   },
 });

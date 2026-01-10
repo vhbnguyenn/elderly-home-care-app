@@ -9,16 +9,16 @@ import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/nativ
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 // Mock data - Multiple appointments
@@ -28,6 +28,7 @@ export const appointmentsDataMap: { [key: string]: any } = {
     status: "in-progress", // new, pending, confirmed, in-progress, completed, cancelled, rejected
     date: "2025-10-25",
     timeSlot: "08:00 - 16:00",
+    userId: "677cdd7cd85e80a1eb92b57a", // ID của careseeker (người đặt lịch)
     duration: "8 giờ",
     packageType: "Gói Cao Cấp",
     
@@ -1198,6 +1199,7 @@ export default function AppointmentDetailScreen() {
       date: appointmentData.date,
       time: appointmentData.timeSlot,
       packageName: appointmentData.packageType,
+      userId: appointmentData.userId || appointmentData.elderly?.userId || "",
       fromScreen: "appointment-detail",
     };
     

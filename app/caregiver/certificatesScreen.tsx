@@ -1,4 +1,5 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import { CaregiverSkillsAPI } from "@/services/api/caregiver-skills.api";
 import axiosInstance from "@/services/axiosInstance";
 import { API_CONFIG } from "@/services/config/api.config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -90,6 +91,8 @@ export default function CertificatesScreen() {
   const [editingCertificateId, setEditingCertificateId] = useState<string | null>(null);
   const [imageSourceModal, setImageSourceModal] = useState(false);
   const [skillModalVisible, setSkillModalVisible] = useState(false);
+  const [skillEditMode, setSkillEditMode] = useState(false);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState<any>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -154,9 +157,37 @@ export default function CertificatesScreen() {
     }
   }, []);
 
+  // Fetch skills from API
+  const fetchSkills = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await CaregiverSkillsAPI.getMySkills();
+      const data = response.data || [];
+      
+      // Map API response to component format
+      const mappedSkills = data.map((skill: any, index: number) => ({
+        id: skill._id || skill.id || `skill-${index}`, // Fallback ID
+        name: skill.name,
+        description: skill.description,
+        icon: skill.icon || 'star',
+        selected: skill.isDisplayedOnProfile || false, // Use isDisplayedOnProfile to determine selection
+        isActive: skill.isActive,
+      }));
+      
+      setSkills(mappedSkills.length > 0 ? mappedSkills : MOCK_SKILLS);
+    } catch (error: any) {
+      console.error("Error fetching skills:", error);
+      // If error, keep using mock data
+      setSkills(MOCK_SKILLS);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCertificates();
-  }, [fetchCertificates]);
+    fetchSkills();
+  }, [fetchCertificates, fetchSkills]);
 
   // Fetch certificate detail by ID
   const fetchCertificateDetail = async (certificateId: string) => {
@@ -513,15 +544,72 @@ export default function CertificatesScreen() {
     }
   };
 
-  const toggleSkill = (id: number) => {
-    setSkills(skills.map(skill => 
-      skill.id === id ? { ...skill, selected: !skill.selected } : skill
-    ));
+  const toggleSkill = async (id: string) => {
+    try {
+      const skill = skills.find(s => s.id === id);
+      if (!skill) return;
+
+      const newSelectedState = !skill.selected;
+
+      // Update UI immediately for better UX
+      setSkills(skills.map(s => 
+        s.id === id ? { ...s, selected: newSelectedState } : s
+      ));
+
+      // Call API to toggle isDisplayedOnProfile
+      await CaregiverSkillsAPI.toggleSkillDisplay(id);
+    } catch (error: any) {
+      console.error("Error toggling skill:", error);
+      // Revert the change on error
+      setSkills(skills.map(s => 
+        s.id === id ? { ...s, selected: !s.selected } : s
+      ));
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Không thể cập nhật kỹ năng. Vui lòng thử lại."
+      );
+    }
   };
 
-  const handleDeleteSkill = (id: number, skillName: string) => {
+  const handleSkillLongPress = (id: string, skillName: string) => {
     Alert.alert(
-      "Xóa kỹ năng",
+      skillName,
+      "Bạn muốn làm gì với kỹ năng này?",
+      [
+        {
+          text: "Chỉnh sửa",
+          onPress: () => handleEditSkill(id)
+        },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: () => handleDeleteSkill(id, skillName)
+        },
+        {
+          text: "Hủy",
+          style: "cancel"
+        }
+      ]
+    );
+  };
+
+  const handleEditSkill = (id: string) => {
+    const skill = skills.find(s => s.id === id);
+    if (!skill) return;
+
+    setSkillForm({
+      name: skill.name,
+      description: skill.description || "",
+      icon: skill.icon || "star",
+    });
+    setEditingSkillId(id);
+    setSkillEditMode(true);
+    setSkillModalVisible(true);
+  };
+
+  const handleDeleteSkill = async (id: string, skillName: string) => {
+    Alert.alert(
+      "Xác nhận xóa",
       `Bạn có chắc muốn xóa kỹ năng "${skillName}"?`,
       [
         {
@@ -531,9 +619,21 @@ export default function CertificatesScreen() {
         {
           text: "Xóa",
           style: "destructive",
-          onPress: () => {
-            setSkills(skills.filter(skill => skill.id !== id));
-            Alert.alert("Đã xóa", `Đã xóa kỹ năng "${skillName}"`);
+          onPress: async () => {
+            try {
+              setSubmitting(true);
+              await CaregiverSkillsAPI.deleteSkill(id);
+              setSkills(skills.filter(skill => skill.id !== id));
+              Alert.alert("Đã xóa", `Đã xóa kỹ năng "${skillName}"`);
+            } catch (error: any) {
+              console.error("Error deleting skill:", error);
+              Alert.alert(
+                "Lỗi",
+                error.response?.data?.message || "Không thể xóa kỹ năng. Vui lòng thử lại."
+              );
+            } finally {
+              setSubmitting(false);
+            }
           }
         }
       ]
@@ -547,7 +647,7 @@ export default function CertificatesScreen() {
     "medical-bag", "thermometer", "clipboard-pulse", "hand-heart", "spa", "flower"
   ];
 
-  const handleAddSkill = () => {
+  const handleAddSkill = async () => {
     // Validate
     if (!skillForm.name || skillForm.name.trim().length < 3) {
       setSkillError("Vui lòng nhập tên kỹ năng (tối thiểu 3 ký tự)");
@@ -559,25 +659,68 @@ export default function CertificatesScreen() {
       return;
     }
 
-    // Create new skill
-    const newSkill = {
-      id: skills.length + 1,
-      name: skillForm.name.trim(),
-      description: skillForm.description.trim() || "Kỹ năng chăm sóc",
-      icon: skillForm.icon,
-      selected: true, // Auto-select new skill
-    };
+    try {
+      setSubmitting(true);
 
-    // Add to skills list
-    setSkills([...skills, newSkill]);
+      if (skillEditMode && editingSkillId) {
+        // Update existing skill
+        const response = await CaregiverSkillsAPI.updateSkill(editingSkillId, {
+          name: skillForm.name.trim(),
+          description: skillForm.description.trim() || "Kỹ năng chăm sóc",
+          icon: skillForm.icon,
+        });
 
-    // Reset form
-    setSkillForm({ name: "", description: "", icon: "star" });
-    setSkillError("");
-    setSkillModalVisible(false);
+        // Update skill in list
+        setSkills(skills.map(s => 
+          s.id === editingSkillId 
+            ? {
+                ...s,
+                name: response.data.name,
+                description: response.data.description,
+                icon: response.data.icon,
+              }
+            : s
+        ));
 
-    // Show success alert
-    Alert.alert("Thành công", "✓ Đã thêm kỹ năng mới");
+        Alert.alert("Thành công", "✓ Đã cập nhật kỹ năng");
+      } else {
+        // Call API to create skill
+        const response = await CaregiverSkillsAPI.createSkill({
+          name: skillForm.name.trim(),
+          description: skillForm.description.trim() || "Kỹ năng chăm sóc",
+          icon: skillForm.icon,
+        });
+
+        // Create new skill from API response
+        const newSkill = {
+          id: response.data._id,
+          name: response.data.name,
+          description: response.data.description,
+          icon: response.data.icon,
+          selected: true, // Auto-select new skill
+        };
+
+        // Add to skills list
+        setSkills([...skills, newSkill]);
+
+        Alert.alert("Thành công", "✓ Đã thêm kỹ năng mới");
+      }
+
+      // Reset form
+      setSkillForm({ name: "", description: "", icon: "star" });
+      setSkillError("");
+      setSkillEditMode(false);
+      setEditingSkillId(null);
+      setSkillModalVisible(false);
+    } catch (error: any) {
+      console.error("Error adding skill:", error);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Không thể thêm kỹ năng. Vui lòng thử lại."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -760,11 +903,10 @@ export default function CertificatesScreen() {
               <Text style={styles.selectedList}>
                 {skills.filter(s => s.selected).map(s => s.name).join(", ")}
               </Text>
+              <Text style={styles.autoSaveHint}>
+                💡 Kỹ năng được lưu tự động khi bạn chọn/bỏ chọn
+              </Text>
             </View>
-
-            <TouchableOpacity style={styles.saveSkillBtn}>
-              <Text style={styles.saveSkillText}>Lưu kỹ năng</Text>
-            </TouchableOpacity>
 
             <View style={styles.skillsGrid}>
               {skills.map((skill) => (
@@ -772,7 +914,7 @@ export default function CertificatesScreen() {
                   key={skill.id}
                   style={[styles.skillCard, skill.selected && styles.skillSelected]}
                   onPress={() => toggleSkill(skill.id)}
-                  onLongPress={() => handleDeleteSkill(skill.id, skill.name)}
+                  onLongPress={() => handleSkillLongPress(skill.id, skill.name)}
                   delayLongPress={500}
                 >
                   <View style={styles.skillIcon}>
@@ -1131,9 +1273,21 @@ export default function CertificatesScreen() {
           <View style={styles.skillModalContent}>
             {/* Header */}
             <View style={styles.skillModalHeader}>
-              <MaterialCommunityIcons name="plus-circle" size={24} color="#2196F3" />
-              <Text style={styles.skillModalTitle}>Thêm kỹ năng mới</Text>
-              <TouchableOpacity onPress={() => setSkillModalVisible(false)}>
+              <MaterialCommunityIcons 
+                name={skillEditMode ? "pencil-circle" : "plus-circle"} 
+                size={24} 
+                color="#2196F3" 
+              />
+              <Text style={styles.skillModalTitle}>
+                {skillEditMode ? "Chỉnh sửa kỹ năng" : "Thêm kỹ năng mới"}
+              </Text>
+              <TouchableOpacity onPress={() => {
+                setSkillModalVisible(false);
+                setSkillEditMode(false);
+                setEditingSkillId(null);
+                setSkillForm({ name: "", description: "", icon: "star" });
+                setSkillError("");
+              }}>
                 <MaterialCommunityIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
@@ -1220,9 +1374,19 @@ export default function CertificatesScreen() {
               <TouchableOpacity
                 style={styles.submitSkillBtn}
                 onPress={handleAddSkill}
+                disabled={submitting}
               >
-                <MaterialCommunityIcons name="check" size={20} color="#FFF" />
-                <Text style={styles.submitSkillBtnText}>Thêm kỹ năng</Text>
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <MaterialCommunityIcons name="check" size={20} color="#FFF" />
+                )}
+                <Text style={styles.submitSkillBtnText}>
+                  {submitting 
+                    ? (skillEditMode ? "Đang cập nhật..." : "Đang thêm...") 
+                    : (skillEditMode ? "Cập nhật kỹ năng" : "Thêm kỹ năng")
+                  }
+                </Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -1577,17 +1741,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#42A5F5",
   },
-  saveSkillBtn: {
-    backgroundColor: "#2196F3",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  saveSkillText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "600",
+  autoSaveHint: {
+    fontSize: 12,
+    color: "#757575",
+    marginTop: 8,
+    fontStyle: "italic",
   },
   skillsGrid: {
     flexDirection: "row",

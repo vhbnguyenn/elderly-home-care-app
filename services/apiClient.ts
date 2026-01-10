@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_CONFIG } from './config/api.config';
 
@@ -10,9 +11,15 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor để log
+// Request interceptor để thêm token và log
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    // Thêm token vào header nếu có
+    const token = await AsyncStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     console.log('🚀 API Request:', config.method?.toUpperCase(), config.url);
     console.log('📦 Request data:', config.data);
     return config;
