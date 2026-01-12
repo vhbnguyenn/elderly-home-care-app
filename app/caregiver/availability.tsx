@@ -3,6 +3,7 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import AvailabilityModal from "@/components/schedule/AvailabilityModal";
 import { getAppointmentStatus, subscribeToStatusChanges } from "@/data/appointmentStore";
+import axiosInstance from "@/services/axiosInstance";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
@@ -17,95 +18,139 @@ import {
 
 const { width } = Dimensions.get("window");
 
-// Initial mock data for availability (lịch rảnh đã set)
-const initialAvailabilityData = [
-  {
-    date: new Date(2025, 9, 23), // Oct 23, 2025
-    isFullDay: true, // Full day available - will show green
-    timeSlots: [
-      { start: "08:00", end: "12:00" },
-      { start: "14:00", end: "18:00" },
-    ],
-  },
-  {
-    date: new Date(2025, 9, 25), // Oct 25, 2025
-    isFullDay: false, // By time slots - will show split color
-    timeSlots: [
-      { start: "08:00", end: "12:00" },
-      { start: "14:00", end: "18:00" },
-    ],
-  },
-  {
-    date: new Date(2025, 9, 26), // Oct 26, 2025
-    isFullDay: false, // By time slots
-    timeSlots: [
-      { start: "08:00", end: "18:00" },
-    ],
-  },
-  {
-    date: new Date(2025, 9, 27), // Oct 27, 2025
-    isFullDay: false, // By time slots
-    timeSlots: [
-      { start: "08:00", end: "14:00" }, // Morning only
-    ],
-  },
-  {
-    date: new Date(2025, 9, 28), // Oct 28, 2025
-    isFullDay: true, // Full day available - will show green
-    timeSlots: [
-      { start: "08:00", end: "18:00" },
-    ],
-  },
-];
-
-// Mock data for schedule
-const scheduleData = [
-  {
-    id: "1",
-    date: new Date(2025, 9, 25), // Oct 25, 2025 (Thứ 6)
-    time: "8:00 - 16:00",
-    duration: "8 giờ",
-    name: "Bà Nguyễn Thị Lan",
-    category: "Cao Cấp",
-    service: "Chăm sóc toàn diện",
-    address: "123 Nguyễn Văn Linh, Q7",
-    price: "1,100,000₫",
-    status: "in-progress",
-  },
-  {
-    id: "2",
-    date: new Date(2025, 9, 26), // Oct 26, 2025 (Thứ 7)
-    time: "8:00 - 16:00",
-    duration: "8 giờ",
-    name: "Ông Trần Văn Hùng",
-    category: "Tiêu Chuẩn",
-    service: "Hỗ trợ sinh hoạt",
-    address: "456 Lê Văn Việt, Q9",
-    price: "750,000₫",
-    status: "pending",
-  },
-  {
-    id: "3",
-    date: new Date(2025, 10, 11), // Nov 11, 2025 (Thứ ba) - Month is 0-indexed, so 10 = November
-    time: "8:00 - 12:00",
-    duration: "4 giờ",
-    name: "Bà Lê Thị Hoa",
-    category: "Cơ Bản",
-    service: "Hỗ trợ cơ bản",
-    address: "789 Pasteur, Q1",
-    price: "400,000₫",
-    status: "new",
-  },
-];
-
 export default function AvailabilityScreen() {
   const navigation = useNavigation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
-  const [availabilityData, setAvailabilityData] = useState(initialAvailabilityData);
+  const [availabilityData, setAvailabilityData] = useState<any[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [, setRefreshKey] = useState(0); // For triggering re-render when status changes
 
+  // Fetch calendar data from API
+  const fetchCalendarData = useCallback(async (date: Date) => {
+    setLoading(true);
+    try {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const lastDay = new Date(year, month, 0);
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
+      
+      console.log('[Availability] Fetching calendar data:', { startDate, endDate });
+      
+      const response = await axiosInstance.get('/api/caregiver-availability/calendar', {
+        params: { startDate, endDate }
+      });
+      
+      const events = response.data.data?.events || [];
+      console.log('[Availability] Received events:', events.length);
+      
+      setCalendarEvents(events);
+      
+      // Transform availabilities: group by date, then by scheduleId, keep latest schedule
+      const availabilityByDate = new Map();
+      
+      events
+        .filter((e: any) => e.type === 'availability' && e.status !== 'unavailable')
+        .forEach((event: any) => {
+          const dateKey = event.date;
+          
+          if (!availabilityByDate.has(dateKey)) {
+            availabilityByDate.set(dateKey, new Map());
+          }
+          
+          const scheduleMap = availabilityByDate.get(dateKey);
+          const scheduleKey = event.scheduleId || 'default';
+          
+          if (!scheduleMap.has(scheduleKey)) {
+            scheduleMap.set(scheduleKey, []);
+          }
+          
+          scheduleMap.get(scheduleKey).push(event);
+        });
+      
+      // For each date, get the latest schedule
+      const availabilities = [];
+      availabilityByDate.forEach((scheduleMap, dateKey) => {
+        // Flatten all events for this date
+        const allEventsForDate: any[] = [];
+        scheduleMap.forEach((events) => {
+          allEventsForDate.push(...events);
+        });
+        
+        // Find the event with latest timestamp (updatedAt or createdAt)
+        let latestEvent = allEventsForDate[0];
+        let latestTimestamp = 0;
+        
+        allEventsForDate.forEach((event) => {
+          const updated = event.updatedAt ? new Date(event.updatedAt).getTime() : 0;
+          const created = event.createdAt ? new Date(event.createdAt).getTime() : 0;
+          const timestamp = updated || created || 0;
+          
+          if (timestamp > latestTimestamp) {
+            latestTimestamp = timestamp;
+            latestEvent = event;
+          }
+        });
+        
+        // Get the scheduleId of the latest event
+        const latestScheduleId = latestEvent.scheduleId || 'default';
+        
+        // Get all events with this scheduleId
+        const latestScheduleEvents = allEventsForDate.filter(
+          (e: any) => (e.scheduleId || 'default') === latestScheduleId
+        );
+        
+        console.log(`[Availability] Date ${dateKey}: ${scheduleMap.size} schedules, latest scheduleId=${latestScheduleId}, timestamp=${new Date(latestTimestamp).toISOString()}, events=${latestScheduleEvents.length}`);
+        
+        // Check if full day
+        const isFullDay = latestScheduleEvents.some((e: any) => e.isAllDay);
+        
+        if (isFullDay) {
+          availabilities.push({
+            date: new Date(dateKey),
+            isFullDay: true,
+            timeSlots: [],
+            timestamp: latestTimestamp,
+          });
+        } else {
+          // Merge all timeSlots from latest schedule
+          const timeSlots: any[] = [];
+          latestScheduleEvents.forEach((event: any) => {
+            if (event.startTime && event.endTime) {
+              const slotExists = timeSlots.some(
+                (slot: any) => slot.start === event.startTime && slot.end === event.endTime
+              );
+              if (!slotExists) {
+                timeSlots.push({
+                  start: event.startTime,
+                  end: event.endTime,
+                });
+              }
+            }
+          });
+          
+          availabilities.push({
+            date: new Date(dateKey),
+            isFullDay: false,
+            timeSlots,
+            timestamp: latestTimestamp,
+          });
+        }
+      });
+      
+      setAvailabilityData(availabilities);
+    } catch (error: any) {
+      if (error.response?.status !== 404) {
+        console.error('Error fetching calendar data:', error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
   // Handler for opening modal
   const handleOpenModal = useCallback(() => {
     console.log("Opening modal, current state:", modalVisible);
@@ -138,6 +183,11 @@ export default function AvailabilityScreen() {
     });
   }, [navigation, handleOpenModal]);
 
+  // Fetch calendar data on mount and when month changes
+  useEffect(() => {
+    fetchCalendarData(currentDate);
+  }, [currentDate, fetchCalendarData]);
+  
   // Subscribe to status changes from global store
   useEffect(() => {
     const unsubscribe = subscribeToStatusChanges(() => {
@@ -166,46 +216,43 @@ export default function AvailabilityScreen() {
   const { year, month, daysInMonth, startDayOfWeek } = getMonthData(currentDate);
 
   // Get availability status for a day
-  // Returns: 'free' | 'busy' | 'mixed' | null
   const getAvailabilityStatus = (day: number) => {
-    const availability = availabilityData.find(
-      (item) =>
-        item.date.getDate() === day &&
-        item.date.getMonth() === month &&
-        item.date.getFullYear() === year
-    );
+    const availabilities = calendarEvents.filter((event: any) => {
+      if (event.type !== 'availability' || event.status === 'unavailable') return false;
+      const eventDate = new Date(event.date);
+      return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+    });
 
-    const hasAppointment = scheduleData.some(
-      (item) =>
-        item.date.getDate() === day &&
-        item.date.getMonth() === month &&
-        item.date.getFullYear() === year
-    );
+    if (availabilities.length === 0) return null;
 
-    if (!availability) {
-      return null; // No availability set (busy by default)
-    }
+    // Get latest availability by updatedAt
+    const latest = availabilities.sort((a: any, b: any) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || 0);
+      const dateB = new Date(b.updatedAt || b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    })[0];
 
-    // If marked as full day available
-    if (availability.isFullDay) {
-      return "free"; // Full day green, regardless of appointments
-    }
+    // Check for bookings
+    const hasBookings = calendarEvents.some((event: any) => {
+      if (event.type !== 'booking') return false;
+      const eventDate = new Date(event.date);
+      return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+    });
 
-    // If set by time slots (partial day)
-    if (hasAppointment) {
-      return "mixed"; // Has some free time slots, some busy - show split color
-    }
-
-    return "mixed"; // Has time slots set but no appointment - still show split color
+    if (latest.isAllDay) return "free";
+    return hasBookings ? "mixed" : "mixed";
   };
 
-  // Get dates with schedule
+  // Get dates with schedule (bookings) from calendarEvents
   const getDatesWithSchedule = () => {
     const dates = new Set<string>();
-    scheduleData.forEach(item => {
-      const dateStr = `${item.date.getDate()}-${item.date.getMonth()}-${item.date.getFullYear()}`;
-      dates.add(dateStr);
-    });
+    calendarEvents
+      .filter((event: any) => event.type === 'booking')
+      .forEach(event => {
+        const eventDate = new Date(event.date);
+        const dateStr = `${eventDate.getDate()}-${eventDate.getMonth()}-${eventDate.getFullYear()}`;
+        dates.add(dateStr);
+      });
     return dates;
   };
 
@@ -232,24 +279,87 @@ export default function AvailabilityScreen() {
            year === selectedDate.getFullYear();
   };
 
-  // Get schedule for selected date
+  // Get schedule (bookings) for selected date
   const getScheduleForDate = () => {
-    return scheduleData.filter(item => 
-      item.date.getDate() === selectedDate.getDate() &&
-      item.date.getMonth() === selectedDate.getMonth() &&
-      item.date.getFullYear() === selectedDate.getFullYear()
-    );
+    return calendarEvents
+      .filter((event: any) => {
+        if (event.type !== 'booking') return false;
+        const eventDate = new Date(event.date);
+        return (
+          eventDate.getDate() === selectedDate.getDate() &&
+          eventDate.getMonth() === selectedDate.getMonth() &&
+          eventDate.getFullYear() === selectedDate.getFullYear()
+        );
+      })
+      .map((event: any) => {
+        const start = new Date(`2000-01-01T${event.startTime}`);
+        const end = new Date(`2000-01-01T${event.endTime}`);
+        const hours = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60));
+        
+        return {
+          id: event.bookingId,
+          date: new Date(event.date),
+          time: `${event.startTime} - ${event.endTime}`,
+          duration: `${hours} giờ`,
+          name: event.elderly?.name || 'Khách hàng',
+          category: event.totalPrice >= 700000 ? 'Cao Cấp' : event.totalPrice >= 400000 ? 'Tiêu Chuẩn' : 'Cơ Bản',
+          service: 'Chăm sóc',
+          address: event.workLocation || '',
+          price: `${event.totalPrice?.toLocaleString()}₫`,
+          status: event.status,
+        };
+      });
   };
 
   const scheduleForSelectedDate = getScheduleForDate();
 
   // Get availability for selected date
   const getAvailabilityForDate = () => {
-    return availabilityData.find(item => 
-      item.date.getDate() === selectedDate.getDate() &&
-      item.date.getMonth() === selectedDate.getMonth() &&
-      item.date.getFullYear() === selectedDate.getFullYear()
-    );
+    const availabilities = calendarEvents.filter((event: any) => {
+      if (event.type !== 'availability' || event.status === 'unavailable') return false;
+      const eventDate = new Date(event.date);
+      return (
+        eventDate.getDate() === selectedDate.getDate() &&
+        eventDate.getMonth() === selectedDate.getMonth() &&
+        eventDate.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+    
+    if (availabilities.length === 0) return null;
+    
+    // Group by scheduleId
+    const scheduleMap = new Map();
+    availabilities.forEach((event: any) => {
+      const key = event.scheduleId || 'default';
+      if (!scheduleMap.has(key)) {
+        scheduleMap.set(key, {
+          isAllDay: event.isAllDay,
+          timeSlots: [],
+          updatedAt: event.updatedAt || event.createdAt || new Date(0),
+        });
+      }
+      
+      const schedule = scheduleMap.get(key);
+      if (!event.isAllDay && event.startTime && event.endTime) {
+        const exists = schedule.timeSlots.some((s: any) => 
+          s.start === event.startTime && s.end === event.endTime
+        );
+        if (!exists) {
+          schedule.timeSlots.push({ start: event.startTime, end: event.endTime });
+        }
+      }
+    });
+    
+    // Get latest schedule
+    const latest = Array.from(scheduleMap.values()).sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    })[0];
+    
+    return {
+      date: selectedDate,
+      isFullDay: latest.isAllDay,
+      timeSlots: latest.isAllDay ? [] : latest.timeSlots,
+    };
   };
 
   const availabilityForSelectedDate = getAvailabilityForDate();
@@ -344,11 +454,13 @@ export default function AvailabilityScreen() {
           {hasScheduleFlag && (
             <View style={styles.scheduleIndicator}>
               <View style={styles.scheduleIndicatorDot} />
-              {scheduleData.filter(item => 
-                item.date.getDate() === day &&
-                item.date.getMonth() === month &&
-                item.date.getFullYear() === year
-              ).length > 1 && (
+              {calendarEvents.filter(event => {
+                if (event.type !== 'booking') return false;
+                const eventDate = new Date(event.date);
+                return eventDate.getDate() === day &&
+                  eventDate.getMonth() === month &&
+                  eventDate.getFullYear() === year;
+              }).length > 1 && (
                 <View style={[styles.scheduleIndicatorDot, { marginLeft: 2 }]} />
               )}
             </View>
@@ -533,109 +645,14 @@ export default function AvailabilityScreen() {
       <AvailabilityModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSave={(data) => {
-          console.log("Saved availability:", data);
-          
-          const { isBusy, frequency, selectedDays, timeSlots, startDate, endDate, isFullDay } = data;
-          
-          // If isBusy is true, remove availability for selected dates
-          if (isBusy) {
-            const datesToRemove: Date[] = [];
-            
-            if (frequency === "Không lặp lại") {
-              datesToRemove.push(new Date(startDate));
-            } else {
-              // Weekly recurring - generate dates for 1 year or until endDate
-              const maxDate = endDate 
-                ? new Date(endDate) 
-                : new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
-              const currentCheckDate = new Date(startDate);
-              
-              while (currentCheckDate <= maxDate) {
-                const dayOfWeek = currentCheckDate.getDay();
-                if (selectedDays.includes(dayOfWeek)) {
-                  datesToRemove.push(new Date(currentCheckDate));
-                }
-                currentCheckDate.setDate(currentCheckDate.getDate() + 1);
-              }
-            }
-            
-            // Remove availability for these dates
-            const updatedAvailability = availabilityData.filter((item) => {
-              const itemDateStr = item.date.toDateString();
-              return !datesToRemove.some((date) => date.toDateString() === itemDateStr);
-            });
-            
-            setAvailabilityData(updatedAvailability);
-            console.log(`Removed availability for ${datesToRemove.length} days`);
-            return;
-          }
-          
-          // Mode is "available" - add/update availability
-          // Generate dates based on frequency
-          const newAvailability = [];
-          
-          if (frequency === "Không lặp lại") {
-            // One-time availability - just add the start date
-            newAvailability.push({
-              date: new Date(startDate),
-              isFullDay: isFullDay,
-              timeSlots: isFullDay ? [] : timeSlots.map((slot: any) => ({
-                start: slot.startTime,
-                end: slot.endTime,
-              })),
-            });
-          } else {
-            // Weekly recurring - generate dates for 1 year or until endDate
-            const maxDate = endDate 
-              ? new Date(endDate) 
-              : new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year if no end date
-            const currentCheckDate = new Date(startDate);
-            
-            while (currentCheckDate <= maxDate) {
-              const dayOfWeek = currentCheckDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
-              
-              if (selectedDays.includes(dayOfWeek)) {
-                newAvailability.push({
-                  date: new Date(currentCheckDate),
-                  isFullDay: isFullDay,
-                  timeSlots: isFullDay ? [] : timeSlots.map((slot: any) => ({
-                    start: slot.startTime,
-                    end: slot.endTime,
-                  })),
-                });
-              }
-              
-              // Move to next day
-              currentCheckDate.setDate(currentCheckDate.getDate() + 1);
-            }
-          }
-          
-          // Merge with existing availability (update if exists, add if new)
-          const updatedAvailability = [...availabilityData];
-          let addedCount = 0;
-          let updatedCount = 0;
-          
-          newAvailability.forEach((newItem) => {
-            const existingIndex = updatedAvailability.findIndex(
-              (item) => item.date.toDateString() === newItem.date.toDateString()
-            );
-            
-            if (existingIndex >= 0) {
-              // Update existing availability
-              updatedAvailability[existingIndex] = newItem;
-              updatedCount++;
-            } else {
-              // Add new availability
-              updatedAvailability.push(newItem);
-              addedCount++;
-            }
-          });
-          
-          setAvailabilityData(updatedAvailability);
-          console.log(`Updated ${updatedCount} days, added ${addedCount} days`);
+        onSave={async (data) => {
+          // Modal already handled API call, just refresh calendar data
+          const savedDate = data.startDate || new Date();
+          setCurrentDate(savedDate);
+          setSelectedDate(savedDate);
+          await fetchCalendarData(savedDate);
         }}
-        existingSchedule={scheduleData}
+        existingSchedule={scheduleForSelectedDate}
       />
     </View>
   );

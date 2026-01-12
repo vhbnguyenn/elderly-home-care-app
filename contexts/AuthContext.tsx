@@ -36,9 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await AuthService.login(email, password);
     if (!res) return null;
 
-    console.log("🔍 [AuthContext] Raw API response:", res);
-    console.log("🔍 [AuthContext] Raw role from API:", res.role);
-
     // Normalize role to expected format
     let normalizedRole = res.role ?? "Care Seeker";
     if (normalizedRole.toLowerCase() === "careseeker") {
@@ -46,8 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else if (normalizedRole.toLowerCase() === "caregiver") {
       normalizedRole = "Caregiver";
     }
-
-    console.log("✅ [AuthContext] Normalized role:", normalizedRole);
 
     const userData: User = {
       id: res.id,
@@ -59,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       avatar: res.avatar,
       hasCompletedProfile: res.hasCompletedProfile ?? false,
       role: normalizedRole,
-      status: res.status, // Load status from API
+      status: res.profileStatus || res.profile_status || res.status, // Try multiple field names
     };
 
     // If user is Caregiver and has status, load it into profileStore

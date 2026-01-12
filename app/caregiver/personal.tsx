@@ -5,12 +5,12 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import React from "react";
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 // Types
@@ -114,6 +114,9 @@ export default function PersonalScreen() {
         break;
       case "training":
         navigation.navigate("Đào tạo");
+        break;
+      case "reviews":
+        navigation.navigate("Đánh giá từ khách hàng");
         break;
       case "support":
         navigation.navigate("Câu hỏi thường gặp");

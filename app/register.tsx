@@ -166,7 +166,7 @@ export default function RegisterScreen() {
       
       const response = await AuthService.register(registerData);
 
-      showSuccessTooltip("Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
+      showSuccessTooltip("Đăng ký thành công! Đang chuyển đến trang xác thực...");
 
       // Navigate to verify code screen for email verification
       setTimeout(() => {

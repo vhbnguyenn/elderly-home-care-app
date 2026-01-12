@@ -133,15 +133,11 @@ export default function VerifyCodeScreen() {
 
     setIsSending(true);
     try {
-      if (isEmailVerification) {
-        await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESEND_VERIFICATION, {
-          email,
-        });
-      } else {
-        await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
-          email,
-        });
-      }
+      // Backend không có endpoint resend-verification riêng
+      // Chỉ có thể dùng forgot-password để gửi lại code
+      await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+        email,
+      });
 
       showSuccessTooltip("Mã xác thực mới đã được gửi!");
       setCode(["", "", "", "", "", ""]); // Clear all inputs
@@ -177,15 +173,11 @@ export default function VerifyCodeScreen() {
 
     setIsSending(true);
     try {
-      if (isEmailVerification) {
-        await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.RESEND_VERIFICATION, {
-          email,
-        });
-      } else {
-        await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
-          email,
-        });
-      }
+      // Backend không có endpoint resend-verification riêng
+      // Chỉ có thể dùng forgot-password để gửi lại code
+      await axiosInstance.post(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+        email,
+      });
       showSuccessTooltip("Mã xác thực đã được gửi đến email của bạn!");
       setCodeSent(true);
       setResendCountdown(60);

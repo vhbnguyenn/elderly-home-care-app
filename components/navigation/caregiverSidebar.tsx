@@ -23,6 +23,7 @@ import PaymentScreen from "@/app/caregiver/payment";
 import PersonalScreen from "@/app/caregiver/personal";
 import ProfileStatusScreen from "@/app/caregiver/profile-status";
 import ReviewScreen from "@/app/caregiver/review";
+import ReviewsScreen from "@/app/caregiver/reviewlist";
 import SettingsScreen from "@/app/caregiver/settings";
 import TrainingCourseDetail from "@/app/caregiver/training-course-detail";
 import TrainingCoursesMobile from "@/app/caregiver/training-courses";
@@ -886,6 +887,16 @@ export default function CaregiverSidebar() {
           component={IncomingCallScreen}
           options={{
             drawerItemStyle: { display: "none" },
+            headerShown: false,
+          }}
+        />
+
+        {/* Reviews Screen - Hidden from drawer */}
+        <Drawer.Screen
+          name="Đánh giá từ khách hàng"
+          component={ReviewsScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
             headerShown: false,
           }}
         />

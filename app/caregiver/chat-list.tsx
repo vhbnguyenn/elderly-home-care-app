@@ -1,14 +1,18 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+import { useAuth } from "@/contexts/AuthContext";
+import { ChatAPI, ChatListItem } from "@/services/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 // Types
@@ -109,17 +113,88 @@ const chatData: ChatItem[] = [
 
 export default function ChatListScreen() {
   const navigation = useNavigation<any>();
-  const [activeFilter, setActiveFilter] = useState<"all" | "unread">("all");
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [chats, setChats] = useState<ChatListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Format time
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      // Today - show time
+      return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInDays === 1) {
+      return "Hôm qua";
+    } else if (diffInDays < 7) {
+      return `${diffInDays} ngày trước`;
+    } else if (diffInDays < 14) {
+      return "1 tuần trước";
+    } else if (diffInDays < 30) {
+      return `${Math.floor(diffInDays / 7)} tuần trước`;
+    } else {
+      return date.toLocaleDateString('vi-VN');
+    }
+  };
+
+  // Fetch chats from API
+  const fetchChats = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await ChatAPI.getMyChats();
+      setChats(response.data);
+    } catch (err: any) {
+      console.error('Error fetching chats:', err);
+      setError(err?.response?.data?.message || 'Không thể tải danh sách tin nhắn');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch on mount and when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      fetchChats();
+    }, [fetchChats])
+  );
+
+  // Map API data to ChatItem
+  const mapChatToChatItem = (chat: ChatListItem): ChatItem => {
+    // Find the other participant (not current user)
+    const otherParticipant = chat.participants.find(p => p._id !== user?.id);
+    
+    // Get avatar from participant data (profileImage or avatar field)
+    const avatarUrl = otherParticipant?.profileImage || otherParticipant?.avatar;
+    
+    // Default emoji based on role if no avatar URL
+    const defaultAvatar = otherParticipant?.role === 'caregiver' ? '👨' : '👵';
+    
+    return {
+      id: chat._id,
+      name: otherParticipant?.name || 'Người dùng',
+      avatar: avatarUrl || defaultAvatar,
+      lastMessage: chat.lastMessage?.content || 'Chưa có tin nhắn',
+      time: chat.lastMessage?.timestamp ? formatTime(chat.lastMessage.timestamp) : '',
+      unreadCount: chat.unreadCount,
+      isOnline: false,
+      isPriority: false,
+      isTyping: false,
+      isSeen: chat.unreadCount === 0,
+    };
+  };
 
   // Filter chats
-  const filteredChats = chatData.filter((chat) => {
+  const chatItems = chats.map(mapChatToChatItem);
+  const filteredChats = chatItems.filter((chat) => {
     const matchesSearch = chat.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = activeFilter === "all" || (activeFilter === "unread" && chat.unreadCount > 0);
-    return matchesSearch && matchesFilter;
+    return matchesSearch;
   });
-
-  const unreadCount = chatData.filter((chat) => chat.unreadCount > 0).length;
 
   const handleChatPress = (chat: ChatItem) => {
     navigation.navigate("Tin nhắn", { 
@@ -130,54 +205,90 @@ export default function ChatListScreen() {
     });
   };
 
-  const renderChatItem = (chat: ChatItem) => (
-    <TouchableOpacity
-      key={chat.id}
-      style={[
-        styles.chatItem,
-        chat.unreadCount > 0 && styles.chatItemUnread,
-      ]}
-      onPress={() => handleChatPress(chat)}
-    >
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          <MaterialCommunityIcons
-            name={chat.avatar === "🏥" ? "hospital-building" : "account"}
-            size={32}
-            color="#2196F3"
-          />
-        </View>
-        {chat.isOnline && <View style={styles.onlineBadge} />}
-      </View>
-
-      <View style={styles.chatContent}>
-        <View style={styles.chatHeader}>
-          <Text style={styles.chatName}>{chat.name}</Text>
-          <Text style={styles.chatTime}>{chat.time}</Text>
-        </View>
-        <View style={styles.chatMessageRow}>
-          {chat.isPriority && !chat.isTyping && (
-            <Text style={styles.priorityIcon}>🚨</Text>
-          )}
-          <Text
-            style={[
-              styles.chatMessage,
-              chat.isTyping && styles.chatMessageTyping,
-              chat.unreadCount > 0 && styles.chatMessageUnread,
-            ]}
-            numberOfLines={1}
-          >
-            {chat.lastMessage}
-          </Text>
-          {chat.unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadBadgeText}>{chat.unreadCount}</Text>
+  const renderChatItem = (chat: ChatItem) => {
+    // Check if avatar is a URL or emoji
+    const isAvatarUrl = chat.avatar.startsWith('http');
+    
+    return (
+      <TouchableOpacity
+        key={chat.id}
+        style={[
+          styles.chatItem,
+          chat.unreadCount > 0 && styles.chatItemUnread,
+        ]}
+        onPress={() => handleChatPress(chat)}
+      >
+        <View style={styles.avatarContainer}>
+          {isAvatarUrl ? (
+            <Image 
+              source={{ uri: chat.avatar }} 
+              style={styles.avatarImage}
+            />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarEmoji}>{chat.avatar}</Text>
             </View>
           )}
+          {chat.isOnline && <View style={styles.onlineBadge} />}
         </View>
+
+        <View style={styles.chatContent}>
+          <View style={styles.chatHeader}>
+            <Text style={styles.chatName}>{chat.name}</Text>
+            <Text style={styles.chatTime}>{chat.time}</Text>
+          </View>
+          <View style={styles.chatMessageRow}>
+            {chat.isPriority && !chat.isTyping && (
+              <Text style={styles.priorityIcon}>🚨</Text>
+            )}
+            <Text
+              style={[
+                styles.chatMessage,
+                chat.isTyping && styles.chatMessageTyping,
+                chat.unreadCount > 0 && styles.chatMessageUnread,
+              ]}
+              numberOfLines={1}
+            >
+              {chat.lastMessage}
+            </Text>
+            {chat.unreadCount > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadBadgeText}>{chat.unreadCount}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2DC2D7" />
+          <Text style={styles.loadingText}>Đang tải tin nhắn...</Text>
+        </View>
+        <CaregiverBottomNav activeTab="home" />
       </View>
-    </TouchableOpacity>
-  );
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchChats}>
+            <Text style={styles.retryText}>Thử lại</Text>
+          </TouchableOpacity>
+        </View>
+        <CaregiverBottomNav activeTab="home" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -198,58 +309,22 @@ export default function ChatListScreen() {
         />
       </View>
 
-      {/* Filter Tabs */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[
-            styles.filterTab,
-            activeFilter === "all" && styles.filterTabActive,
-          ]}
-          onPress={() => setActiveFilter("all")}
-        >
-          <Text
-            style={[
-              styles.filterTabText,
-              activeFilter === "all" && styles.filterTabTextActive,
-            ]}
-          >
-            Tất cả
-          </Text>
-          <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{chatData.length}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterTab,
-            activeFilter === "unread" && styles.filterTabActive,
-          ]}
-          onPress={() => setActiveFilter("unread")}
-        >
-          <Text
-            style={[
-              styles.filterTabText,
-              activeFilter === "unread" && styles.filterTabTextActive,
-            ]}
-          >
-            Chưa đọc
-          </Text>
-          {unreadCount > 0 && (
-            <View style={[styles.filterBadge, styles.filterBadgeUnread]}>
-              <Text style={styles.filterBadgeText}>{unreadCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
       {/* Chat List */}
       <ScrollView
         style={styles.chatList}
         contentContainerStyle={styles.chatListContent}
         showsVerticalScrollIndicator={false}
       >
-        {filteredChats.map(renderChatItem)}
+        {filteredChats.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>💬</Text>
+            <Text style={styles.emptyText}>
+              {searchQuery ? "Không tìm thấy cuộc trò chuyện" : "Chưa có tin nhắn nào"}
+            </Text>
+          </View>
+        ) : (
+          filteredChats.map(renderChatItem)
+        )}
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -262,6 +337,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 100,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#ff0000',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  retryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: '#2DC2D7',
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
   },
 
   // Search
@@ -287,50 +407,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: "#1F2937",
-  },
-
-  // Filter
-  filterContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    gap: 12,
-  },
-  filterTab: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    gap: 8,
-  },
-  filterTabActive: {
-    backgroundColor: "#3B82F6",
-  },
-  filterTabText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#6B7280",
-  },
-  filterTabTextActive: {
-    color: "#fff",
-  },
-  filterBadge: {
-    backgroundColor: "#E5E7EB",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    minWidth: 24,
-    alignItems: "center",
-  },
-  filterBadgeUnread: {
-    backgroundColor: "#EF4444",
-  },
-  filterBadgeText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#374151",
   },
 
   // Chat List
@@ -362,6 +438,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#E3F2FD",
     justifyContent: "center",
     alignItems: "center",
+  },
+  avatarImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+  },
+  avatarEmoji: {
+    fontSize: 32,
   },
   onlineBadge: {
     position: "absolute",

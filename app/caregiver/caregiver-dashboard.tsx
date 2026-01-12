@@ -1,18 +1,23 @@
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
+import { hasProfile, setProfileStatus } from "@/data/profileStore";
+import { ChatAPI } from "@/services/api/chat.api";
+import axiosInstance from "@/services/axiosInstance";
+import { API_CONFIG } from "@/services/config/api.config";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { useAppointments } from "@/hooks/useDatabaseEntities";
 
 const { width: screenWidth } = Dimensions.get("window");
 const CARD_PADDING = 16; // paddingHorizontal của statsOuterContainer
@@ -23,11 +28,10 @@ const CARD_WIDTH = (screenWidth - CARD_PADDING * 2 - CARD_GAP) / 2;
 const mapStatusToDashboard = (status: string | undefined) => {
   switch (status) {
     case "new":
-      return { text: "Yêu cầu mới", color: "#3B82F6" };
     case "pending":
-      return { text: "Chờ thực hiện", color: "#F59E0B" };
+      return { text: "Yêu cầu mới", color: "#3B82F6" };
     case "confirmed":
-      return { text: "Đã xác nhận", color: "#10B981" };
+      return { text: "Chờ thực hiện", color: "#F59E0B" };
     case "in-progress":
       return { text: "Đang thực hiện", color: "#8B5CF6" };
     case "completed":
@@ -51,49 +55,157 @@ const caregiverStats = {
 
 export default function CaregiverDashboardScreen() {
   const navigation = useNavigation<any>();
-  const { user } = useAuth();
-  const { appointments, loading, error, refresh } = useAppointments(user?.id || '');
-  const [, setRefreshKey] = useState(0); // For triggering re-render when status changes
+  const { user, updateProfile } = useAuth();
+  const [todayBookings, setTodayBookings] = useState<any[]>([]);
+  const [pendingBookingsCount, setPendingBookingsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Get today's appointments
+  // Get today's date
   const today = new Date().toISOString().split('T')[0];
-  const todayAppointments = appointments.filter(apt => apt.start_date === today);
+
+  // Fetch today's bookings from API
+  const fetchTodayBookings = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Get all caregiver bookings
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.BOOKING.GET_CAREGIVER_BOOKINGS);
+      const allBookings = response.data.data || response.data || [];
+      
+      // Fetch elderly profiles for each booking if needed
+      const bookingsWithElderlyInfo = await Promise.all(
+        allBookings.map(async (booking: any) => {
+          // If elderlyProfile is just an ID, fetch the full profile
+          if (booking.elderlyProfile && typeof booking.elderlyProfile === 'string') {
+            try {
+              const elderlyResponse = await axiosInstance.get(
+                API_CONFIG.ENDPOINTS.ELDERLY.GET_BY_ID(booking.elderlyProfile)
+              );
+              booking.elderlyProfile = elderlyResponse.data.data || elderlyResponse.data;
+            } catch (error) {
+              console.error('Error fetching elderly profile:', error);
+            }
+          }
+          return booking;
+        })
+      );
+      
+      // Filter for today's bookings
+      const todayBookingsFiltered = bookingsWithElderlyInfo.filter((booking: any) => {
+        const bookingDate = booking.bookingDate?.split('T')[0] || booking.startDate?.split('T')[0] || booking.start_date?.split('T')[0];
+        return bookingDate === today;
+      });
+      
+      // Count pending bookings
+      const pendingCount = allBookings.filter((booking: any) => booking.status === 'pending').length;
+      setPendingBookingsCount(pendingCount);
+      
+      setTodayBookings(todayBookingsFiltered);
+    } catch (err: any) {
+      console.error('Error fetching today bookings:', err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id, today]);
+
+  // Fetch bookings on mount
+  useEffect(() => {
+    if (user?.role === "Caregiver") {
+      fetchTodayBookings();
+    }
+  }, [user?.role, fetchTodayBookings]);
+
+  // Fetch caregiver profile to get latest profileStatus
+  const fetchCaregiverProfile = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      const response = await axiosInstance.get(API_CONFIG.ENDPOINTS.CAREGIVER.GET_OWN_PROFILE);
+      
+      // Handle nested response structure: response.data.data contains the actual profile
+      const profileData = response.data.data || response.data;
+
+      // Get status from profile
+      const statusValue = profileData.profileStatus || profileData.profile_status || profileData.status;
+
+      // Update user context with profileStatus
+      if (statusValue) {
+        updateProfile({ status: statusValue });
+        
+        // Also update profileStore
+        if (statusValue === "approved") {
+          setProfileStatus(user.id, "approved");
+        } else if (statusValue === "rejected") {
+          setProfileStatus(user.id, "rejected", "Hồ sơ không đáp ứng yêu cầu");
+        } else {
+          setProfileStatus(user.id, "pending");
+        }
+        
+        // Return the status so caller can use it
+        return statusValue;
+      }
+    } catch (error: any) {
+      // If 404, profile doesn't exist yet - that's ok
+      if (error.response?.status !== 404) {
+        console.error("Profile fetch error:", error);
+      }
+      return null; // No profile exists
+    }
+  }, [user?.id, updateProfile]);
 
   // Check profile status and navigate accordingly
   useFocusEffect(
     useCallback(() => {
       if (user && user.role === "Caregiver") {
-        // Small delay to ensure navigation is ready
-        setTimeout(() => {
-          // Check if profile has been submitted (exists in profileStore)
-          const { getProfileStatus, hasProfile } = require("@/data/profileStore");
-          const hasProfileInStore = hasProfile(user.id);
-          const profileStatus = getProfileStatus(user.id);
+        // Fetch latest profile status first, then decide navigation
+        const checkAndNavigate = async () => {
+          // Fetch latest profile from API
+          const latestStatus = await fetchCaregiverProfile();
           
-          // Check status from API (user.status) or profileStore
-          const currentStatus = user.status || profileStatus.status;
-          
-          // If profile is approved (from API or profileStore), stay on dashboard
-          if (currentStatus === "approved") {
-            return; // Stay on dashboard
+          // Priority 1: If API returned approved status, stay on dashboard
+          if (latestStatus === "approved") {
+            return; // Stay on dashboard - profile is approved
           }
           
-          // If profile is pending or rejected, navigate to status screen
-          if (currentStatus === "pending" || currentStatus === "rejected") {
-            navigation.navigate("Trạng thái hồ sơ");
+          // Priority 2: Check user.status from AuthContext (already updated by fetchCaregiverProfile)
+          if (user.status === "approved") {
+            return; // Stay on dashboard - profile is approved
+          }
+          
+          // Priority 3: If profile exists but is pending or rejected, navigate to status screen
+          if (latestStatus === "pending" || latestStatus === "rejected") {
+            setTimeout(() => navigation.navigate("Trạng thái hồ sơ"), 100);
             return;
           }
           
-          // If no profile submitted yet and user hasn't completed profile, navigate to complete profile
-          if (!hasProfileInStore && !user.hasCompletedProfile) {
-            navigation.navigate("Hoàn thiện hồ sơ", {
-              email: user.email,
-              fullName: user.name || "",
-            });
+          if (user.status === "pending" || user.status === "rejected") {
+            setTimeout(() => navigation.navigate("Trạng thái hồ sơ"), 100);
+            return;
           }
-        }, 500);
+          
+          // Priority 4: If no profile exists (404 error or null status), navigate to complete profile
+          if (!latestStatus) {
+            const hasProfileInStore = hasProfile(user.id);
+            
+            if (!hasProfileInStore) {
+              setTimeout(() => {
+                navigation.navigate("Hoàn thiện hồ sơ", {
+                  email: user.email,
+                  fullName: user.name || "",
+                });
+              }, 100);
+            }
+          }
+        };
+        
+        checkAndNavigate();
       }
-    }, [user, navigation])
+    }, [user, navigation, fetchCaregiverProfile])
   );
 
   if (loading) {
@@ -113,7 +225,7 @@ export default function CaregiverDashboardScreen() {
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
           <Text style={styles.errorText}>Lỗi: {error.message}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchTodayBookings}>
             <Text style={styles.retryText}>Thử lại</Text>
           </TouchableOpacity>
         </View>
@@ -134,7 +246,7 @@ export default function CaregiverDashboardScreen() {
           <View style={styles.header}>
             <View style={styles.headerTextContainer}>
               <Text style={styles.greeting}>Xin chào</Text>
-              <Text style={styles.userName}>Trần Văn Nam</Text>
+              <Text style={styles.userName}>{user?.name || 'Người dùng'}</Text>
             </View>
             <View style={styles.headerIconsContainer}>
               <TouchableOpacity 
@@ -155,19 +267,21 @@ export default function CaregiverDashboardScreen() {
         
 
         {/* New Requests Alert */}
-        <TouchableOpacity 
-          style={styles.alertCard}
-          onPress={() => navigation.navigate("Yêu cầu dịch vụ", { initialTab: "Mới" })}
-        >
-        <View style={styles.alertIconContainer}>
-          <Text style={styles.alertIcon}>🔔</Text>
-        </View>
-        <View style={styles.alertContent}>
-          <Text style={styles.alertTitle}>3 yêu cầu mới</Text>
-          <Text style={styles.alertSubtitle}>Hãy phản hồi để nhận việc</Text>
-        </View>
-        <Text style={styles.alertArrow}>›</Text>
-      </TouchableOpacity>
+        {pendingBookingsCount > 0 && (
+          <TouchableOpacity 
+            style={styles.alertCard}
+            onPress={() => navigation.navigate("Yêu cầu dịch vụ", { initialTab: "Mới" })}
+          >
+            <View style={styles.alertIconContainer}>
+              <Text style={styles.alertIcon}>🔔</Text>
+            </View>
+            <View style={styles.alertContent}>
+              <Text style={styles.alertTitle}>{pendingBookingsCount} yêu cầu mới</Text>
+              <Text style={styles.alertSubtitle}>Hãy phản hồi để nhận việc</Text>
+            </View>
+            <Text style={styles.alertArrow}>›</Text>
+          </TouchableOpacity>
+        )}
 
       {/* Today's Schedule */}
       <View style={styles.scheduleCard}>
@@ -175,31 +289,58 @@ export default function CaregiverDashboardScreen() {
           <Text style={styles.scheduleTitle}>Lịch hôm nay</Text>
         </View>
 
-        {todayAppointments.length === 0 ? (
+        {todayBookings.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Không có lịch hẹn nào hôm nay</Text>
           </View>
         ) : (
-          todayAppointments.map((appointment: any) => {
-            const statusInfo = mapStatusToDashboard(appointment.status);
+          todayBookings.map((booking: any) => {
+            const statusInfo = mapStatusToDashboard(booking.status);
+            
+            // Extract elderly profile data
+            const elderlyProfile = booking.elderlyProfile;
+            const elderlyAvatar = elderlyProfile?.profileImage || elderlyProfile?.avatar;
+            const elderlyName = elderlyProfile?.fullName || elderlyProfile?.name || 'Người cao tuổi';
+            const elderlyAge = elderlyProfile?.age || elderlyProfile?.dateOfBirth ? 
+              (new Date().getFullYear() - new Date(elderlyProfile.dateOfBirth).getFullYear()) : null;
+            
+            // Extract booking data
+            const bookingId = booking._id || booking.id;
+            const packageInfo = booking.package;
+            const packageName = packageInfo?.name || packageInfo?.packageName || 'Gói cơ bản';
+            const bookingTime = booking.bookingTime || '--:--';
+            const duration = booking.duration || 0;
+            const endTimeCalculated = duration > 0 ? 
+              `${String(parseInt(bookingTime.split(':')[0]) + duration).padStart(2, '0')}:${bookingTime.split(':')[1] || '00'}` : '--:--';
+            const workLocation = booking.workLocation || 'Chưa có địa chỉ';
+            const careseekerPhone = booking.careseeker?.phone || 'Chưa có SĐT';
+            const userId = booking.careseeker?._id;
+            
             return (
               <TouchableOpacity 
-                key={appointment.id} 
+                key={bookingId} 
                 style={styles.appointmentCard}
-                onPress={() => navigation.navigate("Appointment Detail", { appointmentId: appointment.id, fromScreen: "dashboard" })}
+                onPress={() => navigation.navigate("Appointment Detail", { appointmentId: bookingId, fromScreen: "dashboard" })}
                 activeOpacity={0.7}
               >
                 <View style={styles.appointmentHeader}>
                   <View style={styles.appointmentInfo}>
-                    <View style={styles.avatarCircle}>
-                      <Text style={styles.avatarEmoji}>👤</Text>
-                    </View>
+                    {elderlyAvatar ? (
+                      <Image 
+                        source={{ uri: elderlyAvatar }} 
+                        style={styles.avatarImage}
+                      />
+                    ) : (
+                      <View style={styles.avatarCircle}>
+                        <Text style={styles.avatarEmoji}>👤</Text>
+                      </View>
+                    )}
                     <View style={styles.appointmentDetails}>
                       <Text style={styles.appointmentName}>
-                        {appointment.elderly_profile_id}
+                        {elderlyName}{elderlyAge ? `, ${elderlyAge} tuổi` : ''}
                       </Text>
                       <Text style={styles.appointmentMeta}>
-                        {appointment.package_type || 'Gói cơ bản'}
+                        {packageName}
                       </Text>
                     </View>
                   </View>
@@ -212,27 +353,66 @@ export default function CaregiverDashboardScreen() {
                   <View style={styles.appointmentTimeLocation}>
                     <View style={styles.timeRow}>
                       <Text style={styles.timeIcon}>🕐</Text>
-                      <Text style={styles.timeText}>{appointment.start_time} - {appointment.end_time}</Text>
+                      <Text style={styles.timeText}>{bookingTime} - {endTimeCalculated} ({duration}h)</Text>
                     </View>
                     <View style={styles.locationRow}>
                       <Text style={styles.locationIcon}>📍</Text>
-                      <Text style={styles.locationText}>{appointment.work_location || 'Chưa có địa chỉ'}</Text>
+                      <Text style={styles.locationText}>{workLocation}</Text>
+                    </View>
+                    <View style={styles.phoneRow}>
+                      <Text style={styles.phoneIcon}>📞</Text>
+                      <Text style={styles.phoneText}>{careseekerPhone}</Text>
                     </View>
                   </View>
 
                   <View style={styles.appointmentActions}>
                     <TouchableOpacity 
                       style={styles.detailButton}
-                      onPress={() => navigation.navigate("Appointment Detail", { appointmentId: appointment.id, fromScreen: "dashboard" })}
+                      onPress={() => navigation.navigate("Appointment Detail", { appointmentId: bookingId, fromScreen: "dashboard" })}
                     >
                       <Text style={styles.detailButtonText}>Xem chi tiết</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                       style={styles.contactButton}
-                      onPress={() => navigation.navigate("Tin nhắn", { 
-                        clientId: appointment.user_id,
-                        fromScreen: "dashboard"
-                      })}
+                      onPress={async () => {
+                        try {
+                          if (!userId) {
+                            Alert.alert("Lỗi", "Không tìm thấy thông tin người dùng");
+                            return;
+                          }
+                          
+                          // Get all chats to check if chat with this user already exists
+                          const chatsResponse = await ChatAPI.getMyChats();
+                          const existingChat = chatsResponse.data.find((chat) => 
+                            chat.participants.some((p) => p._id === userId)
+                          );
+                          
+                          let chatId: string;
+                          
+                          if (existingChat) {
+                            // Chat already exists, use existing chatId
+                            chatId = existingChat._id;
+                          } else {
+                            // Chat doesn't exist, create new one
+                            const chatResponse = await ChatAPI.createOrGetChat(userId);
+                            chatId = chatResponse._id;
+                          }
+                          
+                          navigation.navigate("Tin nhắn", { 
+                            clientId: userId,
+                            clientName: elderlyName,
+                            chatId: chatId,
+                            participantId: userId,
+                            fromScreen: "dashboard"
+                          });
+                        } catch (error: any) {
+                          console.error("Error creating/getting chat:", error);
+                          Alert.alert(
+                            "Lỗi", 
+                            error?.response?.data?.message || "Không thể tạo cuộc trò chuyện. Vui lòng thử lại."
+                          );
+                        }
+                      }}
                     >
                       <Text style={styles.contactButtonText}>Liên hệ</Text>
                     </TouchableOpacity>
@@ -533,6 +713,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
+  avatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 12,
+  },
   avatarEmoji: {
     fontSize: 28,
   },
@@ -548,6 +734,7 @@ const styles = StyleSheet.create({
   appointmentMeta: {
     fontSize: 13,
     color: "#6B7280",
+    marginBottom: 2,
   },
   statusText: {
     color: "#fff",
@@ -576,6 +763,7 @@ const styles = StyleSheet.create({
   locationRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 6,
   },
   locationIcon: {
     fontSize: 16,
@@ -585,6 +773,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#374151",
     flex: 1,
+  },
+  phoneRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  phoneIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  phoneText: {
+    fontSize: 14,
+    color: "#4A90E2",
+    fontWeight: "500",
   },
   appointmentActions: {
     flexDirection: "row",

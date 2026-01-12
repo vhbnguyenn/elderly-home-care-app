@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SimpleNavBar } from '@/components/navigation/SimpleNavBar';
 import { ThemedText } from '@/components/themed-text';
 import { useAppointments } from '@/hooks/useDatabaseEntities';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,10 +34,9 @@ export default function AppointmentsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2DC2D7" />
+          <ActivityIndicator size="large" color="#FF6B35" />
           <ThemedText style={styles.loadingText}>Đang tải lịch hẹn...</ThemedText>
         </View>
-        <SimpleNavBar />
       </SafeAreaView>
     );
   }
@@ -52,7 +50,6 @@ export default function AppointmentsScreen() {
             <ThemedText style={styles.retryText}>Thử lại</ThemedText>
           </TouchableOpacity>
         </View>
-        <SimpleNavBar />
       </SafeAreaView>
     );
   }
@@ -168,7 +165,7 @@ export default function AppointmentsScreen() {
 
       {/* View Detail Arrow */}
       <View style={styles.arrowContainer}>
-        <Ionicons name="chevron-forward" size={20} color="#68C2E8" />
+        <Ionicons name="chevron-forward" size={20} color="#FF6B35" />
       </View>
     </TouchableOpacity>
   );
@@ -177,14 +174,8 @@ export default function AppointmentsScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <ThemedText style={styles.headerTitle}>Lịch hẹn</ThemedText>
-          <ThemedText style={styles.headerSubtitle}>Quản lý lịch chăm sóc</ThemedText>
-        </View>
-        <View style={styles.placeholder} />
+        <ThemedText style={styles.headerTitle}>Lịch hẹn</ThemedText>
+        <ThemedText style={styles.headerSubtitle}>Quản lý lịch chăm sóc</ThemedText>
       </View>
 
       {/* Tabs */}
@@ -239,8 +230,6 @@ export default function AppointmentsScreen() {
           }
         />
       </View>
-
-      <SimpleNavBar />
     </SafeAreaView>
   );
 }
@@ -271,7 +260,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: '#2DC2D7',
+    backgroundColor: '#FF6B35',
     borderRadius: 8,
   },
   retryText: {
@@ -280,22 +269,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    padding: 8,
-  },
-  placeholder: {
-    width: 40,
-  },
-  headerCenter: {
-    flex: 1,
     alignItems: 'center',
   },
   headerTitle: {
@@ -326,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabActive: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   tabText: {
     fontSize: 13,
@@ -384,7 +361,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -437,7 +414,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   packageBadge: {
-    backgroundColor: '#E0F2FE',
+    backgroundColor: '#FFF4F0',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -445,12 +422,12 @@ const styles = StyleSheet.create({
   packageText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0284C7',
+    color: '#FF6B35',
   },
   amountText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   arrowContainer: {
     position: 'absolute',
