@@ -1,6 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../axiosInstance";
 import { API_CONFIG } from "../config/api.config";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Types
 export interface UserProfile {

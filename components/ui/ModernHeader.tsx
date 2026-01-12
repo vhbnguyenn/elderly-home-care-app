@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
@@ -25,7 +25,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 }) => {
   return (
     <LinearGradient
-      colors={['#FF6B6B', '#FF8E53']}
+      colors={['#FF6B35', '#FF8E53']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}

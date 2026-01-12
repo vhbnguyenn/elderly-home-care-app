@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -314,7 +314,7 @@ export default function FamilyDetailScreen() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin_family': return '#dc3545';
+      case 'admin_family': return '#FF6B35';
       case 'member': return '#6c757d';
       default: return '#6c757d';
     }
@@ -322,9 +322,9 @@ export default function FamilyDetailScreen() {
 
   const getHealthStatusColor = (status: string) => {
     switch (status) {
-      case 'good': return '#28a745';
-      case 'fair': return '#ffc107';
-      case 'poor': return '#dc3545';
+      case 'good': return '#FFA07A';
+      case 'fair': return '#FFB84D';
+      case 'poor': return '#FF6B35';
       default: return '#6c757d';
     }
   };
@@ -386,13 +386,13 @@ export default function FamilyDetailScreen() {
             style={styles.actionButton}
             onPress={() => handleEditMember(member)}
           >
-            <Ionicons name="create-outline" size={20} color="#4ECDC4" />
+            <Ionicons name="create-outline" size={20} color="#FF8E53" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handleDeleteMember(member)}
           >
-            <Ionicons name="trash-outline" size={20} color="#dc3545" />
+            <Ionicons name="trash-outline" size={20} color="#FF6B35" />
           </TouchableOpacity>
         </View>
       )}
@@ -539,7 +539,7 @@ export default function FamilyDetailScreen() {
              </View>
 
              <View style={styles.noteSection}>
-               <Ionicons name="information-circle" size={20} color="#4ECDC4" />
+               <Ionicons name="information-circle" size={20} color="#FF8E53" />
                <ThemedText style={styles.noteText}>
                  Lời mời sẽ được gửi đến email này. Thành viên cần chấp nhận lời mời để tham gia gia đình.
                </ThemedText>
@@ -591,7 +591,7 @@ export default function FamilyDetailScreen() {
                        </View>
                      </View>
                      {isSelected && (
-                       <Ionicons name="checkmark-circle" size={24} color="#4ECDC4" />
+                       <Ionicons name="checkmark-circle" size={24} color="#FF8E53" />
                      )}
                    </TouchableOpacity>
                  );
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#4ECDC4',
+    borderBottomColor: '#FF8E53',
   },
   tabText: {
     fontSize: 16,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   activeTabText: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   content: {
     flex: 1,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   addElderlyButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     margin: 20,
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   selectedElderlyItem: {
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#f8fffe',
   },
   elderlySelectionInfo: {
@@ -768,7 +768,7 @@ const styles = StyleSheet.create({
   },
   currentUserItem: {
     borderWidth: 2,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#f8f9fa',
   },
   memberNameContainer: {
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   currentUserBadge: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderWidth: 2,
     borderColor: 'white',
   },
@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
   saveButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   modalContent: {
     flex: 1,
@@ -997,8 +997,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   roleOptionSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   roleOptionText: {
     fontSize: 14,
@@ -1015,7 +1015,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     gap: 12,
   },
   noteText: {

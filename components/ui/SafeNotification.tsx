@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef } from 'react';
 import {
     Animated,
@@ -88,33 +88,33 @@ export const SafeNotification: React.FC<SafeNotificationProps> = ({
       case 'success':
         return {
           backgroundColor: '#d4edda',
-          borderColor: '#28a745',
+          borderColor: '#FFA07A',
           iconName: 'checkmark-circle' as const,
-          iconColor: '#28a745',
+          iconColor: '#FFA07A',
           textColor: '#155724',
         };
       case 'warning':
         return {
           backgroundColor: '#fff3cd',
-          borderColor: '#ffc107',
+          borderColor: '#FFB84D',
           iconName: 'warning' as const,
-          iconColor: '#ffc107',
+          iconColor: '#FFB84D',
           textColor: '#856404',
         };
       case 'error':
         return {
           backgroundColor: '#f8d7da',
-          borderColor: '#dc3545',
+          borderColor: '#FF6B35',
           iconName: 'close-circle' as const,
-          iconColor: '#dc3545',
+          iconColor: '#FF6B35',
           textColor: '#721c24',
         };
       default:
         return {
           backgroundColor: '#f8f9ff',
-          borderColor: '#30A0E0',
+          borderColor: '#FF8E53',
           iconName: 'information-circle' as const,
-          iconColor: '#30A0E0',
+          iconColor: '#FF8E53',
           textColor: '#2c3e50',
         };
     }

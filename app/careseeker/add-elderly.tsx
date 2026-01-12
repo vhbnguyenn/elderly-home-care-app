@@ -1,13 +1,13 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View
+    Modal,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -157,22 +157,35 @@ export default function AddElderlyScreen() {
 
   const totalSteps = 5;
 
+  // Calculate age from date of birth
+  const calculateAge = (dateOfBirth: string): string => {
+    if (!dateOfBirth || !dateOfBirth.trim()) return '';
+    
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = dateOfBirth.match(dateRegex);
+    
+    if (!match) return '';
+    
+    const [_, day, month, year] = match;
+    const birthDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const today = new Date();
+    
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age > 0 ? age.toString() : '';
+  };
+
   // Validate individual field
   const validateField = (fieldName: string, value: any): string => {
     switch (fieldName) {
       case 'name':
         if (!value || !value.trim()) {
           return 'Vui lòng nhập họ và tên';
-        }
-        return '';
-      
-      case 'age':
-        if (!value || !value.trim()) {
-          return 'Vui lòng nhập tuổi';
-        }
-        const age = parseInt(value);
-        if (isNaN(age) || age < 50 || age > 120) {
-          return 'Tuổi phải là số từ 50 đến 120';
         }
         return '';
       
@@ -202,15 +215,6 @@ export default function AddElderlyScreen() {
       case 1: // Thông tin cá nhân
         if (!profile.personalInfo.name.trim()) {
           showErrorTooltip('Vui lòng nhập họ và tên');
-          return false;
-        }
-        if (!profile.personalInfo.age.trim()) {
-          showErrorTooltip('Vui lòng nhập tuổi');
-          return false;
-        }
-        const age = parseInt(profile.personalInfo.age);
-        if (isNaN(age) || age < 50 || age > 120) {
-          showErrorTooltip('Tuổi phải là số từ 50 đến 120');
           return false;
         }
         if (!profile.personalInfo.dateOfBirth.trim()) {
@@ -473,7 +477,7 @@ export default function AddElderlyScreen() {
                       style={styles.removeMemberButton}
                       onPress={() => handleRemoveMember(member.id)}
                     >
-                      <Ionicons name="close-circle" size={20} color="#ff6b6b" />
+                      <Ionicons name="close-circle" size={20} color="#FF6B35" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -511,7 +515,7 @@ export default function AddElderlyScreen() {
                           <ThemedText style={styles.familyItemName}>{family.name}</ThemedText>
                           <View style={[
                             styles.roleBadge,
-                            { backgroundColor: family.userRole === 'admin_family' ? '#68C2E8' : '#6c757d' }
+                            { backgroundColor: family.userRole === 'admin_family' ? '#FF6B35' : '#6c757d' }
                           ]}>
                             <ThemedText style={styles.roleBadgeText}>
                               {family.userRole === 'admin_family' ? 'Quản trị viên' : 'Thành viên'}
@@ -521,17 +525,17 @@ export default function AddElderlyScreen() {
                         <ThemedText style={styles.familyItemDescription}>{family.description}</ThemedText>
                         <View style={styles.familyItemStats}>
                           <View style={styles.statItem}>
-                            <Ionicons name="people" size={16} color="#68C2E8" />
+                            <Ionicons name="people" size={16} color="#FF6B35" />
                             <ThemedText style={styles.statText}>{family.memberCount} thành viên</ThemedText>
                           </View>
                           <View style={styles.statItem}>
-                            <Ionicons name="person" size={16} color="#ff6b6b" />
+                            <Ionicons name="person" size={16} color="#FF6B35" />
                             <ThemedText style={styles.statText}>{family.elderlyCount} người già</ThemedText>
                           </View>
                         </View>
                       </View>
                       {selectedFamily?.id === family.id && (
-                        <Ionicons name="checkmark-circle" size={24} color="#68C2E8" />
+                        <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
                       )}
                     </TouchableOpacity>
                   ))}
@@ -592,30 +596,14 @@ export default function AddElderlyScreen() {
         <View style={styles.inputGroupHalf}>
           <View style={styles.labelContainer}>
             <ThemedText style={styles.inputLabel}>Tuổi</ThemedText>
-            <ThemedText style={styles.requiredMark}>*</ThemedText>
           </View>
           <TextInput
-            style={[styles.textInput, fieldErrors.age && styles.textInputError]}
+            style={[styles.textInput, styles.textInputDisabled]}
             value={profile.personalInfo.age}
-            onChangeText={(text) => {
-              setProfile(prev => ({
-                ...prev,
-                personalInfo: { ...prev.personalInfo, age: text }
-              }));
-              if (fieldErrors.age) {
-                setFieldErrors(prev => ({ ...prev, age: '' }));
-              }
-            }}
-            onBlur={() => {
-              const error = validateField('age', profile.personalInfo.age);
-              setFieldErrors(prev => ({ ...prev, age: error }));
-            }}
-            placeholder="Tuổi"
-            keyboardType="numeric"
+            editable={false}
+            placeholder="Tự động tính"
           />
-          {fieldErrors.age && (
-            <ThemedText style={styles.errorText}>{fieldErrors.age}</ThemedText>
-          )}
+          <ThemedText style={styles.helperText}>Tự động tính từ ngày sinh</ThemedText>
         </View>
         <View style={styles.inputGroupHalf}>
           <View style={styles.labelContainer}>
@@ -626,10 +614,18 @@ export default function AddElderlyScreen() {
             style={[styles.textInput, fieldErrors.dateOfBirth && styles.textInputError]}
             value={profile.personalInfo.dateOfBirth}
             onChangeText={(text) => {
+              // Auto-calculate age from date of birth
+              const calculatedAge = calculateAge(text);
+              
               setProfile(prev => ({
                 ...prev,
-                personalInfo: { ...prev.personalInfo, dateOfBirth: text }
+                personalInfo: { 
+                  ...prev.personalInfo, 
+                  dateOfBirth: text,
+                  age: calculatedAge
+                }
               }));
+              
               if (fieldErrors.dateOfBirth) {
                 setFieldErrors(prev => ({ ...prev, dateOfBirth: '' }));
               }
@@ -914,7 +910,7 @@ export default function AddElderlyScreen() {
               router.push('/careseeker/emergency-contacts');
             }}
           >
-            <Ionicons name="call-outline" size={20} color="#68C2E8" />
+            <Ionicons name="call-outline" size={20} color="#FF6B35" />
             <ThemedText style={styles.manageContactsText}>Quản lý liên hệ khẩn cấp</ThemedText>
             <Ionicons name="chevron-forward" size={20} color="#7F8C8D" />
           </TouchableOpacity>
@@ -1042,7 +1038,7 @@ export default function AddElderlyScreen() {
       <View style={styles.navigation}>
         {currentStep > 1 && (
           <TouchableOpacity style={styles.previousButton} onPress={handlePrevious}>
-            <Ionicons name="chevron-back" size={20} color="#68C2E8" />
+            <Ionicons name="chevron-back" size={20} color="#FF6B35" />
             <ThemedText style={styles.previousButtonText}>
               {currentStep === totalSteps ? 'Chỉnh sửa' : 'Trước'}
             </ThemedText>
@@ -1254,7 +1250,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 2,
   },
   textInput: {
@@ -1268,12 +1264,22 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   textInputError: {
-    borderColor: '#EF4444',
+    borderColor: '#FF6B35',
     borderWidth: 1.5,
+  },
+  textInputDisabled: {
+    backgroundColor: '#F8F9FA',
+    color: '#6C757D',
+  },
+  helperText: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 4,
+    marginLeft: 4,
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
+    color: '#FF6B35',
     marginTop: 4,
     marginLeft: 4,
   },
@@ -1300,7 +1306,7 @@ const styles = StyleSheet.create({
     borderColor: '#FF6B35',
   },
   genderButtonError: {
-    borderColor: '#EF4444',
+    borderColor: '#FF6B35',
   },
   genderText: {
     fontSize: 15,
@@ -1660,7 +1666,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#FFB84D',
   },
   memberNoteTitle: {
     fontSize: 14,
@@ -1840,7 +1846,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#FFB84D',
   },
   familyPreviewNoteText: {
     fontSize: 12,

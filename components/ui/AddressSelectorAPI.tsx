@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   requiredStar: {
-    color: '#EF4444',
+    color: '#FF6B35',
   },
   input: {
     height: 56,

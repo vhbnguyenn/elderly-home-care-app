@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
@@ -70,13 +70,13 @@ export default function TrainingCoursesMobile({ navigation }: any) {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Cơ bản":
-        return "#10B981";
+        return "#FFA07A";
       case "Trung cấp":
-        return "#10B981";
+        return "#FFA07A";
       case "Nâng cao":
-        return "#10B981";
+        return "#FFA07A";
       default:
-        return "#10B981";
+        return "#FFA07A";
     }
   };
 
@@ -138,7 +138,7 @@ export default function TrainingCoursesMobile({ navigation }: any) {
       >
         {/* Hero Section */}
         <LinearGradient
-          colors={["#2563EB", "#10B981"]}
+          colors={["#FF6B35", "#FFA07A"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.heroSection}

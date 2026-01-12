@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     StyleSheet,
@@ -29,7 +29,7 @@ export const renderMedicalTab = (profile: any) => (
       {profile.medicalConditions.underlyingDiseases?.map((disease: string, index: number) => (
         <View key={index} style={styles.diseaseCard}>
           <View style={styles.diseaseIcon}>
-            <Ionicons name="medical" size={20} color="#dc3545" />
+            <Ionicons name="medical" size={20} color="#FF6B35" />
           </View>
           <View style={styles.diseaseInfo}>
             <ThemedText style={styles.diseaseName}>{disease}</ThemedText>
@@ -44,7 +44,7 @@ export const renderMedicalTab = (profile: any) => (
       <ThemedText style={styles.sectionTitle}>Tình trạng đặc biệt</ThemedText>
       {profile.medicalConditions.specialConditions?.map((condition: string, index: number) => (
         <View key={index} style={styles.conditionCard}>
-          <Ionicons name="alert-circle" size={16} color="#ffc107" />
+          <Ionicons name="alert-circle" size={16} color="#FFB84D" />
           <ThemedText style={styles.conditionText}>{condition}</ThemedText>
         </View>
       ))}
@@ -56,7 +56,7 @@ export const renderMedicalTab = (profile: any) => (
       {profile.medicalConditions.medications?.map((med: any, index: number) => (
         <View key={index} style={styles.medicationCard}>
           <View style={styles.medicationIcon}>
-            <Ionicons name="medical" size={20} color="#4ECDC4" />
+            <Ionicons name="medical" size={20} color="#FF8E53" />
           </View>
           <View style={styles.medicationInfo}>
             <ThemedText style={styles.medicationName}>{med.name}</ThemedText>
@@ -73,7 +73,7 @@ export const renderMedicalTab = (profile: any) => (
       <View style={styles.allergiesContainer}>
         {profile.medicalConditions.allergies?.map((allergy: string, index: number) => (
           <View key={index} style={styles.allergyTag}>
-            <Ionicons name="warning" size={14} color="#dc3545" />
+            <Ionicons name="warning" size={14} color="#FF6B35" />
             <ThemedText style={styles.allergyText}>{allergy}</ThemedText>
           </View>
         ))}
@@ -85,9 +85,9 @@ export const renderMedicalTab = (profile: any) => (
 export const renderIndependenceTab = (profile: any) => {
   const getIndependenceColor = (level: string) => {
     switch (level) {
-      case 'independent': return '#28a745';
-      case 'assisted': return '#ffc107';
-      case 'dependent': return '#dc3545';
+      case 'independent': return '#FFA07A';
+      case 'assisted': return '#FFB84D';
+      case 'dependent': return '#FF6B35';
       default: return '#6c757d';
     }
   };
@@ -115,7 +115,7 @@ export const renderIndependenceTab = (profile: any) => {
         {independenceItems.map((item, index) => (
           <View key={index} style={styles.independenceCard}>
             <View style={styles.independenceIcon}>
-              <Ionicons name={item.icon as any} size={20} color="#4ECDC4" />
+              <Ionicons name={item.icon as any} size={20} color="#FF8E53" />
             </View>
             <View style={styles.independenceInfo}>
               <ThemedText style={styles.independenceLabel}>{item.label}</ThemedText>
@@ -162,7 +162,7 @@ export const renderNeedsTab = (profile: any) => {
                 <Ionicons 
                   name={item.icon as any} 
                   size={20} 
-                  color="#28a745" 
+                  color="#FFA07A" 
                 />
               </View>
               <View style={styles.needInfo}>
@@ -172,7 +172,7 @@ export const renderNeedsTab = (profile: any) => {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Ionicons name="checkmark-circle" size={48} color="#28a745" />
+            <Ionicons name="checkmark-circle" size={48} color="#FFA07A" />
             <ThemedText style={styles.emptyStateText}>
               Không có nhu cầu chăm sóc đặc biệt
             </ThemedText>
@@ -191,7 +191,7 @@ export const renderPreferencesTab = (profile: any) => (
       <View style={styles.tagsContainer}>
         {profile.preferences.hobbies?.map((hobby: string, index: number) => (
           <View key={index} style={styles.hobbyTag}>
-            <Ionicons name="star" size={14} color="#ffc107" />
+            <Ionicons name="star" size={14} color="#FFB84D" />
             <ThemedText style={styles.hobbyText}>{hobby}</ThemedText>
           </View>
         ))}
@@ -204,7 +204,7 @@ export const renderPreferencesTab = (profile: any) => (
       <View style={styles.tagsContainer}>
         {profile.preferences.favoriteActivities?.map((activity: string, index: number) => (
           <View key={index} style={styles.activityTag}>
-            <Ionicons name="happy" size={14} color="#4ECDC4" />
+            <Ionicons name="happy" size={14} color="#FF8E53" />
             <ThemedText style={styles.activityText}>{activity}</ThemedText>
           </View>
         ))}
@@ -239,7 +239,7 @@ export const renderPreferencesTab = (profile: any) => (
       <View style={styles.tagsContainer}>
         {profile.preferences.foodPreferences?.map((food: string, index: number) => (
           <View key={index} style={styles.foodTag}>
-            <Ionicons name="restaurant" size={14} color="#28a745" />
+            <Ionicons name="restaurant" size={14} color="#FFA07A" />
             <ThemedText style={styles.foodText}>{food}</ThemedText>
           </View>
         ))}
@@ -255,7 +255,7 @@ export const renderBudgetTab = (profile: any) => (
       
       <View style={styles.budgetCard}>
         <View style={styles.budgetIcon}>
-          <Ionicons name="time" size={24} color="#4ECDC4" />
+          <Ionicons name="time" size={24} color="#FF8E53" />
         </View>
         <View style={styles.budgetInfo}>
           <ThemedText style={styles.budgetLabel}>Giá theo giờ</ThemedText>
@@ -265,7 +265,7 @@ export const renderBudgetTab = (profile: any) => (
 
       <View style={styles.budgetCard}>
         <View style={styles.budgetIcon}>
-          <Ionicons name="calendar" size={24} color="#28a745" />
+          <Ionicons name="calendar" size={24} color="#FFA07A" />
         </View>
         <View style={styles.budgetInfo}>
           <ThemedText style={styles.budgetLabel}>Ngân sách tháng</ThemedText>
@@ -275,7 +275,7 @@ export const renderBudgetTab = (profile: any) => (
 
       <View style={styles.budgetCard}>
         <View style={styles.budgetIcon}>
-          <Ionicons name="card" size={24} color="#ffc107" />
+          <Ionicons name="card" size={24} color="#FFB84D" />
         </View>
         <View style={styles.budgetInfo}>
           <ThemedText style={styles.budgetLabel}>Phương thức thanh toán</ThemedText>
@@ -338,7 +338,7 @@ export const renderEnvironmentTab = (profile: any) => {
         <View style={styles.tagsContainer}>
           {profile.livingEnvironment.accessibility?.map((item: string, index: number) => (
             <View key={index} style={styles.accessibilityTag}>
-              <Ionicons name="checkmark-circle" size={14} color="#28a745" />
+              <Ionicons name="checkmark-circle" size={14} color="#FFA07A" />
               <ThemedText style={styles.accessibilityText}>{item}</ThemedText>
             </View>
           ))}
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   },
   diseaseStatus: {
     fontSize: 12,
-    color: '#dc3545',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   conditionCard: {
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   },
   medicationFrequency: {
     fontSize: 12,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   allergiesContainer: {

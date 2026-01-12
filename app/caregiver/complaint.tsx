@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getAppointmentComplaint, getAppointmentHasComplained, getHasComplaintFeedback, markAppointmentAsComplained } from "@/data/appointmentStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
@@ -388,11 +388,11 @@ export default function ComplaintScreen() {
   const getUrgencyColor = (level: string) => {
     switch (level) {
       case "low":
-        return "#10B981";
+        return "#FFA07A";
       case "medium":
-        return "#F59E0B";
+        return "#FFA500";
       case "high":
-        return "#EF4444";
+        return "#FF6B35";
       default:
         return "#6B7280";
     }
@@ -445,17 +445,17 @@ export default function ComplaintScreen() {
       case "pending":
         return "#6B7280"; // Gray
       case "reviewing":
-        return "#3B82F6"; // Blue
+        return "#FF6B35"; // Blue
       case "need_more_info":
-        return "#F59E0B"; // Orange
+        return "#FFA500"; // Orange
       case "resolved":
-        return "#10B981"; // Green
+        return "#FFA07A"; // Green
       case "refunded":
-        return "#10B981"; // Green
+        return "#FFA07A"; // Green
       case "rejected":
-        return "#EF4444"; // Red
+        return "#FF6B35"; // Red
       default:
-        return "#3B82F6"; // Blue
+        return "#FF6B35"; // Blue
     }
   };
 
@@ -490,7 +490,7 @@ export default function ComplaintScreen() {
           <>
             {/* Success Banner */}
             <View style={styles.successBanner}>
-              <MaterialCommunityIcons name="check-circle" size={24} color="#10B981" />
+              <MaterialCommunityIcons name="check-circle" size={24} color="#FFA07A" />
               <View style={styles.successContent}>
                 <Text style={styles.successTitle}>Đã gửi khiếu nại</Text>
                 <Text style={styles.successText}>
@@ -585,7 +585,7 @@ export default function ComplaintScreen() {
                         <MaterialCommunityIcons
                           name={type?.icon as any}
                           size={24}
-                          color="#10B981"
+                          color="#FFA07A"
                         />
                         <Text style={[styles.typeLabel, styles.typeLabelActive]}>
                           {type?.label || typeId}
@@ -648,7 +648,7 @@ export default function ComplaintScreen() {
 
             {/* Guidelines */}
             <View style={styles.guidelinesCard}>
-              <MaterialCommunityIcons name="information" size={20} color="#2563EB" />
+              <MaterialCommunityIcons name="information" size={20} color="#FF6B35" />
               <View style={styles.guidelinesContent}>
                 <Text style={styles.guidelinesTitle}>Quy trình xử lý</Text>
                 <Text style={styles.guidelinesText}>
@@ -667,7 +667,7 @@ export default function ComplaintScreen() {
           <>
             {/* Warning Banner */}
             <View style={styles.warningBanner}>
-              <MaterialCommunityIcons name="alert-circle" size={24} color="#DC2626" />
+              <MaterialCommunityIcons name="alert-circle" size={24} color="#E85D2A" />
               <View style={styles.warningContent}>
                 <Text style={styles.warningTitle}>Lưu ý quan trọng</Text>
                 <Text style={styles.warningText}>
@@ -779,7 +779,7 @@ export default function ComplaintScreen() {
                 <MaterialCommunityIcons
                   name={type.icon as any}
                   size={24}
-                  color={selectedTypes.includes(type.id) ? "#10B981" : "#6B7280"}
+                  color={selectedTypes.includes(type.id) ? "#FFA07A" : "#6B7280"}
                 />
                 <Text
                   style={[
@@ -866,7 +866,7 @@ export default function ComplaintScreen() {
                     style={styles.removeButton}
                     onPress={() => handleRemoveFile(index)}
                   >
-                    <Ionicons name="close-circle" size={24} color="#EF4444" />
+                    <Ionicons name="close-circle" size={24} color="#FF6B35" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -876,7 +876,7 @@ export default function ComplaintScreen() {
 
             {/* Guidelines */}
             <View style={styles.guidelinesCard}>
-              <MaterialCommunityIcons name="information" size={20} color="#2563EB" />
+              <MaterialCommunityIcons name="information" size={20} color="#FF6B35" />
               <View style={styles.guidelinesContent}>
                 <Text style={styles.guidelinesTitle}>Quy trình xử lý</Text>
                 <Text style={styles.guidelinesText}>
@@ -901,32 +901,32 @@ export default function ComplaintScreen() {
             const status = submittedComplaint?.status;
             let buttonText = "Đánh giá khiếu nại";
             let buttonIcon: "star-outline" | "close-circle-outline" | "create-outline" | "eye-outline" = "star-outline";
-            let buttonColor = "#2563EB";
+            let buttonColor = "#FF6B35";
             let onPressHandler = handleRateComplaint;
 
             if (status === "pending" || status === "reviewing") {
               // Đang chờ duyệt hoặc đang xem xét -> Hủy khiếu nại
               buttonText = "Hủy khiếu nại";
               buttonIcon = "close-circle-outline";
-              buttonColor = "#EF4444";
+              buttonColor = "#FF6B35";
               onPressHandler = handleCancelComplaint;
             } else if (status === "need_more_info") {
               // Chờ bổ sung -> Sửa khiếu nại
               buttonText = "Sửa khiếu nại";
               buttonIcon = "create-outline";
-              buttonColor = "#F59E0B";
+              buttonColor = "#FFA500";
               onPressHandler = handleEditComplaint;
             } else if (hasComplaintFeedback) {
               // Đã đánh giá -> Xem đánh giá
               buttonText = "Xem đánh giá";
               buttonIcon = "eye-outline";
-              buttonColor = "#2563EB";
+              buttonColor = "#FF6B35";
               onPressHandler = handleRateComplaint;
             } else {
               // Chưa đánh giá -> Đánh giá khiếu nại
               buttonText = "Đánh giá khiếu nại";
               buttonIcon = "star-outline";
-              buttonColor = "#2563EB";
+              buttonColor = "#FF6B35";
               onPressHandler = handleRateComplaint;
             }
 
@@ -950,7 +950,7 @@ export default function ComplaintScreen() {
               <Text style={styles.cancelButtonText}>Quay lại</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.submitButton, { backgroundColor: "#2563EB" }]}
+              style={[styles.submitButton, { backgroundColor: "#FF6B35" }]}
               onPress={handleViewComplaint}
             >
               <MaterialCommunityIcons name="eye" size={20} color="#fff" />
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#DC2626",
+    borderLeftColor: "#E85D2A",
   },
   warningContent: {
     flex: 1,
@@ -1005,7 +1005,7 @@ const styles = StyleSheet.create({
   warningTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#DC2626",
+    color: "#E85D2A",
     marginBottom: 4,
   },
   warningText: {
@@ -1087,7 +1087,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   typeCardActive: {
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
     backgroundColor: "#ECFDF5",
   },
   typeLabel: {
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   typeLabelActive: {
-    color: "#10B981",
+    color: "#FFA07A",
   },
   checkmark: {
     position: "absolute",
@@ -1107,7 +1107,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1197,7 +1197,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#2563EB",
+    borderLeftColor: "#FF6B35",
   },
   guidelinesContent: {
     flex: 1,
@@ -1206,12 +1206,12 @@ const styles = StyleSheet.create({
   guidelinesTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1E40AF",
+    color: "#E85D2A",
     marginBottom: 8,
   },
   guidelinesText: {
     fontSize: 13,
-    color: "#1E40AF",
+    color: "#E85D2A",
     lineHeight: 20,
   },
   bottomAction: {
@@ -1243,7 +1243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
@@ -1261,7 +1261,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#10B981",
+    borderLeftColor: "#FFA07A",
   },
   successContent: {
     flex: 1,
@@ -1270,7 +1270,7 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#10B981",
+    color: "#FFA07A",
     marginBottom: 4,
   },
   successText: {

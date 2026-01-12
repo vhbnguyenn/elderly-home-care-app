@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { useErrorNotification, useInfoNotification, useSuccessNotification, useWarningNotification } from '@/contexts/NotificationContext';
@@ -62,16 +62,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   successButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
   },
   errorButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#FF6B35',
   },
   warningButton: {
-    backgroundColor: '#ffc107',
+    backgroundColor: '#FFB84D',
   },
   infoButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
   },
   buttonText: {
     color: 'white',

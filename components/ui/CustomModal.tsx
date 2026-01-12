@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
@@ -34,8 +34,8 @@ export function CustomModal({
   buttonText,
   onPress,
   iconName = 'checkmark',
-  iconColor = '#30A0E0',
-  buttonColors = ['#30A0E0', '#44A08D'],
+  iconColor = '#FF8E53',
+  buttonColors = ['#FF8E53', '#44A08D'],
   isLoading = false,
   showCancelButton = false,
   cancelButtonText = 'Hủy',

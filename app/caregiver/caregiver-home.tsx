@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "expo-router";
 import {
@@ -12,9 +12,9 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const COLORS = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#FFD93D",
+  "#FF6B35",
+  "#FF8E53",
+  "#FFB84D",
   "#6A4C93",
   "#FFA07A",
   "#20B2AA",

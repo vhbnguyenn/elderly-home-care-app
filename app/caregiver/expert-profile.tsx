@@ -1,4 +1,4 @@
-// ExpertProfileScreen.js
+﻿// ExpertProfileScreen.js
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -407,7 +407,7 @@ export default function ExpertProfileScreen() {
             onPress={() => navigation.navigate("Chứng chỉ và kỹ năng")}
           >
             <View style={styles.linkCardContent}>
-              <MaterialCommunityIcons name="certificate" size={20} color="#2563EB" />
+              <MaterialCommunityIcons name="certificate" size={20} color="#FF6B35" />
               <Text style={styles.linkCardText}>
                 Quản lý chứng chỉ và kỹ năng
               </Text>
@@ -438,7 +438,7 @@ export default function ExpertProfileScreen() {
           }}
         >
           <TouchableOpacity
-            style={[styles.btn, { backgroundColor: "#10B981", paddingHorizontal: 32 }]}
+            style={[styles.btn, { backgroundColor: "#FFA07A", paddingHorizontal: 32 }]}
             onPress={onSave}
           >
             <Text style={{ color: "#fff", fontWeight: "700" }}>Lưu</Text>
@@ -458,7 +458,7 @@ export default function ExpertProfileScreen() {
                 onPress={() => setShowGenderModal(false)}
                 style={styles.modalClose}
               >
-                <Text style={{ color: "#2563EB", fontWeight: "700" }}>
+                <Text style={{ color: "#FF6B35", fontWeight: "700" }}>
                   Đóng
                 </Text>
               </TouchableOpacity>
@@ -479,7 +479,7 @@ export default function ExpertProfileScreen() {
                 onPress={() => setShowEducationModal(false)}
                 style={styles.modalClose}
               >
-                <Text style={{ color: "#2563EB", fontWeight: "700" }}>
+                <Text style={{ color: "#FF6B35", fontWeight: "700" }}>
                   Đóng
                 </Text>
               </TouchableOpacity>
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   avatarPlaceholderText: { color: "#94A3B8" },
 
   primaryBtn: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#FF6B35",
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   linkCardText: {
-    color: "#2563EB",
+    color: "#FF6B35",
     fontSize: 14,
     fontWeight: "600",
     flex: 1,

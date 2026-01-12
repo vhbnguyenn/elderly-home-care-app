@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     StyleSheet,
@@ -162,7 +162,7 @@ export function DurationSelector({
       case 'unlimited':
         return (
           <View style={styles.unlimitedContainer}>
-            <Ionicons name="infinite" size={24} color="#30A0E0" />
+            <Ionicons name="infinite" size={24} color="#FF8E53" />
             <ThemedText style={styles.unlimitedText}>
               Không giới hạn thời gian
             </ThemedText>
@@ -197,7 +197,7 @@ export function DurationSelector({
             ]}>
               {startDate ? new Date(startDate).toLocaleDateString('vi-VN') : 'Chọn ngày bắt đầu'}
             </ThemedText>
-            <Ionicons name="calendar-outline" size={20} color="#30A0E0" />
+            <Ionicons name="calendar-outline" size={20} color="#FF8E53" />
           </TouchableOpacity>
         </View>
 
@@ -218,7 +218,7 @@ export function DurationSelector({
               ]}>
                 {startTime || 'Chọn giờ bắt đầu'}
               </ThemedText>
-              <Ionicons name="time-outline" size={20} color="#30A0E0" />
+              <Ionicons name="time-outline" size={20} color="#FF8E53" />
             </TouchableOpacity>
           </View>
         )}
@@ -240,7 +240,7 @@ export function DurationSelector({
               ]}>
                 {endDate ? new Date(endDate).toLocaleDateString('vi-VN') : 'Chọn ngày kết thúc'}
               </ThemedText>
-              <Ionicons name="calendar-outline" size={20} color="#30A0E0" />
+              <Ionicons name="calendar-outline" size={20} color="#FF8E53" />
             </TouchableOpacity>
           </View>
         )}
@@ -262,7 +262,7 @@ export function DurationSelector({
               ]}>
                 {endTime || 'Chọn giờ kết thúc'}
               </ThemedText>
-              <Ionicons name="time-outline" size={20} color="#30A0E0" />
+              <Ionicons name="time-outline" size={20} color="#FF8E53" />
             </TouchableOpacity>
           </View>
         )}
@@ -358,8 +358,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   durationTypeButtonSelected: {
-    backgroundColor: '#30A0E0',
-    borderColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   durationTypeButtonText: {
     fontSize: 14,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 2,
   },
   textInput: {
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   },
   durationDisplay: {
     fontSize: 14,
-    color: '#30A0E0',
+    color: '#FF8E53',
     marginTop: 6,
     fontWeight: '600',
   },
@@ -412,11 +412,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0fdfa',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   unlimitedText: {
     fontSize: 16,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '600',
     marginLeft: 8,
   },

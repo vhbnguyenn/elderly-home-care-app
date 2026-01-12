@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import React, { useEffect, useState } from 'react';
 import {
@@ -324,7 +324,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                   >
                     {immediateData.selectedPackage === pkg.id && (
                       <View style={styles.packageCheckmark}>
-                        <Ionicons name="checkmark-circle" size={24} color="#68C2E8" />
+                        <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
                       </View>
                     )}
                     
@@ -344,7 +344,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                       <ThemedText style={styles.packageServicesTitle}>Dịch vụ bao gồm:</ThemedText>
                       {pkg.services.map((service, index) => (
                         <View key={index} style={styles.packageServiceItem}>
-                          <Ionicons name="checkmark" size={16} color="#68C2E8" />
+                          <Ionicons name="checkmark" size={16} color="#FF6B35" />
                           <ThemedText style={styles.packageServiceText}>{service}</ThemedText>
                         </View>
                       ))}
@@ -410,7 +410,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
               <Ionicons 
                 name={expandedSections.basicInfo ? "chevron-up" : "chevron-down"} 
                 size={20} 
-                color="#68C2E8" 
+                color="#FF6B35" 
               />
             </TouchableOpacity>
             
@@ -456,7 +456,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
               <Ionicons 
                 name={expandedSections.note ? "chevron-up" : "chevron-down"} 
                 size={20} 
-                color="#68C2E8" 
+                color="#FF6B35" 
               />
             </TouchableOpacity>
             
@@ -604,7 +604,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                     <Ionicons 
                       name={method.icon as any} 
                       size={24} 
-                      color={selectedPaymentMethod === method.id ? '#68C2E8' : '#6c757d'} 
+                      color={selectedPaymentMethod === method.id ? '#FF6B35' : '#6c757d'} 
                     />
                   </View>
                   <View style={styles.paymentMethodTextContainer}>
@@ -620,7 +620,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                   </View>
                 </View>
                 {selectedPaymentMethod === method.id && (
-                  <Ionicons name="checkmark-circle" size={24} color="#68C2E8" />
+                  <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
                 )}
               </TouchableOpacity>
             ))}
@@ -630,13 +630,13 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
           {selectedPaymentMethod === 'qr_code' && (
             <View style={styles.paymentDetailsContainer}>
               <View style={styles.paymentDetailsHeader}>
-                <Ionicons name="qr-code" size={24} color="#68C2E8" />
+                <Ionicons name="qr-code" size={24} color="#FF6B35" />
                 <ThemedText style={styles.paymentDetailsTitle}>Quét mã QR để thanh toán</ThemedText>
               </View>
               
               <View style={styles.qrCodeContainer}>
                 <View style={styles.qrCodePlaceholder}>
-                  <Ionicons name="qr-code-outline" size={120} color="#68C2E8" />
+                  <Ionicons name="qr-code-outline" size={120} color="#FF6B35" />
                   <ThemedText style={styles.qrCodeText}>Mã QR thanh toán</ThemedText>
                   <ThemedText style={styles.qrCodeSubtext}>
                     {totalAmount.toLocaleString('vi-VN')} VNĐ
@@ -654,7 +654,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
               </View>
               
               <View style={styles.paymentNote}>
-                <Ionicons name="information-circle-outline" size={20} color="#68C2E8" />
+                <Ionicons name="information-circle-outline" size={20} color="#FF6B35" />
                 <ThemedText style={styles.paymentNoteText}>
                   Mở ứng dụng ngân hàng và quét mã QR để thanh toán. Hệ thống sẽ tự động xác nhận sau khi thanh toán thành công.
                 </ThemedText>
@@ -665,7 +665,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
           {/* Default Note *\/}
           {!selectedPaymentMethod && (
             <View style={styles.paymentNote}>
-              <Ionicons name="information-circle-outline" size={20} color="#68C2E8" />
+              <Ionicons name="information-circle-outline" size={20} color="#FF6B35" />
               <ThemedText style={styles.paymentNoteText}>
                 Vui lòng chọn phương thức thanh toán để tiếp tục.
               </ThemedText>
@@ -737,7 +737,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
         <View style={styles.navigation}>
           {currentStep > 1 && (
             <TouchableOpacity style={styles.previousButton} onPress={() => setCurrentStep(prev => prev - 1)}>
-              <Ionicons name="chevron-back" size={20} color="#68C2E8" />
+              <Ionicons name="chevron-back" size={20} color="#FF6B35" />
               <ThemedText style={styles.previousButtonText}>Trước</ThemedText>
             </TouchableOpacity>
           )}
@@ -809,7 +809,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                           >
                             <View style={styles.locationOptionContent}>
                               <View style={styles.locationOptionIcon}>
-                                <Ionicons name="home" size={24} color="#68C2E8" />
+                                <Ionicons name="home" size={24} color="#FF6B35" />
                               </View>
                               <View style={styles.locationOptionText}>
                                 <ThemedText style={styles.locationOptionName}>{profile.name}</ThemedText>
@@ -819,7 +819,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                               </View>
                             </View>
                             {immediateData.workLocation === profile.address && (
-                              <Ionicons name="checkmark-circle" size={24} color="#68C2E8" />
+                              <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
                             )}
                           </TouchableOpacity>
                           <TouchableOpacity
@@ -829,7 +829,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                               Alert.alert('Chỉnh sửa địa chỉ', `Chỉnh sửa địa chỉ của ${profile.name}`);
                             }}
                           >
-                            <Ionicons name="create-outline" size={20} color="#68C2E8" />
+                            <Ionicons name="create-outline" size={20} color="#FF6B35" />
                           </TouchableOpacity>
                         </View>
                       ))}
@@ -846,7 +846,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                     >
                       <View style={styles.locationOptionContent}>
                         <View style={styles.locationOptionIcon}>
-                          <Ionicons name="add-circle" size={24} color="#68C2E8" />
+                          <Ionicons name="add-circle" size={24} color="#FF6B35" />
                         </View>
                         <View style={styles.locationOptionText}>
                           <ThemedText style={styles.locationOptionName}>Nhập địa chỉ khác</ThemedText>
@@ -883,7 +883,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
                     setCustomLocation('');
                   }}
                 >
-                  <Ionicons name="arrow-back" size={24} color="#68C2E8" />
+                  <Ionicons name="arrow-back" size={24} color="#FF6B35" />
                 </TouchableOpacity>
                 <ThemedText style={styles.modalTitle}>Nhập địa chỉ</ThemedText>
                 <TouchableOpacity onPress={() => {
@@ -1064,7 +1064,7 @@ export function BookingModal({ visible, onClose, caregiver, elderlyProfiles: ini
           <View style={styles.modalOverlay}>
             <View style={styles.successModal}>
               <View style={styles.successIconContainer}>
-                <Ionicons name="checkmark-circle" size={80} color="#68C2E8" />
+                <Ionicons name="checkmark-circle" size={80} color="#FF6B35" />
               </View>
               
               <ThemedText style={styles.successTitle}>Đặt lịch thành công! 🎉</ThemedText>
@@ -1097,7 +1097,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -1138,7 +1138,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 2,
   },
   content: {
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
   stepSubtitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -1209,7 +1209,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 4,
   },
   inputGroup: {
@@ -1246,7 +1246,7 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   optionCardSelected: {
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     backgroundColor: '#f0fdfa',
   },
   optionContent: {
@@ -1265,14 +1265,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   optionTitleSelected: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   optionDescription: {
     fontSize: 14,
     color: '#6c757d',
   },
   optionDescriptionSelected: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   navigation: {
     flexDirection: 'row',
@@ -1290,11 +1290,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   previousButtonText: {
     marginLeft: 8,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   navigationSpacer: {
@@ -1303,7 +1303,7 @@ const styles = StyleSheet.create({
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -1339,13 +1339,13 @@ const styles = StyleSheet.create({
   },
   timeRangeText: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginTop: 8,
     fontWeight: '500',
   },
   salaryDisplay: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginTop: 6,
     fontWeight: '600',
   },
@@ -1370,14 +1370,14 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
   checkboxBoxChecked: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   checkboxLabel: {
     flex: 1,
@@ -1495,8 +1495,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   dateCardSelected: {
-    backgroundColor: '#68C2E8',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   dateCardDay: {
     fontSize: 14,
@@ -1662,7 +1662,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   pickerItemSelected: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   pickerText: {
     fontSize: 16,
@@ -1705,7 +1705,7 @@ const styles = StyleSheet.create({
   },
   summaryPrice: {
     fontSize: 16,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: 'bold',
   },
   // Task Styles
@@ -1717,12 +1717,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     borderStyle: 'dashed',
   },
   addTaskText: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '500',
     marginLeft: 6,
   },
@@ -1812,9 +1812,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   packageCardSelected: {
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     backgroundColor: '#f0fdf4',
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOpacity: 0.15,
   },
   packageCheckmark: {
@@ -1850,7 +1850,7 @@ const styles = StyleSheet.create({
   },
   packagePrice: {
     fontSize: 16,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: 'bold',
   },
   packageServices: {
@@ -1895,7 +1895,7 @@ const styles = StyleSheet.create({
   locationSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -1912,7 +1912,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   locationOptionSelected: {
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     backgroundColor: '#f0fdf4',
   },
   locationOptionTouchable: {
@@ -1996,7 +1996,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 12,
     padding: 16,
     gap: 8,
@@ -2042,13 +2042,13 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   successButton: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 48,
     width: '100%',
     alignItems: 'center',
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -2071,7 +2071,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   paymentSummaryLabel: {
     fontSize: 16,
@@ -2081,7 +2081,7 @@ const styles = StyleSheet.create({
   paymentSummaryAmount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   paymentMethodsContainer: {
     gap: 12,
@@ -2102,9 +2102,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   paymentMethodCardSelected: {
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     backgroundColor: '#f0f8ff',
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOpacity: 0.15,
   },
   paymentMethodContent: {
@@ -2125,7 +2125,7 @@ const styles = StyleSheet.create({
   },
   paymentMethodIconSelected: {
     backgroundColor: '#e3f2fd',
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   paymentMethodTextContainer: {
     flex: 1,
@@ -2137,7 +2137,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   paymentMethodNameSelected: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   paymentMethodDescription: {
     fontSize: 13,
@@ -2151,7 +2151,7 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#68C2E8',
+    borderLeftColor: '#FF6B35',
   },
   paymentNoteText: {
     flex: 1,
@@ -2236,7 +2236,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     borderStyle: 'dashed',
     padding: 20,
   },
@@ -2249,7 +2249,7 @@ const styles = StyleSheet.create({
   qrCodeSubtext: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginTop: 8,
   },
   qrCodeInfo: {

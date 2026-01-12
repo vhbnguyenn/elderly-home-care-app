@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -156,7 +156,7 @@ export default function AlertListScreen() {
       case 'payment': return '#27ae60';
       case 'system': return '#95a5a6';
       case 'urgent': return '#f39c12';
-      default: return '#68C2E8';
+      default: return '#FF6B35';
     }
   };
 
@@ -166,7 +166,7 @@ export default function AlertListScreen() {
       case 'high': return '#f39c12';
       case 'medium': return '#3498db';
       case 'low': return '#95a5a6';
-      default: return '#68C2E8';
+      default: return '#FF6B35';
     }
   };
 
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   unreadAlert: {
     borderLeftWidth: 4,
-    borderLeftColor: '#68C2E8',
+    borderLeftColor: '#FF6B35',
   },
   criticalAlert: {
     borderLeftColor: '#e74c3c',
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   actionButton: {
     marginTop: 12,

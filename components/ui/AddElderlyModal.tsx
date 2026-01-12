@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Modal,
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 16,
     paddingVertical: 12,
     elevation: 4,
@@ -638,13 +638,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioCircleSelected: {
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
   },
   radioLabel: {
     fontSize: 16,
@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   nextButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitButton: {
-    backgroundColor: '#28A745',
+    backgroundColor: '#FFA07A',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

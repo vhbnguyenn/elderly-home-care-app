@@ -1,4 +1,4 @@
-import {
+﻿import {
     useErrorNotification,
     useSuccessNotification,
 } from "@/contexts/NotificationContext";
@@ -212,7 +212,7 @@ export default function ResetPasswordScreen() {
 
           <View style={[styles.inputContainer, confirmPasswordError ? styles.inputError : null]}>
             <View style={styles.inputIcon}>
-              <Ionicons name="lock-closed-outline" size={20} color={confirmPasswordError ? "#EF4444" : "#FF5722"} />
+              <Ionicons name="lock-closed-outline" size={20} color={confirmPasswordError ? "#FF6B35" : "#FF5722"} />
             </View>
             <TextInput
               style={styles.input}
@@ -270,7 +270,7 @@ export default function ResetPasswordScreen() {
             <Ionicons 
               name={newPassword.length >= 6 ? "checkmark-circle" : "ellipse-outline"} 
               size={16} 
-              color={newPassword.length >= 6 ? "#10B981" : "#9CA3AF"} 
+              color={newPassword.length >= 6 ? "#FFA07A" : "#9CA3AF"} 
             />
             <Text style={styles.requirementText}>Ít nhất 6 ký tự</Text>
           </View>
@@ -278,7 +278,7 @@ export default function ResetPasswordScreen() {
             <Ionicons 
               name={/[a-zA-Z]/.test(newPassword) ? "checkmark-circle" : "ellipse-outline"} 
               size={16} 
-              color={/[a-zA-Z]/.test(newPassword) ? "#10B981" : "#9CA3AF"} 
+              color={/[a-zA-Z]/.test(newPassword) ? "#FFA07A" : "#9CA3AF"} 
             />
             <Text style={styles.requirementText}>Chứa ít nhất 1 chữ cái</Text>
           </View>
@@ -286,7 +286,7 @@ export default function ResetPasswordScreen() {
             <Ionicons 
               name={/[0-9]/.test(newPassword) ? "checkmark-circle" : "ellipse-outline"} 
               size={16} 
-              color={/[0-9]/.test(newPassword) ? "#10B981" : "#9CA3AF"} 
+              color={/[0-9]/.test(newPassword) ? "#FFA07A" : "#9CA3AF"} 
             />
             <Text style={styles.requirementText}>Chứa ít nhất 1 chữ số</Text>
           </View>
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     height: 56,
   },
   inputError: {
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
     backgroundColor: "#FEF2F2",
   },
   inputIcon: {
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     color: "#2C3E50",
   },
   errorText: {
-    color: "#EF4444",
+    color: "#FF6B35",
     fontSize: 13,
     marginTop: -12,
     marginLeft: 4,

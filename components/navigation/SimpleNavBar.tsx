@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -66,7 +66,7 @@ export function SimpleNavBar() {
                 <Ionicons
                   name={item.icon as any}
                   size={24}
-                  color={isActive ? '#68C2E8' : '#78909C'}
+                  color={isActive ? '#FF6B35' : '#78909C'}
                 />
               </View>
               <Text style={isActive ? styles.navLabelActive : styles.navLabel}>
@@ -91,11 +91,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E0F2FE',
+    borderTopColor: '#FFE5D9',
     paddingVertical: 8,
     paddingHorizontal: 4,
     paddingBottom: 20,
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     marginBottom: -2,
   },
   iconContainerActive: {
-    backgroundColor: '#E0F2FE',
+    backgroundColor: '#FFE5D9',
   },
   navLabel: {
     fontSize: 11,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
   navLabelActive: {
     fontSize: 11,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '700',
   },
 });

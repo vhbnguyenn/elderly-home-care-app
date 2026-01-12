@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -401,9 +401,9 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
 
     const getHealthStatusColor = (status: string) => {
       switch (status) {
-        case 'good': return '#28a745';
-        case 'fair': return '#ffc107';
-        case 'poor': return '#dc3545';
+        case 'good': return '#FFA07A';
+        case 'fair': return '#FFB84D';
+        case 'poor': return '#FF6B35';
         default: return '#6c757d';
       }
     };
@@ -444,7 +444,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
                   
                   <View style={styles.selectionIndicator}>
                     {selectedProfileId === profile.id ? (
-                      <Ionicons name="checkmark-circle" size={20} color="#4ECDC4" />
+                      <Ionicons name="checkmark-circle" size={20} color="#FF8E53" />
                     ) : (
                       <View style={styles.unselectedCircle} />
                     )}
@@ -477,7 +477,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
           style={styles.manualInputButton}
           onPress={handleManualInput}
         >
-          <Ionicons name="add-circle-outline" size={24} color="#4ECDC4" />
+          <Ionicons name="add-circle-outline" size={24} color="#FF8E53" />
           <ThemedText style={styles.manualInputButtonText}>Nhập yêu cầu thủ công</ThemedText>
         </TouchableOpacity>
       </View>
@@ -512,7 +512,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
             ]}
             onPress={() => setUserInfo(prev => ({ ...prev, healthStatus: 'good' }))}
           >
-            <Ionicons name="happy" size={32} color={userInfo.healthStatus === 'good' ? 'white' : '#4ECDC4'} />
+            <Ionicons name="happy" size={32} color={userInfo.healthStatus === 'good' ? 'white' : '#FF8E53'} />
             <ThemedText style={[
               styles.healthLevelText,
               userInfo.healthStatus === 'good' && styles.healthLevelTextSelected
@@ -527,7 +527,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
             ]}
             onPress={() => setUserInfo(prev => ({ ...prev, healthStatus: 'moderate' }))}
           >
-            <Ionicons name="medical" size={32} color={userInfo.healthStatus === 'moderate' ? 'white' : '#4ECDC4'} />
+            <Ionicons name="medical" size={32} color={userInfo.healthStatus === 'moderate' ? 'white' : '#FF8E53'} />
             <ThemedText style={[
               styles.healthLevelText,
               userInfo.healthStatus === 'moderate' && styles.healthLevelTextSelected
@@ -542,7 +542,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
             ]}
             onPress={() => setUserInfo(prev => ({ ...prev, healthStatus: 'weak' }))}
           >
-            <Ionicons name="warning" size={32} color={userInfo.healthStatus === 'weak' ? 'white' : '#4ECDC4'} />
+            <Ionicons name="warning" size={32} color={userInfo.healthStatus === 'weak' ? 'white' : '#FF8E53'} />
             <ThemedText style={[
               styles.healthLevelText,
               userInfo.healthStatus === 'weak' && styles.healthLevelTextSelected
@@ -579,7 +579,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
               </ThemedText>
             </View>
             {userInfo.careLevel === (level.id as number) && (
-              <Ionicons name="checkmark-circle" size={24} color="#4ECDC4" />
+              <Ionicons name="checkmark-circle" size={24} color="#FF8E53" />
             )}
           </TouchableOpacity>
         ))}
@@ -743,7 +743,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
               {exp.label}
             </ThemedText>
             {userInfo.requiredYearsExperience === exp.id && (
-              <Ionicons name="checkmark-circle" size={24} color="#4ECDC4" />
+              <Ionicons name="checkmark-circle" size={24} color="#FF8E53" />
             )}
           </TouchableOpacity>
         ))}
@@ -799,7 +799,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
               (userInfo.overallRatingRange && rating.id && 
                userInfo.overallRatingRange.min === rating.min && 
                userInfo.overallRatingRange.max === rating.max)) && (
-              <Ionicons name="checkmark-circle" size={24} color="#4ECDC4" />
+              <Ionicons name="checkmark-circle" size={24} color="#FF8E53" />
             )}
           </TouchableOpacity>
         ))}
@@ -813,7 +813,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
       <View style={styles.inputGroup}>
         <ThemedText style={styles.inputLabel}>Vị trí làm việc</ThemedText>
         <View style={styles.locationCard}>
-          <Ionicons name="location" size={24} color="#4ECDC4" />
+          <Ionicons name="location" size={24} color="#FF8E53" />
           <ThemedText style={styles.locationText}>
             Quận 7, TP.HCM (Tọa độ: 10.7350, 106.7200)
           </ThemedText>
@@ -837,7 +837,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
         <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Mức giá tham khảo tại {priceRef.area}</ThemedText>
           <View style={styles.priceReferenceCard}>
-            <Ionicons name="information-circle" size={20} color="#4ECDC4" />
+            <Ionicons name="information-circle" size={20} color="#FF8E53" />
             <ThemedText style={styles.priceReferenceText}>
               {formatCurrency(priceRef.min * 1000, false)} - {formatCurrency(priceRef.max * 1000, false)}/giờ
             </ThemedText>
@@ -845,7 +845,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
         </View>
         {showWarning && (
           <View style={styles.warningCard}>
-            <Ionicons name="warning" size={20} color="#ff6b6b" />
+            <Ionicons name="warning" size={20} color="#FF6B35" />
             <ThemedText style={styles.warningText}>
               Bạn đang chọn mức ngân sách ít hơn mức giá tham khảo, nếu bạn vẫn tiếp tục thì có thể ảnh hưởng tới quá trình tự động tìm người chăm sóc của chúng tôi
             </ThemedText>
@@ -868,7 +868,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
           {/* Hiển thị số tiền bằng tiếng Việt */}
           {userInfo.budgetPerHour && parseInt(userInfo.budgetPerHour) > 0 && (
             <View style={styles.currencyDisplay}>
-              <Ionicons name="cash-outline" size={16} color="#4ECDC4" />
+              <Ionicons name="cash-outline" size={16} color="#FF8E53" />
               <ThemedText style={styles.currencyText}>
                 {formatCurrency(parseInt(userInfo.budgetPerHour))}/giờ
               </ThemedText>
@@ -936,7 +936,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
         <View style={styles.navigation}>
           {currentStep > 1 && (
             <TouchableOpacity style={styles.previousButton} onPress={handlePrevious}>
-              <Ionicons name="chevron-back" size={20} color="#4ECDC4" />
+              <Ionicons name="chevron-back" size={20} color="#FF8E53" />
               <ThemedText style={styles.previousButtonText}>Trước</ThemedText>
             </TouchableOpacity>
           )}
@@ -965,7 +965,7 @@ export function AIMatchingModal({ visible, onClose, onGetRecommendations, elderl
                 ]}
               >
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
-                  <Ionicons name="heart" size={48} color="#4ECDC4" />
+                  <Ionicons name="heart" size={48} color="#FF8E53" />
                 </Animated.View>
               </Animated.View>
               
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -1037,7 +1037,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     borderRadius: 2,
   },
   content: {
@@ -1084,7 +1084,7 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   optionCardSelected: {
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#f0fdfa',
   },
   optionContent: {
@@ -1097,14 +1097,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   optionTitleSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   optionDescription: {
     fontSize: 14,
     color: '#6c757d',
   },
   optionDescriptionSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   optionsGrid: {
     flexDirection: 'row',
@@ -1120,8 +1120,8 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   specialNeedCardSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   specialNeedText: {
     fontSize: 14,
@@ -1146,8 +1146,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   genderCardSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   genderText: {
     fontSize: 14,
@@ -1173,11 +1173,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   previousButtonText: {
     marginLeft: 8,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   navigationSpacer: {
@@ -1186,7 +1186,7 @@ const styles = StyleSheet.create({
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -1213,7 +1213,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   profileCardSelected: {
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#F0FDFB',
   },
   profileHeader: {
@@ -1232,14 +1232,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   profileNameSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   profileAge: {
     fontSize: 16,
     color: '#6B7280',
   },
   profileAgeSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   selectionIndicator: {
     marginLeft: 12,
@@ -1286,7 +1286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#F0FDFB',
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     borderRadius: 12,
     paddingVertical: 14,
     gap: 8,
@@ -1294,7 +1294,7 @@ const styles = StyleSheet.create({
   manualInputButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   helpText: {
     fontSize: 14,
@@ -1317,8 +1317,8 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   healthLevelCardSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   healthLevelText: {
     fontSize: 14,
@@ -1339,11 +1339,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 8,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   mapButtonText: {
     marginLeft: 8,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   priceReferenceCard: {
@@ -1353,7 +1353,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   priceReferenceText: {
     marginLeft: 8,
@@ -1362,7 +1362,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   requiredMark: {
-    color: '#dc3545',
+    color: '#FF6B35',
     fontWeight: 'bold',
   },
   ageRangeContainer: {
@@ -1396,7 +1396,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   locationText: {
     marginLeft: 12,
@@ -1418,13 +1418,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ff6b6b',
+    borderColor: '#FF6B35',
     marginBottom: 16,
   },
   warningText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#dc3545',
+    color: '#FF6B35',
     flex: 1,
     lineHeight: 20,
   },
@@ -1447,7 +1447,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0fdfa',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   currencyText: {
     fontSize: 14,
@@ -1508,6 +1508,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
   },
 });

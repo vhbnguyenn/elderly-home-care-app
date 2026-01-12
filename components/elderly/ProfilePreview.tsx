@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -20,9 +20,9 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ profile }) => {
 
   const getIndependenceColor = (level: string) => {
     switch (level) {
-      case 'independent': return '#28a745';
-      case 'assisted': return '#ffc107';
-      case 'dependent': return '#dc3545';
+      case 'independent': return '#FFA07A';
+      case 'assisted': return '#FFB84D';
+      case 'dependent': return '#FF6B35';
       default: return '#6c757d';
     }
   };
@@ -134,7 +134,7 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ profile }) => {
           .filter(([_, value]) => value)
           .map(([key, _]) => (
             <View key={key} style={styles.careNeedItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+              <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
               <ThemedText style={styles.careNeedText}>
                 {key === 'conversation' && 'Trò chuyện'}
                 {key === 'reminders' && 'Nhắc nhở'}

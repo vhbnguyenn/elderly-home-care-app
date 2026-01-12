@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Complaint } from '@/types/complaint';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -206,7 +206,7 @@ export default function ComplaintDetailScreen() {
             
             <View style={styles.personCard}>
               <View style={styles.personHeader}>
-                <Ionicons name="warning" size={20} color="#FF6B6B" />
+                <Ionicons name="warning" size={20} color="#FF6B35" />
                 <ThemedText style={styles.personTitle}>Người bị khiếu nại</ThemedText>
               </View>
               <ThemedText style={styles.personName}>{complaint.accused.name}</ThemedText>
@@ -221,7 +221,7 @@ export default function ComplaintDetailScreen() {
           <ThemedText style={styles.sectionTitle}>Dịch vụ liên quan</ThemedText>
           <View style={styles.serviceCard}>
             <View style={styles.serviceHeader}>
-              <Ionicons name="business" size={20} color="#4ECDC4" />
+              <Ionicons name="business" size={20} color="#FF8E53" />
               <ThemedText style={styles.serviceTitle}>{complaint.service.name}</ThemedText>
             </View>
             <View style={styles.infoRow}>

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -80,7 +80,7 @@ export default function ProfileStatusScreen() {
     <View style={styles.statusCard}>
       <View style={styles.iconContainer}>
         <View style={[styles.iconCircle, styles.iconCirclePending]}>
-          <MaterialCommunityIcons name="clock-outline" size={48} color="#F59E0B" />
+          <MaterialCommunityIcons name="clock-outline" size={48} color="#FFA500" />
         </View>
       </View>
       <Text style={styles.statusTitle}>Đang chờ duyệt</Text>
@@ -100,7 +100,7 @@ export default function ProfileStatusScreen() {
     <View style={styles.statusCard}>
       <View style={styles.iconContainer}>
         <View style={[styles.iconCircle, styles.iconCircleRejected]}>
-          <MaterialCommunityIcons name="close-circle" size={48} color="#EF4444" />
+          <MaterialCommunityIcons name="close-circle" size={48} color="#FF6B35" />
         </View>
       </View>
       <Text style={styles.statusTitle}>Hồ sơ bị từ chối</Text>
@@ -124,7 +124,7 @@ export default function ProfileStatusScreen() {
     <View style={styles.statusCard}>
       <View style={styles.iconContainer}>
         <View style={[styles.iconCircle, styles.iconCircleApproved]}>
-          <MaterialCommunityIcons name="check-circle" size={48} color="#10B981" />
+          <MaterialCommunityIcons name="check-circle" size={48} color="#FFA07A" />
         </View>
       </View>
       <Text style={styles.statusTitle}>Hồ sơ đã được duyệt</Text>
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
   noteLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#8B5CF6",
+    color: "#FF8E53",
     marginBottom: 6,
   },
   noteText: {
     fontSize: 14,
-    color: "#8B5CF6",
+    color: "#FF8E53",
     lineHeight: 20,
   },
   reasonContainer: {
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEE2E2",
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
   },
   reasonLabel: {
     fontSize: 14,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
   approvedMessage: {
     fontSize: 14,
-    color: "#10B981",
+    color: "#FFA07A",
     fontWeight: "600",
     marginTop: 12,
     textAlign: "center",

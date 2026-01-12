@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { PaymentCode } from "@/components/caregiver/PaymentCode";
 import { getAppointmentHasComplained, getAppointmentHasReviewed, getAppointmentStatus, subscribeToStatusChanges, updateAppointmentStatus } from "@/data/appointmentStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -715,19 +715,19 @@ export default function AppointmentDetailScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "new":
-        return "#3B82F6"; // Blue
+        return "#FF6B35"; // Blue
       case "pending":
-        return "#F59E0B"; // Orange
+        return "#FFA500"; // Orange
       case "confirmed":
-        return "#10B981"; // Green
+        return "#FFA07A"; // Green
       case "in-progress":
-        return "#8B5CF6"; // Purple
+        return "#FF8E53"; // Purple
       case "completed":
         return "#6B7280"; // Gray
       case "cancelled":
-        return "#EF4444"; // Red
+        return "#FF6B35"; // Red
       case "rejected":
-        return "#DC2626"; // Dark Red
+        return "#E85D2A"; // Dark Red
       default:
         return "#6B7280";
     }
@@ -1063,7 +1063,7 @@ export default function AppointmentDetailScreen() {
               style={styles.actionButtonSecondary}
               onPress={handleMessage}
             >
-              <Ionicons name="chatbubble-outline" size={20} color="#10B981" />
+              <Ionicons name="chatbubble-outline" size={20} color="#FFA07A" />
               <Text style={styles.actionButtonSecondaryText}>Nhắn tin</Text>
             </TouchableOpacity>
             {showCancelButton && (
@@ -1094,7 +1094,7 @@ export default function AppointmentDetailScreen() {
               style={styles.actionButtonSecondary}
               onPress={handleMessage}
             >
-              <Ionicons name="chatbubble-outline" size={20} color="#10B981" />
+              <Ionicons name="chatbubble-outline" size={20} color="#FFA07A" />
               <Text style={styles.actionButtonSecondaryText}>Nhắn tin</Text>
             </TouchableOpacity>
             <TouchableOpacity 
@@ -1116,8 +1116,8 @@ export default function AppointmentDetailScreen() {
               style={styles.actionButtonSecondary}
               onPress={handleComplaint}
             >
-              <Ionicons name={hasComplained ? "eye-outline" : "alert-circle-outline"} size={20} color="#EF4444" />
-              <Text style={[styles.actionButtonSecondaryText, { color: "#EF4444" }]}>{hasComplained ? "Xem khiếu nại" : "Khiếu nại"}</Text>
+              <Ionicons name={hasComplained ? "eye-outline" : "alert-circle-outline"} size={20} color="#FF6B35" />
+              <Text style={[styles.actionButtonSecondaryText, { color: "#FF6B35" }]}>{hasComplained ? "Xem khiếu nại" : "Khiếu nại"}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.actionButtonPrimary}
@@ -1143,9 +1143,9 @@ export default function AppointmentDetailScreen() {
 
   const getIndependenceColor = (level: string) => {
     switch (level) {
-      case "independent": return "#10B981";
-      case "assisted": return "#F59E0B";
-      case "dependent": return "#EF4444";
+      case "independent": return "#FFA07A";
+      case "assisted": return "#FFA500";
+      case "dependent": return "#FF6B35";
       default: return "#6B7280";
     }
   };
@@ -1226,7 +1226,7 @@ export default function AppointmentDetailScreen() {
             </View>
             {hasComplained && (
               <View style={styles.complaintWarningBadge}>
-                <MaterialCommunityIcons name="alert-circle" size={16} color="#EF4444" />
+                <MaterialCommunityIcons name="alert-circle" size={16} color="#FF6B35" />
                 <Text style={styles.complaintWarningText}>Khiếu nại</Text>
               </View>
             )}
@@ -1243,7 +1243,7 @@ export default function AppointmentDetailScreen() {
             <MaterialCommunityIcons 
               name={isDeadlineExpired ? "clock-alert" : "clock-outline"} 
               size={18} 
-              color={isDeadlineExpired ? "#EF4444" : "#F59E0B"} 
+              color={isDeadlineExpired ? "#FF6B35" : "#FFA500"} 
             />
             <Text style={[
               styles.deadlineDisplayText,
@@ -1339,7 +1339,7 @@ export default function AppointmentDetailScreen() {
                 <Text style={styles.infoLabel}>Bệnh nền</Text>
                 {appointmentData.elderly.underlyingDiseases.map((disease, index) => (
                   <View key={index} style={styles.diseaseTag}>
-                    <MaterialCommunityIcons name="circle-small" size={16} color="#EF4444" />
+                    <MaterialCommunityIcons name="circle-small" size={16} color="#FF6B35" />
                     <Text style={styles.diseaseText}>{disease}</Text>
                   </View>
                 ))}
@@ -1370,7 +1370,7 @@ export default function AppointmentDetailScreen() {
                 <View style={styles.allergyContainer}>
                   {appointmentData.elderly.allergies.map((allergy, index) => (
                     <View key={index} style={styles.allergyTag}>
-                      <MaterialCommunityIcons name="alert" size={14} color="#EF4444" />
+                      <MaterialCommunityIcons name="alert" size={14} color="#FF6B35" />
                       <Text style={styles.allergyText}>{allergy}</Text>
                     </View>
                   ))}
@@ -1431,7 +1431,7 @@ export default function AppointmentDetailScreen() {
               <View style={styles.accessibilityTags}>
                 {appointmentData.elderly.livingEnvironment.accessibility.map((item, index) => (
                   <View key={index} style={styles.accessibilityTag}>
-                    <MaterialCommunityIcons name="check-circle" size={14} color="#10B981" />
+                    <MaterialCommunityIcons name="check-circle" size={14} color="#FFA07A" />
                     <Text style={styles.accessibilityText}>{item}</Text>
                   </View>
                 ))}
@@ -1446,7 +1446,7 @@ export default function AppointmentDetailScreen() {
               <View style={styles.hobbyTags}>
                 {appointmentData.elderly.hobbies.map((hobby, index) => (
                   <View key={index} style={styles.hobbyTag}>
-                    <Ionicons name="star" size={14} color="#F59E0B" />
+                    <Ionicons name="star" size={14} color="#FFA500" />
                     <Text style={styles.hobbyText}>{hobby}</Text>
                   </View>
                 ))}
@@ -1455,7 +1455,7 @@ export default function AppointmentDetailScreen() {
               <View style={styles.foodTags}>
                 {appointmentData.elderly.foodPreferences.map((food, index) => (
                   <View key={index} style={styles.foodTag}>
-                    <Ionicons name="restaurant" size={14} color="#10B981" />
+                    <Ionicons name="restaurant" size={14} color="#FFA07A" />
                     <Text style={styles.foodText}>{food}</Text>
                   </View>
                 ))}
@@ -1465,7 +1465,7 @@ export default function AppointmentDetailScreen() {
             <View style={styles.divider} />
             <View style={styles.emergencyContact}>
               <Text style={styles.emergencyTitle}>
-                <Ionicons name="warning-outline" size={16} color="#EF4444" /> Liên hệ khẩn cấp
+                <Ionicons name="warning-outline" size={16} color="#FF6B35" /> Liên hệ khẩn cấp
               </Text>
               <Text style={styles.emergencyName}>
                 {appointmentData.elderly.emergencyContact.name} ({appointmentData.elderly.emergencyContact.relationship})
@@ -1512,7 +1512,7 @@ export default function AppointmentDetailScreen() {
           <View style={styles.section}>
             <View style={styles.taskSection}>
               <View style={styles.taskSectionHeader}>
-                <MaterialCommunityIcons name="package-variant" size={20} color="#10B981" />
+                <MaterialCommunityIcons name="package-variant" size={20} color="#FFA07A" />
                 <Text style={styles.taskSectionTitle}>Dịch vụ {appointmentData.packageType}</Text>
                 <View style={styles.taskBadge}>
                   <Text style={styles.taskBadgeText}>
@@ -1540,7 +1540,7 @@ export default function AppointmentDetailScreen() {
               disabled={!canAddNote}
               activeOpacity={canAddNote ? 0.7 : 1}
             >
-              <Ionicons name="add-circle" size={20} color={canAddNote ? "#10B981" : "#9CA3AF"} />
+              <Ionicons name="add-circle" size={20} color={canAddNote ? "#FFA07A" : "#9CA3AF"} />
               <Text style={[
                 styles.addNoteText,
                 !canAddNote && styles.addNoteTextDisabled
@@ -1578,7 +1578,7 @@ export default function AppointmentDetailScreen() {
         <View style={styles.stickyHeaderContent}>
           <Text style={styles.stickyHeaderTitle}>Lưu ý đặc biệt</Text>
           <View style={styles.stickyHeaderCard}>
-            <MaterialCommunityIcons name="information" size={20} color="#F59E0B" />
+            <MaterialCommunityIcons name="information" size={20} color="#FFA500" />
             <Text style={styles.instructionsText}>
               {appointmentData.specialInstructions}
             </Text>
@@ -1699,7 +1699,7 @@ const styles = StyleSheet.create({
   complaintWarningText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#DC2626",
+    color: "#E85D2A",
   },
   appointmentId: {
     fontSize: 14,
@@ -1792,7 +1792,7 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#EF4444",
+    color: "#FF6B35",
     marginBottom: 6,
   },
   emergencyName: {
@@ -1803,7 +1803,7 @@ const styles = StyleSheet.create({
   },
   emergencyPhone: {
     fontSize: 14,
-    color: "#EF4444",
+    color: "#FF6B35",
     fontWeight: "600",
   },
   instructionsCard: {
@@ -1813,7 +1813,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     borderLeftWidth: 4,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
   },
   instructionsText: {
     flex: 1,
@@ -1832,7 +1832,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     borderLeftWidth: 4,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
     shadowColor: "#000",
@@ -1874,7 +1874,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   tabActive: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   tabText: {
     fontSize: 14,
@@ -1950,8 +1950,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   checkboxCompleted: {
-    backgroundColor: "#10B981",
-    borderColor: "#10B981",
+    backgroundColor: "#FFA07A",
+    borderColor: "#FFA07A",
   },
   checkboxDisabled: {
     borderColor: "#E5E7EB",
@@ -1968,7 +1968,7 @@ const styles = StyleSheet.create({
   taskTime: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#10B981",
+    color: "#FFA07A",
     marginLeft: 4,
   },
   requiredBadge: {
@@ -1981,7 +1981,7 @@ const styles = StyleSheet.create({
   requiredText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   taskTitle: {
     fontSize: 14,
@@ -2009,7 +2009,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
     borderStyle: "dashed",
     marginBottom: 12,
   },
@@ -2021,7 +2021,7 @@ const styles = StyleSheet.create({
   addNoteText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#10B981",
+    color: "#FFA07A",
     marginLeft: 6,
   },
   addNoteTextDisabled: {
@@ -2085,12 +2085,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
   },
   actionButtonSecondaryText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#10B981",
+    color: "#FFA07A",
     marginLeft: 6,
   },
   actionButtonPrimary: {
@@ -2100,7 +2100,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   actionButtonPrimaryText: {
     fontSize: 15,
@@ -2116,7 +2116,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   actionButtonSuccessText: {
     fontSize: 15,
@@ -2131,7 +2131,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
   },
   actionButtonDangerText: {
     fontSize: 15,
@@ -2146,7 +2146,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#F59E0B",
+    backgroundColor: "#FFA500",
   },
   actionButtonWarningText: {
     fontSize: 15,
@@ -2184,7 +2184,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     marginTop: 6,
     marginRight: 8,
   },
@@ -2218,7 +2218,7 @@ const styles = StyleSheet.create({
   },
   allergyText: {
     fontSize: 12,
-    color: "#DC2626",
+    color: "#E85D2A",
     fontWeight: "500",
   },
   specialConditionsSection: {
@@ -2415,7 +2415,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   modalButtonSaveText: {
     fontSize: 14,
@@ -2432,12 +2432,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
     gap: 12,
   },
   deadlineCardExpired: {
     backgroundColor: "#FEE2E2",
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
   },
   deadlineContent: {
     flex: 1,
@@ -2496,11 +2496,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
   },
   deadlineDisplayExpired: {
     backgroundColor: "#FEE2E2",
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
   },
   deadlineDisplayText: {
     fontSize: 14,

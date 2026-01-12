@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
@@ -70,7 +70,7 @@ export default function ElderlyListScreen() {
         </View>
 
         <TouchableOpacity style={styles.addButton} onPress={handleAddPerson}>
-          <Ionicons name="add-circle" size={32} color="#68C2E8" />
+          <Ionicons name="add-circle" size={32} color="#FF6B35" />
         </TouchableOpacity>
       </View>
 

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   FlatList,
@@ -94,7 +94,7 @@ export const RecentlyBooked: React.FC<RecentlyBookedProps> = ({
         <TouchableOpacity onPress={onSeeAllPress}>
           <View style={styles.seeAllButton}>
             <ThemedText style={styles.seeAllText}>Xem tất cả</ThemedText>
-            <Ionicons name="chevron-forward" size={16} color="#FF6B6B" />
+            <Ionicons name="chevron-forward" size={16} color="#FF6B35" />
           </View>
         </TouchableOpacity>
       </View>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#FF6B35',
     fontWeight: '600',
     marginRight: 4,
   },

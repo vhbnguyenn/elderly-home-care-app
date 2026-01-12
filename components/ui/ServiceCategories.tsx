@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   FlatList,
@@ -25,19 +25,19 @@ const categories: ServiceCategory[] = [
     id: 'home-care',
     title: 'Chăm sóc\ntại nhà',
     icon: 'home',
-    color: '#FF6B6B',
+    color: '#FF6B35',
   },
   {
     id: 'medical',
     title: 'Y tế &\nKiểm tra',
     icon: 'medical',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   {
     id: 'therapy',
     title: 'Vật lý\ntrị liệu',
     icon: 'fitness',
-    color: '#FFD93D',
+    color: '#FFB84D',
   },
   {
     id: 'companion',
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   listContent: {

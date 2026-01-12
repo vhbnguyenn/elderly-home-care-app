@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -11,14 +11,14 @@ export default function ExploreScreen() {
       title: 'Tìm người chăm sóc',
       description: 'Kết nối với những người chăm sóc chuyên nghiệp, có kinh nghiệm',
       icon: 'people',
-      color: '#4ECDC4',
+      color: '#FF8E53',
     },
     {
       id: '2',
       title: 'Chăm sóc 24/7',
       description: 'Dịch vụ chăm sóc liên tục, đảm bảo an toàn cho người thân',
       icon: 'shield-checkmark',
-      color: '#FF6B6B',
+      color: '#FF6B35',
     },
     {
       id: '3',
@@ -79,7 +79,7 @@ export default function ExploreScreen() {
         </View>
         <View style={styles.ratingContainer}>
           {[...Array(testimonial.rating)].map((_, index) => (
-            <Ionicons key={index} name="star" size={16} color="#FFD93D" />
+            <Ionicons key={index} name="star" size={16} color="#FFB84D" />
           ))}
         </View>
       </View>
@@ -110,17 +110,17 @@ export default function ExploreScreen() {
         <ThemedText style={styles.sectionTitle}>Thống kê nền tảng</ThemedText>
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Ionicons name="people" size={24} color="#4ECDC4" />
+            <Ionicons name="people" size={24} color="#FF8E53" />
             <ThemedText style={styles.statNumber}>1000+</ThemedText>
             <ThemedText style={styles.statLabel}>Người chăm sóc</ThemedText>
           </View>
           <View style={styles.statCard}>
-            <Ionicons name="home" size={24} color="#FF6B6B" />
+            <Ionicons name="home" size={24} color="#FF6B35" />
             <ThemedText style={styles.statNumber}>500+</ThemedText>
             <ThemedText style={styles.statLabel}>Gia đình tin tưởng</ThemedText>
           </View>
           <View style={styles.statCard}>
-            <Ionicons name="star" size={24} color="#FFD93D" />
+            <Ionicons name="star" size={24} color="#FFB84D" />
             <ThemedText style={styles.statNumber}>4.9</ThemedText>
             <ThemedText style={styles.statLabel}>Đánh giá trung bình</ThemedText>
           </View>
@@ -138,7 +138,7 @@ export default function ExploreScreen() {
       {/* CTA Section */}
       <View style={styles.ctaSection}>
         <View style={styles.ctaCard}>
-          <Ionicons name="rocket" size={48} color="#4ECDC4" />
+          <Ionicons name="rocket" size={48} color="#FF8E53" />
           <ThemedText style={styles.ctaTitle}>Sẵn sàng bắt đầu?</ThemedText>
           <ThemedText style={styles.ctaDescription}>
             Đăng ký ngay để trải nghiệm dịch vụ chăm sóc người già tốt nhất
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 20,
     paddingVertical: 30,
     alignItems: 'center',
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
   },
   ctaCard: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     borderRadius: 20,
     padding: 30,
     alignItems: 'center',
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   ctaButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   bottomSpacing: {
     height: 20,

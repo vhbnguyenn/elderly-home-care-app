@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -135,7 +135,7 @@ export function WorkTimeSelector({ onTimeSlotsChange }: WorkTimeSelectorProps) {
                   style={styles.removeButton}
                   onPress={() => handleRemoveTimeSlot(slot.id)}
                 >
-                  <Ionicons name="close-circle" size={20} color="#DC3545" />
+                  <Ionicons name="close-circle" size={20} color="#FF6B35" />
                 </TouchableOpacity>
               </View>
             ))}

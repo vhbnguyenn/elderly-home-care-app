@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
 import {
@@ -118,7 +118,7 @@ export default function ChatScreen() {
                 'checkmark'
               } 
               size={14} 
-              color={item.status === 'read' ? '#68C2E8' : '#FFFFFF'} 
+              color={item.status === 'read' ? '#FF6B35' : '#FFFFFF'} 
             />
           )}
         </View>
@@ -186,7 +186,7 @@ export default function ChatScreen() {
         {/* Input */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.attachButton}>
-            <Ionicons name="add-circle-outline" size={28} color="#68C2E8" />
+            <Ionicons name="add-circle-outline" size={28} color="#FF6B35" />
           </TouchableOpacity>
           
           <TextInput
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F7FA',
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 30,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   myMessage: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderBottomRightRadius: 4,
   },
   theirMessage: {
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,

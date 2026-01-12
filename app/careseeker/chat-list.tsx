@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderWidth: 2,
     borderColor: 'white',
   },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   unreadBadge: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 10,
     minWidth: 20,
     height: 20,

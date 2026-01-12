@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     Image,
@@ -93,7 +93,7 @@ export function CaregiverCard({ caregiver, onPress, onBookPress, onChatPress, sh
               style={styles.chatButton}
               onPress={() => onChatPress?.(caregiver)}
             >
-              <Ionicons name="chatbubble-outline" size={16} color="#4ECDC4" />
+              <Ionicons name="chatbubble-outline" size={16} color="#FF8E53" />
               <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
             </TouchableOpacity>
             
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#28a745',
+    color: '#FFA07A',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -230,16 +230,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     gap: 4,
   },
   chatButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   bookButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#FF6B35',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,

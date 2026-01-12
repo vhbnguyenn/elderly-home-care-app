@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   scrollContent: {
@@ -235,11 +235,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   specialtyText: {
     fontSize: 11,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
     textAlign: 'center',
   },

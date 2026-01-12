@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -80,9 +80,9 @@ export default function ElderlyDetailScreen() {
   // Helper functions
   const getHealthStatusColor = (status: ElderlyProfile['healthStatus']) => {
     switch (status) {
-      case 'good': return '#28a745';
-      case 'fair': return '#ffc107';
-      case 'poor': return '#dc3545';
+      case 'good': return '#FFA07A';
+      case 'fair': return '#FFB84D';
+      case 'poor': return '#FF6B35';
       default: return '#6c757d';
     }
   };
@@ -151,7 +151,7 @@ export default function ElderlyDetailScreen() {
         <ThemedText style={styles.sectionTitle}>Người liên hệ khẩn cấp</ThemedText>
         <View style={styles.contactCard}>
           <View style={styles.contactIcon}>
-            <Ionicons name="person" size={20} color="#4ECDC4" />
+            <Ionicons name="person" size={20} color="#FF8E53" />
           </View>
           <View style={styles.contactInfo}>
             <ThemedText style={styles.contactName}>Nguyễn Văn Minh</ThemedText>
@@ -162,7 +162,7 @@ export default function ElderlyDetailScreen() {
         
         <View style={styles.contactCard}>
           <View style={styles.contactIcon}>
-            <Ionicons name="person" size={20} color="#4ECDC4" />
+            <Ionicons name="person" size={20} color="#FF8E53" />
           </View>
           <View style={styles.contactInfo}>
             <ThemedText style={styles.contactName}>Nguyễn Thị Hoa</ThemedText>
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   activeTab: {
-    borderBottomColor: '#4ECDC4',
+    borderBottomColor: '#FF8E53',
   },
   tabText: {
     fontSize: 14,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: 'bold',
   },
   tabContent: {
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   },
   contactPhone: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
 });

@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+﻿import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -112,7 +112,7 @@ export default function RegisterScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color="#667eea" />
+          <Ionicons name="arrow-back" size={24} color="#FF6B35" />
         </TouchableOpacity>
         <ThemedText style={styles.title}>Đăng ký tài khoản</ThemedText>
       </View>
@@ -292,8 +292,8 @@ const styles = StyleSheet.create({
     right: 12,
     top: 12,
   },
-  inputError: { borderColor: "#dc3545", backgroundColor: "#fff5f5" },
-  errorText: { fontSize: 12, color: "#dc3545", marginTop: 4 },
+  inputError: { borderColor: "#FF6B35", backgroundColor: "#fff5f5" },
+  errorText: { fontSize: 12, color: "#FF6B35", marginTop: 4 },
   radioGroup: { marginTop: 8 },
   radioOption: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
   radioCircle: {
@@ -304,10 +304,10 @@ const styles = StyleSheet.create({
     borderColor: "#dee2e6",
     marginRight: 12,
   },
-  radioSelected: { borderColor: "#667eea", backgroundColor: "#667eea" },
+  radioSelected: { borderColor: "#FF6B35", backgroundColor: "#FF6B35" },
   radioText: { fontSize: 16, color: "#495057" },
   submitButton: {
-    backgroundColor: "#667eea",
+    backgroundColor: "#FF6B35",
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: "center",

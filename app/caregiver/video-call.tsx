@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useState } from "react";
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   permissionButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

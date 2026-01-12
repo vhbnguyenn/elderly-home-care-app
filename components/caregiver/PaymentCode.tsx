@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import React from 'react';
 import {
@@ -137,7 +137,7 @@ export function PaymentCode({
 
               <View style={styles.qrCodeContainer}>
                 <View style={styles.qrCodePlaceholder}>
-                  <Ionicons name="qr-code-outline" size={200} color="#68C2E8" />
+                  <Ionicons name="qr-code-outline" size={200} color="#FF6B35" />
                 </View>
               </View>
 
@@ -150,7 +150,7 @@ export function PaymentCode({
                     <ThemedText style={styles.qrInfoLabel}>Mã booking:</ThemedText>
                     <ThemedText style={styles.qrInfoValue}>{bookingId}</ThemedText>
                   </View>
-                  <Ionicons name="copy-outline" size={20} color="#68C2E8" />
+                  <Ionicons name="copy-outline" size={20} color="#FF6B35" />
                 </TouchableOpacity>
 
                 <View style={styles.divider} />
@@ -163,7 +163,7 @@ export function PaymentCode({
                     <ThemedText style={styles.qrInfoLabel}>Số TK:</ThemedText>
                     <ThemedText style={styles.qrInfoValue}>{bankInfo.accountNumber}</ThemedText>
                   </View>
-                  <Ionicons name="copy-outline" size={20} color="#68C2E8" />
+                  <Ionicons name="copy-outline" size={20} color="#FF6B35" />
                 </TouchableOpacity>
 
                 <View style={styles.divider} />
@@ -180,7 +180,7 @@ export function PaymentCode({
             {/* Instructions */}
             <View style={styles.instructionCard}>
               <View style={styles.instructionHeader}>
-                <Ionicons name="information-circle" size={24} color="#68C2E8" />
+                <Ionicons name="information-circle" size={24} color="#FF6B35" />
                 <ThemedText style={styles.instructionTitle}>Hướng dẫn</ThemedText>
               </View>
               <ThemedText style={styles.instructionText}>
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   amountLabel: {
     fontSize: 14,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   qrSection: {
     backgroundColor: 'white',
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#FFB84D',
   },
   instructionHeader: {
     flexDirection: 'row',

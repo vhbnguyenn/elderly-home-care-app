@@ -1,4 +1,4 @@
-import {
+﻿import {
     useErrorNotification,
     useSuccessNotification,
 } from '@/contexts/NotificationContext';
@@ -279,7 +279,7 @@ export default function RegisterFlowScreen() {
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
           <LinearGradient
-            colors={['#FF6B6B', '#FF8E53']}
+            colors={['#FF6B35', '#FF8E53']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[styles.progressFill, { width: `${progress}%` }]}
@@ -297,7 +297,7 @@ export default function RegisterFlowScreen() {
         </TouchableOpacity>
 
         <View style={styles.iconContainer}>
-          <Ionicons name={currentStepData.icon as any} size={60} color="#FF6B6B" />
+          <Ionicons name={currentStepData.icon as any} size={60} color="#FF6B35" />
         </View>
 
         <Text style={styles.question}>{currentStepData.question}</Text>
@@ -364,7 +364,7 @@ export default function RegisterFlowScreen() {
             </View>
             {fieldError ? (
               <View style={styles.helperContainer}>
-                <Ionicons name="alert-circle" size={14} color="#FF6B6B" />
+                <Ionicons name="alert-circle" size={14} color="#FF6B35" />
                 <Text style={styles.errorHelperText}>{fieldError}</Text>
               </View>
             ) : (
@@ -383,7 +383,7 @@ export default function RegisterFlowScreen() {
       <View style={styles.bottomContainer}>
         <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
           <LinearGradient
-            colors={['#FF6B6B', '#FF8E53']}
+            colors={['#FF6B35', '#FF8E53']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.nextButtonGradient}
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
   },
   errorHelperText: {
     fontSize: 13,
-    color: '#FF6B6B',
+    color: '#FF6B35',
     flex: 1,
   },
   eyeButton: {
@@ -490,8 +490,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   optionButtonSelected: {
-    borderColor: '#FF6B6B',
-    backgroundColor: '#FF6B6B',
+    borderColor: '#FF6B35',
+    backgroundColor: '#FF6B35',
   },
   optionText: {
     fontSize: 16,

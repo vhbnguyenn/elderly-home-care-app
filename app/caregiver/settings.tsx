@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
                 value={pushNotifications}
                 onValueChange={setPushNotifications}
                 trackColor={{ false: "#D1D5DB", true: "#34D399" }}
-                thumbColor={pushNotifications ? "#10B981" : "#f4f3f4"}
+                thumbColor={pushNotifications ? "#FFA07A" : "#f4f3f4"}
               />
             </View>
 
@@ -68,7 +68,7 @@ export default function SettingsScreen() {
                 value={showPhone}
                 onValueChange={setShowPhone}
                 trackColor={{ false: "#D1D5DB", true: "#34D399" }}
-                thumbColor={showPhone ? "#10B981" : "#f4f3f4"}
+                thumbColor={showPhone ? "#FFA07A" : "#f4f3f4"}
               />
             </View>
 
@@ -83,7 +83,7 @@ export default function SettingsScreen() {
                 value={showEmail}
                 onValueChange={setShowEmail}
                 trackColor={{ false: "#D1D5DB", true: "#34D399" }}
-                thumbColor={showEmail ? "#10B981" : "#f4f3f4"}
+                thumbColor={showEmail ? "#FFA07A" : "#f4f3f4"}
               />
             </View>
           </View>
@@ -106,7 +106,7 @@ export default function SettingsScreen() {
                 value={biometricLogin}
                 onValueChange={setBiometricLogin}
                 trackColor={{ false: "#D1D5DB", true: "#34D399" }}
-                thumbColor={biometricLogin ? "#10B981" : "#f4f3f4"}
+                thumbColor={biometricLogin ? "#FFA07A" : "#f4f3f4"}
               />
             </View>
 
@@ -142,8 +142,8 @@ export default function SettingsScreen() {
         {/* Danger Zone */}
         <View style={styles.section}>
           <View style={styles.sectionTitleContainer}>
-            <MaterialCommunityIcons name="alert" size={20} color="#EF4444" />
-            <Text style={[styles.sectionTitle, { color: "#EF4444" }]}>Vùng nguy hiểm</Text>
+            <MaterialCommunityIcons name="alert" size={20} color="#FF6B35" />
+            <Text style={[styles.sectionTitle, { color: "#FF6B35" }]}>Vùng nguy hiểm</Text>
           </View>
           
           <View style={styles.settingCard}>
@@ -152,7 +152,7 @@ export default function SettingsScreen() {
                 <Text style={[styles.settingLabel, styles.dangerText]}>Xóa bộ nhớ cache</Text>
                 <Text style={styles.settingDesc}>Giải phóng dung lượng</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#EF4444" />
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#FF6B35" />
             </TouchableOpacity>
 
             <View style={styles.divider} />
@@ -162,7 +162,7 @@ export default function SettingsScreen() {
                 <Text style={[styles.settingLabel, styles.dangerText]}>Xóa tài khoản</Text>
                 <Text style={styles.settingDesc}>Xóa vĩnh viễn tài khoản</Text>
               </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#EF4444" />
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#FF6B35" />
             </TouchableOpacity>
           </View>
         </View>
@@ -236,6 +236,6 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   dangerText: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
 });

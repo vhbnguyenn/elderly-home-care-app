@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { markAppointmentAsReviewed, ReviewData as ReviewDataType } from "@/data/appointmentStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -310,7 +310,7 @@ export default function ReviewScreen() {
         <View style={styles.header}>
           <View style={styles.headerIconContainer}>
             <View style={styles.headerIcon}>
-              <MaterialCommunityIcons name="heart-outline" size={32} color="#10B981" />
+              <MaterialCommunityIcons name="heart-outline" size={32} color="#FFA07A" />
             </View>
           </View>
           <Text style={styles.headerTitle}>Đánh giá Dịch vụ Chăm sóc</Text>
@@ -326,7 +326,7 @@ export default function ReviewScreen() {
           reviewData.cooperation,
           (value) => handleRatingChange("cooperation", value),
           "trending-up",
-          "#3B82F6"
+          "#FF6B35"
         )}
 
         {/* Rating 2: Chất lượng giao tiếp */}
@@ -336,7 +336,7 @@ export default function ReviewScreen() {
           reviewData.communication,
           (value) => handleRatingChange("communication", value),
           "message-text-outline",
-          "#10B981"
+          "#FFA07A"
         )}
 
         {/* Rating 3: Thái độ tôn trọng */}
@@ -346,7 +346,7 @@ export default function ReviewScreen() {
           reviewData.respect,
           (value) => handleRatingChange("respect", value),
           "heart",
-          "#F97316"
+          "#FF6B35"
         )}
 
         {/* Rating 4: Tính sẵn sàng */}
@@ -356,7 +356,7 @@ export default function ReviewScreen() {
           reviewData.readiness,
           (value) => handleRatingChange("readiness", value),
           "clock-outline",
-          "#3B82F6"
+          "#FF6B35"
         )}
 
         {/* Rating 5: Môi trường làm việc */}
@@ -366,7 +366,7 @@ export default function ReviewScreen() {
           reviewData.workingEnvironment,
           (value) => handleRatingChange("workingEnvironment", value),
           "home",
-          "#10B981"
+          "#FFA07A"
         )}
 
         {/* Family Support Section */}
@@ -400,7 +400,7 @@ export default function ReviewScreen() {
         <View style={styles.section}>
           <View style={styles.issuesHeader}>
             <View style={styles.issuesIcon}>
-              <MaterialCommunityIcons name="alert-circle" size={20} color="#EF4444" />
+              <MaterialCommunityIcons name="alert-circle" size={20} color="#FF6B35" />
             </View>
             <Text style={styles.sectionTitle}>Các vấn đề cần lưu ý</Text>
           </View>
@@ -416,7 +416,7 @@ export default function ReviewScreen() {
               >
                 <View style={styles.checkbox}>
                   {reviewData.issues.includes(option.id) && (
-                    <MaterialCommunityIcons name="check" size={16} color="#10B981" />
+                    <MaterialCommunityIcons name="check" size={16} color="#FFA07A" />
                   )}
                 </View>
                 <Text style={styles.checkboxLabel}>{option.label}</Text>
@@ -509,9 +509,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#E0F2FE",
+    backgroundColor: "#FFE5D9",
     borderWidth: 2,
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   radioContent: {
     flex: 1,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: "#10B981",
+    borderColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 8,
     marginBottom: 24,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",

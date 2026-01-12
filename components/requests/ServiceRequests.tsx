@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -214,9 +214,9 @@ export function ServiceRequests({ onChatPress, onBookPress }: ServiceRequestsPro
     switch (status) {
       case 'pending': return '#FFA500';
       case 'approved': return '#17A2B8';
-      case 'rejected': return '#DC3545';
-      case 'completed': return '#28A745';
-      default: return '#007BFF';
+      case 'rejected': return '#FF6B35';
+      case 'completed': return '#FFA07A';
+      default: return '#FF6B35';
     }
   };
 
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
   },
   paymentButton: {
     flex: 1,
-    backgroundColor: '#28A745',
+    backgroundColor: '#FFA07A',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#DC3545',
+    backgroundColor: '#FF6B35',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
   },
   modalPaymentButton: {
     flex: 1,
-    backgroundColor: '#28A745',
+    backgroundColor: '#FFA07A',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
   },
   modalCancelButton: {
     flex: 1,
-    backgroundColor: '#DC3545',
+    backgroundColor: '#FF6B35',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -874,10 +874,10 @@ const styles = StyleSheet.create({
   paymentAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#28A745',
+    color: '#FFA07A',
   },
   completePaymentButton: {
-    backgroundColor: '#28A745',
+    backgroundColor: '#FFA07A',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',

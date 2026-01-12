@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
 import { EmergencyContactProvider } from "@/contexts/EmergencyContactContext";
+import { Stack } from "expo-router";
 
 export default function CareSeekerLayout() {
   return (

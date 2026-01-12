@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     StyleSheet,
@@ -47,7 +47,7 @@ export function DynamicInputList({
         <ThemedText style={styles.title}>{title}</ThemedText>
         {items.length < maxItems && (
           <TouchableOpacity style={styles.addButton} onPress={addItem}>
-            <Ionicons name="add" size={20} color="#30A0E0" />
+            <Ionicons name="add" size={20} color="#FF8E53" />
           </TouchableOpacity>
         )}
       </View>
@@ -66,7 +66,7 @@ export function DynamicInputList({
               style={styles.removeButton}
               onPress={() => removeItem(index)}
             >
-              <Ionicons name="remove" size={20} color="#dc3545" />
+              <Ionicons name="remove" size={20} color="#FF6B35" />
             </TouchableOpacity>
           </View>
         ))}
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   itemsContainer: {
     gap: 8,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#dc3545',
+    borderColor: '#FF6B35',
   },
   emptyState: {
     padding: 20,

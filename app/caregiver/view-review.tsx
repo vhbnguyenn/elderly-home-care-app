@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getAppointmentReview } from "@/data/appointmentStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
@@ -124,7 +124,7 @@ export default function ViewReviewScreen() {
           "Đánh giá mức độ hợp tác và tuân thủ kế hoạch chăm sóc của người được chăm sóc",
           reviewData.cooperation,
           "trending-up",
-          "#3B82F6"
+          "#FF6B35"
         )}
 
         {renderRatingCard(
@@ -132,7 +132,7 @@ export default function ViewReviewScreen() {
           "Khả năng giao tiếp và diễn đạt nhu cầu của người được chăm sóc",
           reviewData.communication,
           "message-text-outline",
-          "#10B981"
+          "#FFA07A"
         )}
 
         {renderRatingCard(
@@ -140,7 +140,7 @@ export default function ViewReviewScreen() {
           "Thái độ tôn trọng và đối xử với người chăm sóc",
           reviewData.respect,
           "heart",
-          "#F97316"
+          "#FF6B35"
         )}
 
         {renderRatingCard(
@@ -148,7 +148,7 @@ export default function ViewReviewScreen() {
           "Sẵn sàng theo lịch trình và không hủy/thay đổi đột ngột",
           reviewData.readiness,
           "clock-outline",
-          "#3B82F6"
+          "#FF6B35"
         )}
 
         {renderRatingCard(
@@ -156,7 +156,7 @@ export default function ViewReviewScreen() {
           "Điều kiện và môi trường tại nhà của người được chăm sóc",
           reviewData.workingEnvironment,
           "home",
-          "#10B981"
+          "#FFA07A"
         )}
 
         {/* Family Support */}
@@ -174,14 +174,14 @@ export default function ViewReviewScreen() {
           <View style={styles.section}>
             <View style={styles.issuesHeader}>
               <View style={styles.issuesIcon}>
-                <MaterialCommunityIcons name="alert-circle" size={20} color="#EF4444" />
+                <MaterialCommunityIcons name="alert-circle" size={20} color="#FF6B35" />
               </View>
               <Text style={styles.sectionTitle}>Các vấn đề cần lưu ý</Text>
             </View>
             <View style={styles.infoCard}>
               {reviewData.issues.map((issueId, index) => (
                 <View key={index} style={styles.issueItem}>
-                  <MaterialCommunityIcons name="circle-small" size={16} color="#EF4444" />
+                  <MaterialCommunityIcons name="circle-small" size={16} color="#FF6B35" />
                   <Text style={styles.issueText}>
                     {issuesLabels[issueId] || issueId}
                   </Text>

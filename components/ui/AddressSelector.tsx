@@ -1,16 +1,16 @@
 import { Colors } from '@/constants/theme';
-import { vietnamProvinces, Province, District, Ward } from '@/data/vietnamAddress';
+import { District, Province, vietnamProvinces, Ward } from '@/data/vietnamAddress';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  StyleSheet,
-  TextInput,
+    FlatList,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface AddressSelectorProps {

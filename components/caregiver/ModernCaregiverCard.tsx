@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   Image,
@@ -64,7 +64,7 @@ export const ModernCaregiverCard: React.FC<CaregiverCardProps> = ({
             </ThemedText>
             {distance && (
               <View style={styles.distanceContainer}>
-                <Ionicons name="location" size={12} color="#FF6B6B" />
+                <Ionicons name="location" size={12} color="#FF6B35" />
                 <ThemedText style={styles.distance}>{distance}</ThemedText>
               </View>
             )}
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   distance: {
     fontSize: 11,
-    color: '#FF6B6B',
+    color: '#FF6B35',
     marginLeft: 2,
     fontWeight: '500',
   },
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   specializationText: {
     fontSize: 11,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   actionContainer: {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   bookButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B35',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,

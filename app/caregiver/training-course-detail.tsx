@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getCurrentLesson, getFirstIncompleteLesson, isLessonCompleted } from "@/data/trainingStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -133,7 +133,7 @@ export default function TrainingCourseDetail() {
       >
         {/* Hero Section with Gradient */}
         <LinearGradient
-          colors={["#6366F1", "#10B981"]}
+          colors={["#6366F1", "#FFA07A"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.heroSection}
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   enrollButton: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#FF6B35",
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: "center",

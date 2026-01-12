@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   callStatus: {
     fontSize: 14,
-    color: "#68C2E8",
+    color: "#FF6B35",
     marginTop: 8,
   },
   cameraView: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     borderWidth: 2,
-    borderColor: "#68C2E8",
+    borderColor: "#FF6B35",
     backgroundColor: "#2a2a2a",
     zIndex: 10,
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   permissionButton: {
-    backgroundColor: "#68C2E8",
+    backgroundColor: "#FF6B35",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

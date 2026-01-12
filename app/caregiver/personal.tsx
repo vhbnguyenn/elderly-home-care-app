@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -221,7 +221,7 @@ export default function PersonalScreen() {
                     <MaterialCommunityIcons 
                       name={item.icon as any} 
                       size={24} 
-                      color={item.isRed ? "#EF4444" : "#6B7280"} 
+                      color={item.isRed ? "#FF6B35" : "#6B7280"} 
                     />
                   </View>
                   <View style={styles.menuTextContainer}>
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#3B82F6",
+    color: "#FF6B35",
     marginBottom: 4,
   },
   statLabel: {
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   menuTitleRed: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   menuSubtitle: {
     fontSize: 13,
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#DC2626",
+    color: "#E85D2A",
   },
   menuArrow: {
     fontSize: 24,

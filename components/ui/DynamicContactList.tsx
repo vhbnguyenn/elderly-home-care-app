@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     StyleSheet,
@@ -67,7 +67,7 @@ export function DynamicContactList({
         <ThemedText style={styles.title}>Liên hệ khẩn cấp</ThemedText>
         {contacts.length < maxItems && (
           <TouchableOpacity style={styles.addButton} onPress={addContact}>
-            <Ionicons name="add" size={20} color="#68C2E8" />
+            <Ionicons name="add" size={20} color="#FF6B35" />
           </TouchableOpacity>
         )}
       </View>
@@ -81,7 +81,7 @@ export function DynamicContactList({
                 style={styles.removeButton}
                 onPress={() => removeContact(index)}
               >
-                <Ionicons name="remove" size={20} color="#dc3545" />
+                <Ionicons name="remove" size={20} color="#FF6B35" />
               </TouchableOpacity>
             </View>
 
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   contactsContainer: {
     gap: 16,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   contactNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   removeButton: {
     width: 28,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#dc3545',
+    borderColor: '#FF6B35',
   },
   inputGroup: {
     marginBottom: 12,
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 2,
   },
   textInput: {
@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   checkboxActive: {
-    backgroundColor: '#68C2E8',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   useMyPhoneText: {
     fontSize: 14,

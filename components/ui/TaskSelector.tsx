@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Modal,
@@ -205,7 +205,7 @@ export function TaskSelector({
         style={styles.addButton}
         onPress={handleOpenAddModal}
       >
-        <Ionicons name="add" size={20} color="#4ECDC4" />
+        <Ionicons name="add" size={20} color="#FF8E53" />
         <ThemedText style={styles.addButtonText}>
           Thêm nhiệm vụ cho khung giờ
         </ThemedText>
@@ -237,7 +237,7 @@ export function TaskSelector({
                 style={styles.removeTaskButton}
                 onPress={() => handleRemoveTask(task.id)}
               >
-                <Ionicons name="close-circle" size={20} color="#dc3545" />
+                <Ionicons name="close-circle" size={20} color="#FF6B35" />
               </TouchableOpacity>
             </View>
           ))}
@@ -322,7 +322,7 @@ export function TaskSelector({
                   ]}>
                     {newTask.startTime || 'Chọn giờ bắt đầu'}
                   </ThemedText>
-                  <Ionicons name="time-outline" size={20} color="#4ECDC4" />
+                  <Ionicons name="time-outline" size={20} color="#FF8E53" />
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -379,13 +379,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: 'white',
     marginBottom: 16,
   },
   addButtonText: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
     marginLeft: 8,
   },
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   modalHeader: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 2,
   },
   optionalMark: {
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: 'white',
   },
   timePickerButtonText: {
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
   },
   addTaskButtonDisabled: {

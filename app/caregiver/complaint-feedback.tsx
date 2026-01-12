@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getComplaintFeedback, markComplaintFeedbackSubmitted } from "@/data/appointmentStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -299,7 +299,7 @@ export default function ComplaintFeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#DBEAFE" }]}>
-              <Ionicons name="time-outline" size={24} color="#2563EB" />
+              <Ionicons name="time-outline" size={24} color="#FF6B35" />
             </View>
             <Text style={styles.cardTitle}>Tốc độ phản hồi</Text>
           </View>
@@ -355,7 +355,7 @@ export default function ComplaintFeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#D1FAE5" }]}>
-              <MaterialCommunityIcons name="shield-check" size={24} color="#10B981" />
+              <MaterialCommunityIcons name="shield-check" size={24} color="#FFA07A" />
             </View>
             <Text style={styles.cardTitle}>Tính chuyên nghiệp</Text>
           </View>
@@ -379,7 +379,7 @@ export default function ComplaintFeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#FEF3C7" }]}>
-              <Ionicons name="chatbubble-outline" size={24} color="#F59E0B" />
+              <Ionicons name="chatbubble-outline" size={24} color="#FFA500" />
             </View>
             <Text style={styles.cardTitle}>Tính rõ ràng trong giao tiếp</Text>
           </View>
@@ -403,7 +403,7 @@ export default function ComplaintFeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#DBEAFE" }]}>
-              <MaterialCommunityIcons name="check-circle" size={24} color="#2563EB" />
+              <MaterialCommunityIcons name="check-circle" size={24} color="#FF6B35" />
             </View>
             <Text style={styles.cardTitle}>Chất lượng giải quyết</Text>
           </View>
@@ -491,7 +491,7 @@ export default function ComplaintFeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#D1FAE5" }]}>
-              <MaterialCommunityIcons name="check-circle" size={24} color="#10B981" />
+              <MaterialCommunityIcons name="check-circle" size={24} color="#FFA07A" />
             </View>
             <Text style={styles.cardTitle}>Mức độ hài lòng tổng thể</Text>
           </View>
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   radioButtonSelected: {
-    borderColor: "#2563EB",
+    borderColor: "#FF6B35",
   },
   radioButtonDisabled: {
     opacity: 0.6,
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#FF6B35",
   },
   radioLabel: {
     fontSize: 14,
@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { updateAppointmentStatus } from "@/data/appointmentStore";
 import React, { useState } from "react";
@@ -436,7 +436,7 @@ export default function AvailabilityModal({
               <MaterialCommunityIcons
                 name="bell-ring"
                 size={24}
-                color="#EF4444"
+                color="#FF6B35"
               />
               <Text style={styles.modalTitle}>Thiết lập lịch rảnh</Text>
             </View>
@@ -492,7 +492,7 @@ export default function AvailabilityModal({
                         <MaterialCommunityIcons
                           name="check"
                           size={20}
-                          color="#3B82F6"
+                          color="#FF6B35"
                         />
                       )}
                     </TouchableOpacity>
@@ -623,7 +623,7 @@ export default function AvailabilityModal({
                           <MaterialCommunityIcons
                             name="close-circle"
                             size={20}
-                            color="#EF4444"
+                            color="#FF6B35"
                           />
                         </TouchableOpacity>
                       )}
@@ -654,7 +654,7 @@ export default function AvailabilityModal({
                     <MaterialCommunityIcons
                       name="plus"
                       size={20}
-                      color="#3B82F6"
+                      color="#FF6B35"
                     />
                     <Text style={styles.addButtonText}>Thêm khung giờ</Text>
                   </TouchableOpacity>
@@ -664,7 +664,7 @@ export default function AvailabilityModal({
               {/* Info for busy mode */}
               {isBusy && (
                 <View style={styles.busyInfoBox}>
-                  <MaterialCommunityIcons name="information" size={20} color="#F59E0B" />
+                  <MaterialCommunityIcons name="information" size={20} color="#FFA500" />
                   <Text style={styles.busyInfoText}>
                     Bạn sẽ đánh dấu các ngày đã chọn là bận cả ngày. Nếu có lịch hẹn trong các ngày này, bạn sẽ được hỏi xác nhận trước khi hủy.
                   </Text>
@@ -711,7 +711,7 @@ export default function AvailabilityModal({
                       onPress={() => setEndDate(null)}
                       style={{ padding: 4 }}
                     >
-                      <Text style={{ color: "#EF4444", fontSize: 14, fontWeight: "600" }}>
+                      <Text style={{ color: "#FF6B35", fontSize: 14, fontWeight: "600" }}>
                         Xóa
                       </Text>
                     </TouchableOpacity>
@@ -849,8 +849,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   dayButtonSelected: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
+    backgroundColor: "#FF6B35",
+    borderColor: "#FF6B35",
   },
   dayButtonText: {
     fontSize: 14,
@@ -909,7 +909,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#3B82F6",
+    color: "#FF6B35",
   },
   dateInput: {
     flexDirection: "row",
@@ -937,7 +937,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#FF6B35",
     paddingVertical: 14,
     borderRadius: 8,
     gap: 8,
@@ -986,12 +986,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   checkboxChecked: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
+    backgroundColor: "#FF6B35",
+    borderColor: "#FF6B35",
   },
   checkboxCheckedBusy: {
-    backgroundColor: "#EF4444",
-    borderColor: "#EF4444",
+    backgroundColor: "#FF6B35",
+    borderColor: "#FF6B35",
   },
   busyInfoBox: {
     flexDirection: "row",

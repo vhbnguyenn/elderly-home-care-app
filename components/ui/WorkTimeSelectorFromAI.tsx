@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+﻿import React, { useCallback, useState } from 'react';
 import {
     StyleSheet,
     TouchableOpacity,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   requiredMark: {
-    color: '#dc3545',
+    color: '#FF6B35',
     fontSize: 16,
     marginLeft: 2,
   },
@@ -504,8 +504,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   dayButtonSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   dayButtonText: {
     fontSize: 14,
@@ -529,8 +529,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   timeSlotButtonSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   timeSlotButtonText: {
     fontSize: 14,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   },
   selectedRangeText: {
     fontSize: 13,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   timeSlotText: {
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#28A745',
+    backgroundColor: '#FFA07A',
     alignItems: 'center',
   },
   confirmButtonDisabled: {
@@ -837,7 +837,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 16,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   previewTitle: {
     fontSize: 14,
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
   },
   previewValue: {
     fontSize: 13,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
     flex: 1,
   },

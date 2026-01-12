@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -14,7 +14,7 @@ export const AddElderlyDemo: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.iconContainer}>
-          <Ionicons name="person-add" size={48} color="#4ECDC4" />
+          <Ionicons name="person-add" size={48} color="#FF8E53" />
         </View>
         
         <ThemedText style={styles.title}>Tạo hồ sơ người già</ThemedText>
@@ -24,19 +24,19 @@ export const AddElderlyDemo: React.FC = () => {
         
         <View style={styles.features}>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+            <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
             <ThemedText style={styles.featureText}>7 bước tạo hồ sơ</ThemedText>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+            <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
             <ThemedText style={styles.featureText}>Xem trước trước khi lưu</ThemedText>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+            <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
             <ThemedText style={styles.featureText}>Thông báo đẹp mắt</ThemedText>
           </View>
           <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+            <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
             <ThemedText style={styles.featureText}>Validation thông minh</ThemedText>
           </View>
         </View>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,

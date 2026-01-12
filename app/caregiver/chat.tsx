@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -341,11 +341,11 @@ const styles = StyleSheet.create({
   },
   chatHeaderStatus: {
     fontSize: 13,
-    color: "#10B981",
+    color: "#FFA07A",
   },
   
   header: {
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userMessageBubble: {
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
     borderBottomRightRadius: 4,
   },
   caregiverMessageBubble: {
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sendButtonActive: {
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
   },
   sendButtonInactive: {
     backgroundColor: "#e9ecef",

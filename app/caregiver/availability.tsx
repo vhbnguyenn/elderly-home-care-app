@@ -1,4 +1,4 @@
-
+﻿
 // AvailabilityScreen.js
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import AvailabilityModal from "@/components/schedule/AvailabilityModal";
@@ -434,7 +434,7 @@ export default function AvailabilityScreen() {
           {availabilityForSelectedDate && (
             <View style={styles.availabilityInfo}>
               <View style={styles.availabilityHeader}>
-                <MaterialCommunityIcons name="clock-check-outline" size={20} color="#10B981" />
+                <MaterialCommunityIcons name="clock-check-outline" size={20} color="#FFA07A" />
                 <Text style={styles.availabilityHeaderText}>
                   {availabilityForSelectedDate.isFullDay ? "Rảnh cả ngày" : "Khung giờ rảnh"}
                 </Text>
@@ -463,14 +463,14 @@ export default function AvailabilityScreen() {
               // Determine card border color based on status
               const getStatusBorderColor = () => {
                 switch (currentStatus) {
-                  case "new": return "#3B82F6"; // Blue
-                  case "pending": return "#F59E0B"; // Orange
-                  case "confirmed": return "#10B981"; // Green
-                  case "in-progress": return "#8B5CF6"; // Purple
+                  case "new": return "#FF6B35"; // Blue
+                  case "pending": return "#FFA500"; // Orange
+                  case "confirmed": return "#FFA07A"; // Green
+                  case "in-progress": return "#FF8E53"; // Purple
                   case "completed": return "#6B7280"; // Gray
-                  case "cancelled": return "#EF4444"; // Red
-                  case "rejected": return "#DC2626"; // Dark Red
-                  default: return "#10B981";
+                  case "cancelled": return "#FF6B35"; // Red
+                  case "rejected": return "#E85D2A"; // Dark Red
+                  default: return "#FFA07A";
                 }
               };
               
@@ -502,12 +502,12 @@ export default function AvailabilityScreen() {
                       </View>
 
                       <View style={styles.scheduleAddressRow}>
-                        <MaterialCommunityIcons name="map-marker" size={16} color="#EF4444" />
+                        <MaterialCommunityIcons name="map-marker" size={16} color="#FF6B35" />
                         <Text style={styles.scheduleAddress}>{item.address}</Text>
                       </View>
 
                       <View style={styles.schedulePriceRow}>
-                        <MaterialCommunityIcons name="cash" size={16} color="#F59E0B" />
+                        <MaterialCommunityIcons name="cash" size={16} color="#FFA500" />
                         <Text style={styles.schedulePrice}>{item.price}</Text>
                       </View>
                     </View>
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
 
   // Schedule Section
@@ -834,7 +834,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: "#10B981",
+    borderLeftColor: "#FFA07A",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -910,7 +910,7 @@ const styles = StyleSheet.create({
   schedulePrice: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#F59E0B",
+    color: "#FFA500",
   },
 
   // Empty State
@@ -943,7 +943,7 @@ const styles = StyleSheet.create({
   availabilityHeaderText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#10B981",
+    color: "#FFA07A",
   },
   availabilityTimeSlots: {
     flexDirection: "row",

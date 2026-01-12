@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   requiredStar: {
-    color: '#EF4444',
+    color: '#FF6B35',
   },
   inputWrapper: {
     position: 'relative',
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   aiBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 10,

@@ -356,7 +356,7 @@ export default function ReviewsScreen() {
     <TouchableOpacity style={styles.reviewCard} onPress={() => handleItemPress(item)}>
       <View style={styles.reviewHeader}>
         <View style={styles.systemInfo}>
-          <Ionicons name="settings" size={24} color="#30A0E0" />
+          <Ionicons name="settings" size={24} color="#FF8E53" />
           <View style={styles.systemDetails}>
             <ThemedText style={styles.systemCategory}>{getCategoryText(item.category)}</ThemedText>
             <ThemedText style={styles.systemDate}>{item.date}</ThemedText>
@@ -446,7 +446,7 @@ export default function ReviewsScreen() {
         {item.type === 'system' && (
           <View style={styles.systemInfo}>
             <View style={styles.systemIcon}>
-              <Ionicons name="settings" size={24} color="#30A0E0" />
+              <Ionicons name="settings" size={24} color="#FF8E53" />
             </View>
             <View style={styles.systemDetails}>
               <ThemedText style={styles.systemTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
@@ -529,7 +529,7 @@ export default function ReviewsScreen() {
             <Ionicons 
               name="videocam" 
               size={16} 
-              color={activeTab === 'video' ? '#30A0E0' : '#6c757d'} 
+              color={activeTab === 'video' ? '#FF8E53' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'video' && styles.tabTextActive]}>
               Video tÆ° váº¥n ({videoReviews.length})
@@ -543,7 +543,7 @@ export default function ReviewsScreen() {
             <Ionicons 
               name="medical" 
               size={16} 
-              color={activeTab === 'service' ? '#30A0E0' : '#6c757d'} 
+              color={activeTab === 'service' ? '#FF8E53' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'service' && styles.tabTextActive]}>
               Dá»‹ch vá»¥ ({serviceReviews.length})
@@ -557,7 +557,7 @@ export default function ReviewsScreen() {
             <Ionicons 
               name="settings" 
               size={16} 
-              color={activeTab === 'system' ? '#30A0E0' : '#6c757d'} 
+              color={activeTab === 'system' ? '#FF8E53' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'system' && styles.tabTextActive]}>
               Há»‡ thá»‘ng ({systemReviews.length})
@@ -571,7 +571,7 @@ export default function ReviewsScreen() {
             <Ionicons 
               name="warning" 
               size={16} 
-              color={activeTab === 'complaint' ? '#30A0E0' : '#6c757d'} 
+              color={activeTab === 'complaint' ? '#FF8E53' : '#6c757d'} 
             />
             <ThemedText style={[styles.tabText, activeTab === 'complaint' && styles.tabTextActive]}>
               Khiáº¿u náº¡i ({complaintReviews.length})
@@ -708,7 +708,7 @@ export default function ReviewsScreen() {
               {selectedReviewItem?.type === 'system' && (
                 <View style={styles.itemInfo}>
                   <View style={styles.itemIcon}>
-                    <Ionicons name="settings" size={24} color="#30A0E0" />
+                    <Ionicons name="settings" size={24} color="#FF8E53" />
                   </View>
                   <View style={styles.itemDetails}>
                     <ThemedText style={styles.itemTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
@@ -765,7 +765,7 @@ export default function ReviewsScreen() {
                 style={styles.addImageButton}
                 onPress={handleImagePicker}
               >
-                <Ionicons name="camera-outline" size={20} color="#30A0E0" />
+                <Ionicons name="camera-outline" size={20} color="#FF8E53" />
                 <ThemedText style={styles.addImageButtonText}>Chá»n áº£nh hoáº·c chá»¥p áº£nh</ThemedText>
               </TouchableOpacity>
               
@@ -941,7 +941,7 @@ export default function ReviewsScreen() {
                   <View style={styles.detailSection}>
                     <View style={styles.detailHeader}>
                       <View style={styles.detailIcon}>
-                        <Ionicons name="settings" size={24} color="#30A0E0" />
+                        <Ionicons name="settings" size={24} color="#FF8E53" />
                       </View>
                       <View style={styles.detailInfo}>
                         <ThemedText style={styles.detailTitle}>ÄÃ¡nh giÃ¡ há»‡ thá»‘ng</ThemedText>
@@ -1278,7 +1278,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabActive: {
-    borderBottomColor: '#30A0E0',
+    borderBottomColor: '#FF8E53',
   },
   tabText: {
     fontSize: 14,
@@ -1342,7 +1342,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   tabTextActive: {
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   // Sub Tabs Styles
@@ -1365,8 +1365,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   subTabActive: {
-    backgroundColor: '#30A0E0',
-    borderColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   subTabText: {
     fontSize: 14,
@@ -1409,7 +1409,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -1482,7 +1482,7 @@ const styles = StyleSheet.create({
   // New styles for different review types
   videoDuration: {
     fontSize: 12,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   serviceStats: {
@@ -1546,7 +1546,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
@@ -1580,7 +1580,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
@@ -1759,7 +1759,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   reviewButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -1847,7 +1847,7 @@ const styles = StyleSheet.create({
   },
   itemSubtitle: {
     fontSize: 14,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
     marginBottom: 2,
   },
@@ -1880,7 +1880,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 16,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   // Comment Styles
@@ -1934,7 +1934,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: 16,
@@ -1944,7 +1944,7 @@ const styles = StyleSheet.create({
   addImageButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#30A0E0',
+    color: '#FF8E53',
   },
   imageListContainer: {
     flexDirection: 'row',
@@ -1974,7 +1974,7 @@ const styles = StyleSheet.create({
   },
   // Submit Button Styles
   submitButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -2033,7 +2033,7 @@ const styles = StyleSheet.create({
   },
   detailSubtitle: {
     fontSize: 16,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
     marginBottom: 4,
   },
@@ -2101,7 +2101,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#30A0E0',
+    color: '#FF8E53',
     marginBottom: 4,
   },
   statLabel: {
@@ -2147,7 +2147,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#FFB84D',
   },
   feedbackText: {
     fontSize: 14,
@@ -2178,7 +2178,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -2236,7 +2236,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#28a745',
+    borderLeftColor: '#FFA07A',
   },
   decisionStatus: {
     marginBottom: 8,
@@ -2304,8 +2304,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmationButtonPrimary: {
-    backgroundColor: '#30A0E0',
-    borderColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   confirmationButtonText: {
     fontSize: 16,

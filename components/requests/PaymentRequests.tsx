@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { PaymentRequest } from '@/types/request';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -13,6 +13,8 @@ const PUBLIC_ENDPOINTS = [
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
   '/api/auth/refresh-token',
+  '/api/caregivers',
+  '/api/match/caregivers',
   // Also match without /api prefix for flexibility
   '/auth/login',
   '/auth/register',

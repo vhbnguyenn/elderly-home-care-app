@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
@@ -63,7 +63,7 @@ export default function EmergencyContactsScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.infoBox}>
-          <Ionicons name="information-circle" size={20} color="#68C2E8" />
+          <Ionicons name="information-circle" size={20} color="#FF6B35" />
           <ThemedText style={styles.infoText}>
             Thêm các liên hệ khẩn cấp để được hỗ trợ kịp thời khi cần thiết
           </ThemedText>
@@ -153,13 +153,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingVertical: 16,
     borderRadius: 12,
     marginTop: 24,
     gap: 8,
     elevation: 2,
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

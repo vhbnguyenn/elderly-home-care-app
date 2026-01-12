@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 import { AddressSelector } from './AddressSelector';
 
@@ -27,7 +27,7 @@ export const AddressPicker: React.FC<AddressPickerProps> = ({
         </Text>
         {showStreetHint && (
           <View style={styles.hintBanner}>
-            <Ionicons name="information-circle" size={16} color="#3B82F6" />
+            <Ionicons name="information-circle" size={16} color="#FF6B35" />
             <Text style={styles.hintText}>
               Nhập địa chỉ và chọn từ danh sách gợi ý
             </Text>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   required: {
-    color: '#EF4444',
+    color: '#FF6B35',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   hintText: {
     flex: 1,
     fontSize: 12,
-    color: '#3B82F6',
+    color: '#FF6B35',
     lineHeight: 16,
   },
 });

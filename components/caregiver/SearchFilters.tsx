@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     ScrollView,
@@ -34,7 +34,7 @@ export function SearchFilters({ filters, selectedFilter, onFilterChange }: Searc
       <Ionicons
         name={filter.icon as any}
         size={16}
-        color={selectedFilter === filter.id ? 'white' : '#667eea'}
+        color={selectedFilter === filter.id ? 'white' : '#FF6B35'}
       />
       <ThemedText
         style={[
@@ -78,17 +78,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#667eea',
+    borderColor: '#FF6B35',
     backgroundColor: 'white',
     gap: 6,
   },
   filterButtonActive: {
-    backgroundColor: '#667eea',
-    borderColor: '#667eea',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   filterButtonText: {
     fontSize: 14,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   filterButtonTextActive: {

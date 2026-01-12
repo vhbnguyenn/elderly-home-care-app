@@ -1,22 +1,22 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  useErrorNotification,
-  useSuccessNotification,
+    useErrorNotification,
+    useSuccessNotification,
 } from "@/contexts/NotificationContext";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function LoginScreen() {
@@ -87,8 +87,8 @@ export default function LoginScreen() {
           console.log("➡️ Navigating to /caregiver");
           router.replace("/caregiver");
         } else {
-          console.log("➡️ Navigating to /careseeker/(tabs)/dashboard");
-          router.replace("/careseeker/(tabs)/dashboard");
+          console.log("➡️ Navigating to /careseeker/(tabs)/appointments");
+          router.replace("/careseeker/(tabs)/appointments");
         }
       }, 500);
     } catch (error: any) {

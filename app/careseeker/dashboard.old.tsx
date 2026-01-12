@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -428,7 +428,7 @@ export default function DashboardScreen() {
             {/* App Info */}
             <View style={styles.appInfoSection}>
               <View style={styles.appInfoLogo}>
-                <Ionicons name="heart" size={32} color="#68C2E8" />
+                <Ionicons name="heart" size={32} color="#FF6B35" />
               </View>
               <ThemedText style={styles.appInfoTitle}>
                 Elder Care Connect
@@ -441,17 +441,17 @@ export default function DashboardScreen() {
             {/* Quick Stats */}
             <View style={styles.appInfoStatsSection}>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="people" size={24} color="#68C2E8" />
+                <Ionicons name="people" size={24} color="#FF6B35" />
                 <ThemedText style={styles.appInfoStatNumber}>1000+</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>Người chăm sóc</ThemedText>
               </View>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="home" size={24} color="#68C2E8" />
+                <Ionicons name="home" size={24} color="#FF6B35" />
                 <ThemedText style={styles.appInfoStatNumber}>500+</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>Gia đình</ThemedText>
               </View>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="star" size={24} color="#68C2E8" />
+                <Ionicons name="star" size={24} color="#FF6B35" />
                 <ThemedText style={styles.appInfoStatNumber}>4.9</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>Đánh giá</ThemedText>
               </View>
@@ -510,7 +510,7 @@ export default function DashboardScreen() {
           >
             <View style={styles.modalHeader}>
               <View style={styles.modalAvatar}>
-                <Ionicons name="person" size={40} color="#68C2E8" />
+                <Ionicons name="person" size={40} color="#FF6B35" />
               </View>
               <ThemedText style={styles.modalName}>
                 {user?.name || 'Người dùng'}
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   },
   // Header - bTaskee Style
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 30,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   // Appointment Section
   appointmentSection: {
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   viewMoreText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   footer: {
     backgroundColor: '#2c3e50',
@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     fontSize: 12,
-    color: '#68C2E8',
+    color: '#FF6B35',
     textDecorationLine: 'underline',
   },
   modalOverlay: {
@@ -878,7 +878,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
     borderWidth: 3,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   modalName: {
     fontSize: 20,
@@ -980,7 +980,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   bannerContent: {
     flex: 1,
@@ -1001,7 +1001,7 @@ const styles = StyleSheet.create({
   },
   // Duplicate styles - removed
   // findNowButton: {
-  //   backgroundColor: '#68C2E8',
+  //   backgroundColor: '#FF6B35',
   //   borderRadius: 12,
   //   paddingVertical: 12,
   //   paddingHorizontal: 20,
@@ -1010,7 +1010,7 @@ const styles = StyleSheet.create({
   //   justifyContent: 'center',
   //   alignSelf: 'flex-start',
   //   elevation: 2,
-  //   shadowColor: '#68C2E8',
+  //   shadowColor: '#FF6B35',
   //   shadowOffset: { width: 0, height: 2 },
   //   shadowOpacity: 0.3,
   //   shadowRadius: 4,
@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   appInfoCloseButton: {
     width: 40,
@@ -1063,7 +1063,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -1134,7 +1134,7 @@ const styles = StyleSheet.create({
   },
   appInfoLink: {
     fontSize: 12,
-    color: '#68C2E8',
+    color: '#FF6B35',
     textDecorationLine: 'underline',
   },
 });

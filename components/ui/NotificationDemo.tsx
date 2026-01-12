@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -120,19 +120,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   successButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
   },
   errorButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#FF6B35',
   },
   warningButton: {
-    backgroundColor: '#ffc107',
+    backgroundColor: '#FFB84D',
   },
   infoButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
   },
   primaryButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#FF6B35',
   },
 });
 

@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { ComplaintFormData, ComplaintService, ComplaintType } from '@/types/complaint';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -206,7 +206,7 @@ export default function CreateComplaintScreen() {
           </View>
           <View style={styles.accusedInfo}>
             <View style={styles.accusedCard}>
-              <Ionicons name="person" size={20} color="#FF6B6B" />
+              <Ionicons name="person" size={20} color="#FF6B35" />
               <View style={styles.accusedDetails}>
                 <ThemedText style={styles.accusedName}>
                   {getSelectedAccused()?.name || 'Chưa chọn'}
@@ -284,7 +284,7 @@ export default function CreateComplaintScreen() {
             style={styles.addEvidenceButton}
             onPress={handleAddEvidence}
           >
-            <Ionicons name="add" size={20} color="#4ECDC4" />
+            <Ionicons name="add" size={20} color="#FF8E53" />
             <ThemedText style={styles.addEvidenceText}>Thêm bằng chứng</ThemedText>
           </TouchableOpacity>
 
@@ -365,7 +365,7 @@ export default function CreateComplaintScreen() {
                     {type.label}
                   </ThemedText>
                   {formData.type === type.value && (
-                    <Ionicons name="checkmark" size={20} color="#4ECDC4" />
+                    <Ionicons name="checkmark" size={20} color="#FF8E53" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     borderStyle: 'dashed',
     borderRadius: 8,
     marginBottom: 16,
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   addEvidenceText: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   evidenceList: {
@@ -624,6 +624,6 @@ const styles = StyleSheet.create({
   },
   typeTextSelected: {
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
 });

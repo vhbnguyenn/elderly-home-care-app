@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import React, { useRef, useState } from 'react';
 import {
     Modal,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     fontSize: 16,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   pickerRow: {
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 50,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     opacity: 0.1,
     borderRadius: 8,
     zIndex: 1,
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   pickerItemTextSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   pickerItemTextDisabled: {
@@ -424,6 +424,6 @@ const styles = StyleSheet.create({
   previewText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
 });

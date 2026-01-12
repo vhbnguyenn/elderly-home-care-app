@@ -1,21 +1,21 @@
-import { Ionicons } from "@expo/vector-icons";
+﻿import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  useErrorNotification,
-  useSuccessNotification,
+    useErrorNotification,
+    useSuccessNotification,
 } from "@/contexts/NotificationContext";
 import { AuthService } from "@/services/auth.service";
 
@@ -254,7 +254,7 @@ export default function RegisterScreen() {
           <View style={styles.formCard}>
             {/* Email Input */}
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Email *</ThemedText>
+              <ThemedText style={styles.label}>Email <ThemedText style={styles.required}>*</ThemedText></ThemedText>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="mail-outline"
@@ -282,7 +282,7 @@ export default function RegisterScreen() {
               </View>
               {emailError ? (
                 <View style={styles.helperContainer}>
-                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <Ionicons name="alert-circle" size={14} color="#FF6B35" />
                   <ThemedText style={styles.errorHelperText}>
                     {emailError}
                   </ThemedText>
@@ -299,7 +299,7 @@ export default function RegisterScreen() {
 
             {/* Password Input */}
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Mật khẩu *</ThemedText>
+              <ThemedText style={styles.label}>Mật khẩu <ThemedText style={styles.required}>*</ThemedText></ThemedText>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="lock-closed-outline"
@@ -333,7 +333,7 @@ export default function RegisterScreen() {
               </View>
               {passwordError ? (
                 <View style={styles.helperContainer}>
-                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <Ionicons name="alert-circle" size={14} color="#FF6B35" />
                   <ThemedText style={styles.errorHelperText}>
                     {passwordError}
                   </ThemedText>
@@ -350,7 +350,7 @@ export default function RegisterScreen() {
 
             {/* Confirm Password Input */}
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Xác nhận mật khẩu *</ThemedText>
+              <ThemedText style={styles.label}>Xác nhận mật khẩu <ThemedText style={styles.required}>*</ThemedText></ThemedText>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="lock-closed-outline"
@@ -386,7 +386,7 @@ export default function RegisterScreen() {
               </View>
               {confirmPasswordError ? (
                 <View style={styles.helperContainer}>
-                  <Ionicons name="alert-circle" size={14} color="#dc3545" />
+                  <Ionicons name="alert-circle" size={14} color="#FF6B35" />
                   <ThemedText style={styles.errorHelperText}>
                     {confirmPasswordError}
                   </ThemedText>
@@ -403,7 +403,7 @@ export default function RegisterScreen() {
 
             {/* User Type Selection */}
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Bạn là: *</ThemedText>
+              <ThemedText style={styles.label}>Bạn là: <ThemedText style={styles.required}>*</ThemedText></ThemedText>
               <View style={styles.radioGroup}>
                 <TouchableOpacity
                   style={[
@@ -631,6 +631,10 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
+  required: {
+    color: "#FF6B35",
+    fontWeight: "700",
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -665,7 +669,7 @@ const styles = StyleSheet.create({
   },
   errorHelperText: {
     fontSize: 12,
-    color: "#dc3545",
+    color: "#FF6B35",
     flex: 1,
   },
   radioGroup: {

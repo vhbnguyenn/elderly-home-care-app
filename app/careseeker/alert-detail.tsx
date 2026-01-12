@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -115,7 +115,7 @@ export default function AlertDetailScreen() {
       case 'payment': return '#27ae60';
       case 'system': return '#95a5a6';
       case 'urgent': return '#f39c12';
-      default: return '#4ECDC4';
+      default: return '#FF8E53';
     }
   };
 
@@ -125,7 +125,7 @@ export default function AlertDetailScreen() {
       case 'high': return '#f39c12';
       case 'medium': return '#3498db';
       case 'low': return '#95a5a6';
-      default: return '#4ECDC4';
+      default: return '#FF8E53';
     }
   };
 
@@ -341,7 +341,7 @@ export default function AlertDetailScreen() {
               style={styles.elderlyCard}
               onPress={handleViewElderlyProfile}
             >
-              <Ionicons name="person" size={20} color="#4ECDC4" />
+              <Ionicons name="person" size={20} color="#FF8E53" />
               <ThemedText style={styles.elderlyName}>{alert.elderlyName}</ThemedText>
               <Ionicons name="chevron-forward" size={16} color="#6c757d" />
             </TouchableOpacity>
@@ -370,7 +370,7 @@ export default function AlertDetailScreen() {
                 style={styles.secondaryActionButton}
                 onPress={handleCallDoctor}
               >
-                <Ionicons name="call" size={20} color="#4ECDC4" />
+                <Ionicons name="call" size={20} color="#FF8E53" />
                 <ThemedText style={styles.secondaryActionText}>
                   Gọi bác sĩ
                 </ThemedText>
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -568,12 +568,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     gap: 8,
   },
   secondaryActionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
 });

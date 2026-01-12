@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Alert,
     Image,
@@ -8,12 +8,14 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 
-import { SimpleNavBar } from '@/components/navigation/SimpleNavBar';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
+import { profileService, UserProfile } from '@/services/profile.service';
 
 interface MenuItem {
     id: string;
@@ -28,6 +30,113 @@ interface MenuItem {
 export default function ProfileScreen() {
     const { user, logout } = useAuth();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [profileData, setProfileData] = useState<UserProfile | null>(null);
+
+    // Load data on mount
+    useEffect(() => {
+        loadProfileData();
+    }, []);
+
+    const loadProfileData = async () => {
+        try {
+            setIsLoading(true);
+            
+            // Debug: Check authentication state
+            console.log('[Profile] User from context:', user);
+            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+            const token = await AsyncStorage.getItem('auth_token');
+            console.log('[Profile] Token exists:', !!token);
+            
+            if (!token) {
+                console.log('[Profile] ❌ No token found, redirecting to login...');
+                Alert.alert(
+                    'Phiên đăng nhập hết hạn',
+                    'Vui lòng đăng nhập lại',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                logout();
+                                router.replace('/login');
+                            }
+                        }
+                    ]
+                );
+                return;
+            }
+            
+            // Load profile data only
+            const profileRes = await profileService.getMe();
+            setProfileData(profileRes);
+        } catch (error: any) {
+            console.error('[Profile] Load error:', error);
+            
+            // If it's an auth error, show alert and logout
+            if (error.message?.includes('token') || error.message?.includes('authentication')) {
+                Alert.alert(
+                    'Lỗi xác thực',
+                    'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                logout();
+                                router.replace('/login');
+                            }
+                        }
+                    ]
+                );
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUploadAvatar = async () => {
+        try {
+            // Request permission
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Thông báo', 'Cần cấp quyền truy cập thư viện ảnh');
+                return;
+            }
+
+            // Pick image
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+                const asset = result.assets[0];
+                
+                setIsUploadingAvatar(true);
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('avatar', {
+                    uri: asset.uri,
+                    type: 'image/jpeg',
+                    name: 'avatar.jpg',
+                } as any);
+
+                // Upload
+                const updatedProfile = await profileService.updateProfile(formData);
+                
+                setProfileData(updatedProfile);
+                Alert.alert('Thành công', 'Cập nhật ảnh đại diện thành công');
+            }
+        } catch (error: any) {
+            console.error('[Profile] Upload avatar error:', error);
+            Alert.alert('Lỗi', error.message || 'Không thể tải ảnh lên');
+        } finally {
+            setIsUploadingAvatar(false);
+        }
+    };
 
     const handleLogout = () => {
         Alert.alert(
@@ -57,22 +166,21 @@ export default function ProfileScreen() {
                     title: 'Hồ sơ người già',
                     icon: 'people',
                     route: '/careseeker/elderly-list',
-                    badge: 3,
-                    color: '#68C2E8',
+                    color: '#FF6B35',
                 },
                 {
                     id: 'family',
                     title: 'Quản lý gia đình',
                     icon: 'home',
                     route: '/careseeker/family-list',
-                    color: '#8B5CF6',
+                    color: '#FF8E53',
                 },
                 {
                     id: 'hired',
                     title: 'Người chăm sóc đã thuê',
                     icon: 'person-add',
                     route: '/careseeker/hired-caregivers',
-                    color: '#10B981',
+                    color: '#FFA07A',
                 },
             ],
         },
@@ -84,14 +192,14 @@ export default function ProfileScreen() {
                     title: 'Lịch hẹn',
                     icon: 'calendar',
                     route: '/careseeker/appointments',
-                    color: '#3B82F6',
+                    color: '#FF6B35',
                 },
                 {
                     id: 'history',
                     title: 'Lịch sử thuê',
                     icon: 'time',
                     route: '/careseeker/hiring-history',
-                    color: '#F59E0B',
+                    color: '#FFA500',
                 },
                 {
                     id: 'reviews',
@@ -110,7 +218,7 @@ export default function ProfileScreen() {
                     title: 'Khiếu nại',
                     icon: 'alert-circle',
                     route: '/careseeker/complaints',
-                    color: '#EF4444',
+                    color: '#FF6B35',
                 },
                 {
                     id: 'system-info',
@@ -136,7 +244,7 @@ export default function ProfileScreen() {
                     title: 'Đăng xuất',
                     icon: 'log-out',
                     action: handleLogout,
-                    color: '#EF4444',
+                    color: '#FF6B35',
                 },
             ],
         },
@@ -150,54 +258,58 @@ export default function ProfileScreen() {
         }
     };
 
+    // Show loading state
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.container} edges={['top']}>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#FF6B35" />
+                    <ThemedText style={styles.loadingText}>Đang tải...</ThemedText>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    const displayUser = profileData || user;
+
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             {/* Header with Profile Info */}
             <View style={styles.header}>
                 <View style={styles.profileSection}>
                     <View style={styles.avatarContainer}>
-                        {user?.avatar ? (
+                        {displayUser?.avatar ? (
                             <Image
-                                source={{ uri: user.avatar }}
+                                source={{ uri: displayUser.avatar }}
                                 style={styles.avatar}
                             />
                         ) : (
                             <View style={styles.avatarPlaceholder}>
                                 <ThemedText style={styles.avatarText}>
-                                    {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                                    {displayUser?.name?.charAt(0) || displayUser?.email?.charAt(0) || 'U'}
                                 </ThemedText>
                             </View>
                         )}
-                        <TouchableOpacity style={styles.editAvatarButton}>
-                            <Ionicons name="camera" size={16} color="white" />
+                        <TouchableOpacity 
+                            style={styles.editAvatarButton}
+                            onPress={handleUploadAvatar}
+                            disabled={isUploadingAvatar}
+                        >
+                            {isUploadingAvatar ? (
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Ionicons name="camera" size={16} color="white" />
+                            )}
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.userInfo}>
                         <ThemedText style={styles.userName}>
-                            {user?.name || 'Người dùng'}
+                            {displayUser?.name || 'Người dùng'}
                         </ThemedText>
                         <View style={styles.roleBadge}>
                             <ThemedText style={styles.roleText}>Care Seeker</ThemedText>
                         </View>
-                    </View>
-                </View>
-
-                {/* Stats */}
-                <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                        <ThemedText style={styles.statValue}>3</ThemedText>
-                        <ThemedText style={styles.statLabel}>Người già</ThemedText>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                        <ThemedText style={styles.statValue}>2</ThemedText>
-                        <ThemedText style={styles.statLabel}>Đang thuê</ThemedText>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                        <ThemedText style={styles.statValue}>15</ThemedText>
-                        <ThemedText style={styles.statLabel}>Lịch hẹn</ThemedText>
                     </View>
                 </View>
             </View>
@@ -268,8 +380,6 @@ export default function ProfileScreen() {
                     </ThemedText>
                 </View>
             </ScrollView>
-
-            <SimpleNavBar />
         </SafeAreaView>
     );
 }
@@ -310,7 +420,7 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#68C2E8',
+        backgroundColor: '#FF6B35',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -326,7 +436,7 @@ const styles = StyleSheet.create({
         width: 28,
         height: 28,
         borderRadius: 14,
-        backgroundColor: '#68C2E8',
+        backgroundColor: '#FF6B35',
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
@@ -343,7 +453,7 @@ const styles = StyleSheet.create({
     },
     roleBadge: {
         alignSelf: 'flex-start',
-        backgroundColor: '#E0F2FE',
+        backgroundColor: '#FFE5D9',
         paddingHorizontal: 12,
         paddingVertical: 4,
         borderRadius: 12,
@@ -351,33 +461,7 @@ const styles = StyleSheet.create({
     roleText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#0284C7',
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#F8FAFC',
-        borderRadius: 16,
-        padding: 16,
-        alignItems: 'center',
-    },
-    statItem: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    statValue: {
-        fontSize: 24,
-        fontWeight: '700',
-        color: '#12394A',
-        marginBottom: 4,
-    },
-    statLabel: {
-        fontSize: 12,
-        color: '#6B7280',
-    },
-    statDivider: {
-        width: 1,
-        height: 40,
-        backgroundColor: '#E5E7EB',
+        color: '#FF6B35',
     },
     content: {
         flex: 1,
@@ -438,7 +522,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     badge: {
-        backgroundColor: '#EF4444',
+        backgroundColor: '#FF6B35',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 10,
@@ -466,6 +550,17 @@ const styles = StyleSheet.create({
     copyrightText: {
         fontSize: 12,
         color: '#9CA3AF',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F4F9FD',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 14,
+        color: '#6B7280',
     },
 });
 

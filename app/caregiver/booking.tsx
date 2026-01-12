@@ -1,4 +1,4 @@
-import { appointmentsDataMap } from "@/app/caregiver/appointment-detail";
+﻿import { appointmentsDataMap } from "@/app/caregiver/appointment-detail";
 import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { getAppointmentHasComplained, getAppointmentHasReviewed, getAppointmentStatus, subscribeToStatusChanges, updateAppointmentStatus } from "@/data/appointmentStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -559,7 +559,7 @@ export default function BookingManagement() {
         {/* Complaint Warning Badge */}
         {hasComplained && (
           <View style={styles.complaintWarningBadge}>
-            <MaterialCommunityIcons name="alert-circle" size={16} color="#EF4444" />
+            <MaterialCommunityIcons name="alert-circle" size={16} color="#FF6B35" />
             <Text style={styles.complaintWarningText}>Khiếu nại</Text>
           </View>
         )}
@@ -580,7 +580,7 @@ export default function BookingManagement() {
 
         {/* Package Detail */}
         <View style={styles.packageDetail}>
-          <MaterialCommunityIcons name="calendar-clock" size={16} color="#8B5CF6" />
+          <MaterialCommunityIcons name="calendar-clock" size={16} color="#FF8E53" />
           <Text style={styles.packageDetailText}>{item.packageDetail}</Text>
         </View>
 
@@ -622,7 +622,7 @@ export default function BookingManagement() {
             <MaterialCommunityIcons 
               name={isDeadlineExpired ? "clock-alert" : "clock-outline"} 
               size={16} 
-              color={isDeadlineExpired ? "#EF4444" : "#F59E0B"} 
+              color={isDeadlineExpired ? "#FF6B35" : "#FFA500"} 
             />
             <Text style={[
               styles.deadlineDisplayText,
@@ -649,7 +649,7 @@ export default function BookingManagement() {
                 onPress={() => handleReject(item.id)}
                 disabled={isDeadlineExpired}
               >
-                <MaterialCommunityIcons name="close" size={16} color="#EF4444" />
+                <MaterialCommunityIcons name="close" size={16} color="#FF6B35" />
                 <Text style={styles.rejectButtonText}>Từ chối</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -673,7 +673,7 @@ export default function BookingManagement() {
                 style={[styles.actionButton, styles.cancelButton]}
                 onPress={() => handleCancel(item.id, item.date)}
               >
-                <MaterialCommunityIcons name="close" size={16} color="#EF4444" />
+                <MaterialCommunityIcons name="close" size={16} color="#FF6B35" />
                 <Text style={styles.cancelButtonText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -705,14 +705,14 @@ export default function BookingManagement() {
                   style={[styles.actionButton, styles.complaintButton]}
                   onPress={() => handleComplaint(item.id)}
                 >
-                  <MaterialCommunityIcons name={globalHasComplained ? "eye" : "alert-circle"} size={16} color="#EF4444" />
+                  <MaterialCommunityIcons name={globalHasComplained ? "eye" : "alert-circle"} size={16} color="#FF6B35" />
                   <Text style={styles.complaintButtonText}>{globalHasComplained ? "Xem khiếu nại" : "Khiếu nại"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.reviewButton]}
                   onPress={() => handleReview(item.id)}
                 >
-                  <MaterialCommunityIcons name={globalHasReviewed ? "eye" : "star"} size={16} color="#F59E0B" />
+                  <MaterialCommunityIcons name={globalHasReviewed ? "eye" : "star"} size={16} color="#FFA500" />
                   <Text style={styles.reviewButtonText}>{globalHasReviewed ? "Xem đánh giá" : "Đánh giá"}</Text>
                 </TouchableOpacity>
               </>
@@ -873,7 +873,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardWithComplaint: {
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
     borderWidth: 1,
     borderColor: "#FEE2E2",
   },
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     color: "#374151",
   },
   packageTextUrgent: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   packageDetail: {
     flexDirection: "row",
@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
   packageDetailText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#8B5CF6",
+    color: "#FF8E53",
   },
   infoRow: {
     flexDirection: "row",
@@ -991,7 +991,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#10B981",
+    color: "#FFA07A",
   },
   actionButtons: {
     flexDirection: "row",
@@ -1007,7 +1007,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   acceptButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   acceptButtonText: {
     fontSize: 14,
@@ -1017,12 +1017,12 @@ const styles = StyleSheet.create({
   rejectButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   rejectButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   detailButton: {
     backgroundColor: "#1F6FEB",
@@ -1035,32 +1035,32 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   cancelButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   reviewButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#F59E0B",
+    borderColor: "#FFA500",
   },
   reviewButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#F59E0B",
+    color: "#FFA500",
   },
   complaintButton: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   complaintButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   cancelledInfo: {
     flex: 1,
@@ -1089,7 +1089,7 @@ const styles = StyleSheet.create({
   complaintWarningText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#DC2626",
+    color: "#E85D2A",
   },
   deadlineWarning: {
     flexDirection: "row",
@@ -1101,11 +1101,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 6,
     borderLeftWidth: 3,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
   },
   deadlineExpired: {
     backgroundColor: "#FEE2E2",
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
   },
   deadlineText: {
     fontSize: 12,
@@ -1129,11 +1129,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 6,
     borderLeftWidth: 3,
-    borderLeftColor: "#F59E0B",
+    borderLeftColor: "#FFA500",
   },
   deadlineDisplayExpired: {
     backgroundColor: "#FEE2E2",
-    borderLeftColor: "#EF4444",
+    borderLeftColor: "#FF6B35",
   },
   deadlineDisplayText: {
     fontSize: 13,

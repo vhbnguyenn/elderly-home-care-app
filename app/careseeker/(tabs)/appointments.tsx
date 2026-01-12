@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -80,11 +80,11 @@ export default function AppointmentsScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return '#F59E0B';
-      case 'confirmed': return '#3B82F6';
-      case 'in-progress': return '#10B981';
+      case 'pending': return '#FFA500';
+      case 'confirmed': return '#FF6B35';
+      case 'in-progress': return '#FFA07A';
       case 'completed': return '#6B7280';
-      case 'cancelled': return '#EF4444';
+      case 'cancelled': return '#FF6B35';
       default: return '#9CA3AF';
     }
   };

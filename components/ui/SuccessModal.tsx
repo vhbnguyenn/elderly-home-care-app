@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { CustomModal } from './CustomModal';
 
 interface SuccessModalProps {
@@ -24,8 +24,8 @@ export function SuccessModal({
       buttonText={buttonText}
       onPress={onPress}
       iconName="checkmark"
-      iconColor="#4ECDC4"
-      buttonColors={['#4ECDC4', '#44A08D']}
+      iconColor="#FF8E53"
+      buttonColors={['#FF8E53', '#44A08D']}
     />
   );
 }

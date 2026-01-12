@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import {
@@ -19,7 +19,7 @@ const transactionsData = [
     status: "pending", // pending, completed, withdrawn, refunded
     statusText: "Chờ xử lí",
     icon: "timer-sand",
-    iconColor: "#F59E0B",
+    iconColor: "#FFA500",
     iconBg: "#FEF3C7",
     remaining: "18 giờ 30 phút",
   },
@@ -32,7 +32,7 @@ const transactionsData = [
     status: "completed",
     statusText: "Đã vào ví",
     icon: "check-circle",
-    iconColor: "#10B981",
+    iconColor: "#FFA07A",
     iconBg: "#D1FAE5",
   },
   {
@@ -44,7 +44,7 @@ const transactionsData = [
     status: "pending",
     statusText: "Chờ xử lí",
     icon: "timer-sand",
-    iconColor: "#F59E0B",
+    iconColor: "#FFA500",
     iconBg: "#FEF3C7",
     remaining: "10 giờ 15 phút",
   },
@@ -57,7 +57,7 @@ const transactionsData = [
     status: "withdrawn",
     statusText: "Đã rút",
     icon: "bank-transfer-out",
-    iconColor: "#F59E0B",
+    iconColor: "#FFA500",
     iconBg: "#FEF3C7",
   },
   {
@@ -69,7 +69,7 @@ const transactionsData = [
     status: "completed",
     statusText: "Đã vào ví",
     icon: "check-circle",
-    iconColor: "#10B981",
+    iconColor: "#FFA07A",
     iconBg: "#D1FAE5",
   },
   {
@@ -81,7 +81,7 @@ const transactionsData = [
     status: "pending",
     statusText: "Chờ xử lí",
     icon: "timer-sand",
-    iconColor: "#F59E0B",
+    iconColor: "#FFA500",
     iconBg: "#FEF3C7",
     remaining: "20 giờ 45 phút",
   },
@@ -94,7 +94,7 @@ const transactionsData = [
     status: "completed",
     statusText: "Đã vào ví",
     icon: "check-circle",
-    iconColor: "#10B981",
+    iconColor: "#FFA07A",
     iconBg: "#D1FAE5",
   },
   {
@@ -106,7 +106,7 @@ const transactionsData = [
     status: "refunded",
     statusText: "Hoàn tiền",
     icon: "close-circle",
-    iconColor: "#EF4444",
+    iconColor: "#FF6B35",
     iconBg: "#FEE2E2",
   },
 ];
@@ -186,7 +186,7 @@ export default function PaymentScreen() {
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <View style={styles.balanceHeader}>
-            <MaterialCommunityIcons name="wallet" size={20} color="#F59E0B" />
+            <MaterialCommunityIcons name="wallet" size={20} color="#FFA500" />
             <Text style={styles.balanceLabel}>Tổng số dư</Text>
           </View>
           <Text style={styles.balanceAmount}>{formatCurrency(totalBalance)}</Text>
@@ -194,7 +194,7 @@ export default function PaymentScreen() {
           <View style={styles.balanceDetails}>
             <View style={styles.balanceDetailItem}>
               <View style={styles.balanceDetailIcon}>
-                <MaterialCommunityIcons name="circle" size={12} color="#10B981" />
+                <MaterialCommunityIcons name="circle" size={12} color="#FFA07A" />
               </View>
               <View>
                 <Text style={styles.balanceDetailLabel}>Khả dụng</Text>
@@ -204,7 +204,7 @@ export default function PaymentScreen() {
             
             <View style={styles.balanceDetailItem}>
               <View style={styles.balanceDetailIcon}>
-                <MaterialCommunityIcons name="timer-sand" size={12} color="#F59E0B" />
+                <MaterialCommunityIcons name="timer-sand" size={12} color="#FFA500" />
               </View>
               <View>
                 <Text style={styles.balanceDetailLabel}>Chờ xử lí</Text>
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
   remainingText: {
     fontSize: 11,
-    color: "#DC2626",
+    color: "#E85D2A",
     fontWeight: "500",
   },
   transactionRight: {
@@ -435,10 +435,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   amountPositive: {
-    color: "#10B981",
+    color: "#FFA07A",
   },
   amountNegative: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   transactionStatus: {
     fontSize: 12,
@@ -448,13 +448,13 @@ const styles = StyleSheet.create({
     color: "#64748B",
   },
   statusPending: {
-    color: "#F59E0B",
+    color: "#FFA500",
   },
   statusWithdrawn: {
     color: "#64748B",
   },
   statusRefunded: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   emptyState: {
     alignItems: "center",

@@ -1,4 +1,4 @@
-import { ThemedText } from "@/components/themed-text";
+﻿import { ThemedText } from "@/components/themed-text";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -161,7 +161,7 @@ export default function VideoQualityReviewScreen() {
                 <View style={styles.header}>
                     <View style={styles.headerIcon}>
                         <LinearGradient
-                            colors={["#4ECDC4", "#44A08D"]}
+                            colors={["#FF8E53", "#44A08D"]}
                             style={styles.iconGradient}
                         >
                             <MaterialCommunityIcons
@@ -456,7 +456,7 @@ export default function VideoQualityReviewScreen() {
                     activeOpacity={0.8}
                 >
                     <LinearGradient
-                        colors={["#68C2E8", "#44A08D"]}
+                        colors={["#FF6B35", "#44A08D"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={styles.submitButtonGradient}

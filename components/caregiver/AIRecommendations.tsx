@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     Dimensions,
@@ -50,7 +50,7 @@ export function AIRecommendations({
       <View style={styles.loadingContainer}>
         <View style={styles.loadingContent}>
           <View style={styles.loadingSpinner}>
-            <Ionicons name="refresh" size={32} color="#4ECDC4" />
+            <Ionicons name="refresh" size={32} color="#FF8E53" />
           </View>
           <ThemedText style={styles.loadingTitle}>AI đang phân tích...</ThemedText>
           <ThemedText style={styles.loadingSubtitle}>
@@ -80,7 +80,7 @@ export function AIRecommendations({
       {/* AI Header */}
       <View style={styles.aiHeader}>
         <View style={styles.aiIconContainer}>
-          <Ionicons name="sparkles" size={24} color="#4ECDC4" />
+          <Ionicons name="sparkles" size={24} color="#FF8E53" />
         </View>
         <View style={styles.aiContent}>
           <ThemedText style={styles.aiTitle}>AI Gợi ý</ThemedText>
@@ -93,15 +93,15 @@ export function AIRecommendations({
       {/* Match Score Info */}
       <View style={styles.matchInfo}>
         <View style={styles.matchItem}>
-          <Ionicons name="checkmark-circle" size={16} color="#28a745" />
+          <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
           <ThemedText style={styles.matchText}>Kỹ năng phù hợp</ThemedText>
         </View>
         <View style={styles.matchItem}>
-          <Ionicons name="location" size={16} color="#28a745" />
+          <Ionicons name="location" size={16} color="#FFA07A" />
           <ThemedText style={styles.matchText}>Gần nhà</ThemedText>
         </View>
         <View style={styles.matchItem}>
-          <Ionicons name="time" size={16} color="#28a745" />
+          <Ionicons name="time" size={16} color="#FFA07A" />
           <ThemedText style={styles.matchText}>Linh hoạt</ThemedText>
         </View>
       </View>
@@ -114,7 +114,7 @@ export function AIRecommendations({
             <View key={recommendation.caregiver_id} style={styles.recommendationItem}>
               {/* Match Score Badge */}
               <View style={styles.matchScoreBadge}>
-                <Ionicons name="star" size={12} color="#ffc107" />
+                <Ionicons name="star" size={12} color="#FFB84D" />
                 <ThemedText style={styles.matchScoreText}>
                   {recommendation.match_percentage} phù hợp
                 </ThemedText>
@@ -134,7 +134,7 @@ export function AIRecommendations({
       {/* AI Explanation */}
       <View style={styles.explanationContainer}>
         <View style={styles.explanationHeader}>
-          <Ionicons name="bulb" size={20} color="#4ECDC4" />
+          <Ionicons name="bulb" size={20} color="#FF8E53" />
           <ThemedText style={styles.explanationTitle}>Tại sao AI chọn những người này?</ThemedText>
         </View>
         <ThemedText style={styles.explanationText}>
@@ -142,25 +142,25 @@ export function AIRecommendations({
         </ThemedText>
         <View style={styles.explanationList}>
           <View style={styles.explanationItem}>
-            <Ionicons name="checkmark" size={16} color="#28a745" />
+            <Ionicons name="checkmark" size={16} color="#FFA07A" />
             <ThemedText style={styles.explanationItemText}>
               Kỹ năng phù hợp với nhu cầu đặc biệt
             </ThemedText>
           </View>
           <View style={styles.explanationItem}>
-            <Ionicons name="checkmark" size={16} color="#28a745" />
+            <Ionicons name="checkmark" size={16} color="#FFA07A" />
             <ThemedText style={styles.explanationItemText}>
               Kinh nghiệm phù hợp với mức độ chăm sóc
             </ThemedText>
           </View>
           <View style={styles.explanationItem}>
-            <Ionicons name="checkmark" size={16} color="#28a745" />
+            <Ionicons name="checkmark" size={16} color="#FFA07A" />
             <ThemedText style={styles.explanationItemText}>
               Vị trí gần địa chỉ của bạn
             </ThemedText>
           </View>
           <View style={styles.explanationItem}>
-            <Ionicons name="checkmark" size={16} color="#28a745" />
+            <Ionicons name="checkmark" size={16} color="#FFA07A" />
             <ThemedText style={styles.explanationItemText}>
               Giá cả phù hợp với ngân sách
             </ThemedText>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   matchText: {
     marginLeft: 4, // Giảm margin left
     fontSize: 11, // Giảm font size một chút
-    color: '#28a745',
+    color: '#FFA07A',
     fontWeight: '500',
     textAlign: 'center', // Center text
     flexShrink: 1, // Cho phép text co lại nếu cần

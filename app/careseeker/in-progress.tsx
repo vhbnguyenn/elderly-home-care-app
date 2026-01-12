@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
@@ -30,7 +30,7 @@ export default function InProgressScreen() {
       {/* Content */}
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Ionicons name="construct-outline" size={100} color="#68C2E8" />
+          <Ionicons name="construct-outline" size={100} color="#FF6B35" />
         </View>
         
         <ThemedText style={styles.title}>Đang phát triển</ThemedText>
@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
   backHomeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
     elevation: 2,
-    shadowColor: '#68C2E8',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

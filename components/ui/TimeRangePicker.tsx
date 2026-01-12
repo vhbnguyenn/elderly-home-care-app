@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Alert,
@@ -425,7 +425,7 @@ export function TimeRangePicker({
 
       {availableRanges && availableRanges.length > 0 && (
         <TouchableOpacity style={styles.addButton} onPress={handleAddTimeRange}>
-          <Ionicons name="add-circle" size={20} color="#68C2E8" />
+          <Ionicons name="add-circle" size={20} color="#FF6B35" />
           <ThemedText style={styles.addButtonText}>Thêm khung giờ cụ thể</ThemedText>
         </TouchableOpacity>
       )}
@@ -442,13 +442,13 @@ export function TimeRangePicker({
               style={styles.editButton}
               onPress={() => handleEditTimeRange(range)}
             >
-              <Ionicons name="pencil" size={16} color="#68C2E8" />
+              <Ionicons name="pencil" size={16} color="#FF6B35" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemoveTimeRange(range.id)}
             >
-              <Ionicons name="remove-circle" size={20} color="#dc3545" />
+              <Ionicons name="remove-circle" size={20} color="#FF6B35" />
             </TouchableOpacity>
           </View>
         </View>
@@ -471,12 +471,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#f0fdfa',
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     alignSelf: 'flex-start',
   },
   addButtonText: {
     marginLeft: 8,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   timeRangeItem: {
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     fontSize: 16,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   timePickerContainer: {
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeOptionSelected: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   timeOptionText: {
     fontSize: 16,
@@ -622,12 +622,12 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#28a745',
+    borderColor: '#FFA07A',
   },
   availableRangesTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#28a745',
+    color: '#FFA07A',
     marginBottom: 8,
   },
   availableRangesList: {
@@ -641,11 +641,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: '#28a745',
+    borderColor: '#FFA07A',
   },
   availableRangeText: {
     fontSize: 12,
-    color: '#28a745',
+    color: '#FFA07A',
     fontWeight: '500',
   },
   noAvailableRangesContainer: {

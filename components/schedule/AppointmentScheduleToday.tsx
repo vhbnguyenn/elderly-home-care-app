@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -55,11 +55,11 @@ export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTo
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return '#10B981'; // Xanh lá cho đã hoàn thành
+        return '#FFA07A'; // Xanh lá cho đã hoàn thành
       case 'in-progress':
-        return '#68C2E8'; // Ocean blue cho đang thực hiện
+        return '#FF6B35'; // Ocean blue cho đang thực hiện
       case 'upcoming':
-        return '#F59E0B'; // Vàng cho sắp tới
+        return '#FFA500'; // Vàng cho sắp tới
       default:
         return '#9CA3AF';
     }
@@ -71,15 +71,15 @@ export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTo
 
   const getTaskColor = (task: Task, appointmentStatus: string, index: number) => {
     if (task.status === 'completed') {
-      return '#10B981'; // Xanh lá cho task đã hoàn thành
+      return '#FFA07A'; // Xanh lá cho task đã hoàn thành
     } else if (task.status === 'failed') {
-      return '#EF4444'; // Đỏ cho task không hoàn thành
+      return '#FF6B35'; // Đỏ cho task không hoàn thành
     } else if (task.status === 'pending') {
       return '#FFB648'; // Cam cho task đang chờ
     } else if (task.completed) {
-      return '#10B981'; // Fallback cho task đã hoàn thành
+      return '#FFA07A'; // Fallback cho task đã hoàn thành
     } else {
-      return '#EF4444'; // Fallback cho task chưa hoàn thành
+      return '#FF6B35'; // Fallback cho task chưa hoàn thành
     }
   };
 
@@ -130,7 +130,7 @@ export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTo
                             {appointment.caregiverName}
                           </ThemedText>
                           {appointment.isVerified && (
-                            <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                            <Ionicons name="checkmark-circle" size={16} color="#FFA07A" />
                           )}
                         </View>
                         <ThemedText style={styles.timeSlot}>
@@ -179,7 +179,7 @@ export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTo
                 <Ionicons 
                   name="chevron-forward" 
                   size={16} 
-                  color="#68C2E8" 
+                  color="#FF6B35" 
                 />
               </TouchableOpacity>
 
@@ -217,13 +217,13 @@ export function AppointmentScheduleToday({ appointments }: AppointmentScheduleTo
                             
                             <View style={styles.taskCheckbox}>
                               {task.status === 'completed' ? (
-                                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                                <Ionicons name="checkmark-circle" size={24} color="#FFA07A" />
                               ) : task.status === 'failed' ? (
-                                <Ionicons name="close-circle" size={24} color="#EF4444" />
+                                <Ionicons name="close-circle" size={24} color="#FF6B35" />
                               ) : task.status === 'pending' ? (
                                 <View style={styles.pendingCircle} />
                               ) : task.completed ? (
-                                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                                <Ionicons name="checkmark-circle" size={24} color="#FFA07A" />
                               ) : (
                                 <View style={styles.uncheckedCircle} />
                               )}
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   viewHistoryText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#4ECDC4',
+    color: '#FF8E53',
     marginRight: 4,
   },
   appointmentsList: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#ecf0f1',
   },
   viewDetailsText: {
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontSize: 14,
     fontWeight: '600',
     marginRight: 4,

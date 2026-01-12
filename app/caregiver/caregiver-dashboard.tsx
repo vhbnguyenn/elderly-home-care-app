@@ -1,8 +1,8 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -23,21 +23,21 @@ const CARD_WIDTH = (screenWidth - CARD_PADDING * 2 - CARD_GAP) / 2;
 const mapStatusToDashboard = (status: string | undefined) => {
   switch (status) {
     case "new":
-      return { text: "Yêu cầu mới", color: "#3B82F6" };
+      return { text: "Yêu cầu mới", color: "#FF6B35" };
     case "pending":
-      return { text: "Chờ thực hiện", color: "#F59E0B" };
+      return { text: "Chờ thực hiện", color: "#FFA500" };
     case "confirmed":
-      return { text: "Đã xác nhận", color: "#10B981" };
+      return { text: "Đã xác nhận", color: "#FFA07A" };
     case "in-progress":
-      return { text: "Đang thực hiện", color: "#8B5CF6" };
+      return { text: "Đang thực hiện", color: "#FF8E53" };
     case "completed":
       return { text: "Hoàn thành", color: "#6B7280" };
     case "cancelled":
-      return { text: "Đã hủy", color: "#EF4444" };
+      return { text: "Đã hủy", color: "#FF6B35" };
     case "rejected":
-      return { text: "Đã từ chối", color: "#DC2626" };
+      return { text: "Đã từ chối", color: "#E85D2A" };
     default:
-      return { text: "Đang thực hiện", color: "#8B5CF6" };
+      return { text: "Đang thực hiện", color: "#FF8E53" };
   }
 };
 
@@ -59,42 +59,8 @@ export default function CaregiverDashboardScreen() {
   const today = new Date().toISOString().split('T')[0];
   const todayAppointments = appointments.filter(apt => apt.start_date === today);
 
-  // Check profile status and navigate accordingly
-  useFocusEffect(
-    useCallback(() => {
-      if (user && user.role === "Caregiver") {
-        // Small delay to ensure navigation is ready
-        setTimeout(() => {
-          // Check if profile has been submitted (exists in profileStore)
-          const { getProfileStatus, hasProfile } = require("@/data/profileStore");
-          const hasProfileInStore = hasProfile(user.id);
-          const profileStatus = getProfileStatus(user.id);
-          
-          // Check status from API (user.status) or profileStore
-          const currentStatus = user.status || profileStatus.status;
-          
-          // If profile is approved (from API or profileStore), stay on dashboard
-          if (currentStatus === "approved") {
-            return; // Stay on dashboard
-          }
-          
-          // If profile is pending or rejected, navigate to status screen
-          if (currentStatus === "pending" || currentStatus === "rejected") {
-            navigation.navigate("Trạng thái hồ sơ");
-            return;
-          }
-          
-          // If no profile submitted yet and user hasn't completed profile, navigate to complete profile
-          if (!hasProfileInStore && !user.hasCompletedProfile) {
-            navigation.navigate("Hoàn thiện hồ sơ", {
-              email: user.email,
-              fullName: user.name || "",
-            });
-          }
-        }, 500);
-      }
-    }, [user, navigation])
-  );
+  // Note: Profile status check has been moved to login flow
+  // Caregiver can only reach this screen if status is "approved"
 
   if (loading) {
     return (

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -250,7 +250,7 @@ export default function CaregiverDetailScreen() {
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.chatButton} onPress={handleChat}>
-            <Ionicons name="chatbubble-outline" size={20} color="#4ECDC4" />
+            <Ionicons name="chatbubble-outline" size={20} color="#FF8E53" />
             <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
           </TouchableOpacity>
           
@@ -321,7 +321,7 @@ export default function CaregiverDetailScreen() {
               <ThemedText style={styles.sectionTitle}>Học vấn</ThemedText>
               {caregiver.education.map((edu, index) => (
                 <View key={index} style={styles.educationItem}>
-                  <Ionicons name="school-outline" size={16} color="#4ECDC4" />
+                  <Ionicons name="school-outline" size={16} color="#FF8E53" />
                   <ThemedText style={styles.educationText}>{edu}</ThemedText>
                 </View>
               ))}
@@ -332,7 +332,7 @@ export default function CaregiverDetailScreen() {
               <ThemedText style={styles.sectionTitle}>Chứng chỉ</ThemedText>
               {caregiver.certifications.map((cert, index) => (
                 <View key={index} style={styles.certificationItem}>
-                  <Ionicons name="ribbon-outline" size={16} color="#4ECDC4" />
+                  <Ionicons name="ribbon-outline" size={16} color="#FF8E53" />
                   <ThemedText style={styles.certificationText}>{cert}</ThemedText>
                 </View>
               ))}
@@ -354,7 +354,7 @@ export default function CaregiverDetailScreen() {
             <View style={styles.section}>
               <ThemedText style={styles.sectionTitle}>Thời gian làm việc</ThemedText>
               <View style={styles.availabilityItem}>
-                <Ionicons name="time-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="time-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.availabilityText}>{caregiver.availability}</ThemedText>
               </View>
             </View>
@@ -363,11 +363,11 @@ export default function CaregiverDetailScreen() {
             <View style={styles.section}>
               <ThemedText style={styles.sectionTitle}>Liên hệ</ThemedText>
               <View style={styles.contactItem}>
-                <Ionicons name="call-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="call-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.contactText}>{caregiver.phone}</ThemedText>
               </View>
               <View style={styles.contactItem}>
-                <Ionicons name="mail-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="mail-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.contactText}>{caregiver.email}</ThemedText>
               </View>
             </View>
@@ -376,17 +376,17 @@ export default function CaregiverDetailScreen() {
             <View style={styles.section}>
               <ThemedText style={styles.sectionTitle}>Thông tin cá nhân</ThemedText>
               <View style={styles.infoItem}>
-                <Ionicons name="calendar-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="calendar-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.infoLabel}>Ngày sinh:</ThemedText>
                 <ThemedText style={styles.infoText}>{caregiver.birthDate}</ThemedText>
               </View>
               <View style={styles.infoItem}>
-                <Ionicons name="person-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="person-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.infoLabel}>Giới tính:</ThemedText>
                 <ThemedText style={styles.infoText}>{caregiver.gender === 'female' ? 'Nữ' : 'Nam'}</ThemedText>
               </View>
               <View style={styles.infoItem}>
-                <Ionicons name="time-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="time-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.infoLabel}>Số năm kinh nghiệm:</ThemedText>
                 <ThemedText style={styles.infoText}>{caregiver.yearsOfExperience} năm</ThemedText>
               </View>
@@ -396,14 +396,14 @@ export default function CaregiverDetailScreen() {
             <View style={styles.section}>
               <ThemedText style={styles.sectionTitle}>Địa chỉ</ThemedText>
               <View style={styles.addressItem}>
-                <Ionicons name="home-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="home-outline" size={16} color="#FF8E53" />
                 <View style={styles.addressContent}>
                   <ThemedText style={styles.addressLabel}>Địa chỉ thường chú:</ThemedText>
                   <ThemedText style={styles.addressText}>{caregiver.permanentAddress}</ThemedText>
                 </View>
               </View>
               <View style={styles.addressItem}>
-                <Ionicons name="location-outline" size={16} color="#4ECDC4" />
+                <Ionicons name="location-outline" size={16} color="#FF8E53" />
                 <View style={styles.addressContent}>
                   <ThemedText style={styles.addressLabel}>Địa chỉ tạm trú:</ThemedText>
                   <ThemedText style={styles.addressText}>{caregiver.temporaryAddress}</ThemedText>
@@ -416,7 +416,7 @@ export default function CaregiverDetailScreen() {
               <ThemedText style={styles.sectionTitle}>Nơi từng làm việc</ThemedText>
               {caregiver.workHistory.map((work, index) => (
                 <View key={index} style={styles.workItem}>
-                  <Ionicons name="business-outline" size={16} color="#4ECDC4" />
+                  <Ionicons name="business-outline" size={16} color="#FF8E53" />
                   <ThemedText style={styles.workText}>{work}</ThemedText>
                 </View>
               ))}
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -561,20 +561,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     gap: 8,
   },
   chatButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   callButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderRadius: 12,
     paddingVertical: 12,
     gap: 8,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#667eea',
+    backgroundColor: '#FF6B35',
     borderRadius: 12,
     paddingVertical: 12,
     gap: 8,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#28a745',
+    color: '#FFA07A',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#4ECDC4',
+    borderBottomColor: '#FF8E53',
   },
   tabText: {
     fontSize: 16,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   activeTabText: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   infoContent: {
     backgroundColor: 'white',
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
   },
   specialtyText: {
     fontSize: 14,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   educationItem: {
@@ -708,11 +708,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
   },
   languageText: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   availabilityItem: {

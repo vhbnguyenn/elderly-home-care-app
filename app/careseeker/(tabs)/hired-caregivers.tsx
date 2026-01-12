@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SimpleNavBar } from '@/components/navigation/SimpleNavBar';
 import { ThemedText } from '@/components/themed-text';
 
 interface HiredCaregiver {
@@ -131,7 +130,7 @@ export default function HiredCaregiversScreen() {
             <Image source={{ uri: item.avatar }} style={styles.avatar} />
           ) : (
             <LinearGradient
-              colors={['#68C2E8', '#5AB9E0']}
+              colors={['#FF6B35', '#FF8E53']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.avatarGradient}
@@ -225,7 +224,7 @@ export default function HiredCaregiversScreen() {
               style={[styles.actionButton, styles.chatButton]}
               onPress={() => handleChatPress(item)}
             >
-              <Ionicons name="chatbubble-outline" size={18} color="#68C2E8" />
+              <Ionicons name="chatbubble-outline" size={18} color="#FF6B35" />
               <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
             </TouchableOpacity>
 
@@ -268,7 +267,7 @@ export default function HiredCaregiversScreen() {
           onPress={() => handleCaregiverPress(item)}
         >
           <ThemedText style={styles.detailButtonText}>Chi tiết</ThemedText>
-          <Ionicons name="chevron-forward" size={18} color="#68C2E8" />
+          <Ionicons name="chevron-forward" size={18} color="#FF6B35" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -278,7 +277,7 @@ export default function HiredCaregiversScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <LinearGradient
-        colors={['#68C2E8', '#5AB9E0']}
+        colors={['#FF6B35', '#FF8E53']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.header}
@@ -423,8 +422,6 @@ export default function HiredCaregiversScreen() {
           </TouchableOpacity>
         </View>
       )}
-
-      <SimpleNavBar />
     </SafeAreaView>
   );
 }
@@ -518,7 +515,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   activeTab: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   tabText: {
     fontSize: 14,
@@ -602,7 +599,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#10B981',
+    backgroundColor: '#FFA07A',
   },
   caregiverInfo: {
     flex: 1,
@@ -643,7 +640,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   specialtyBadge: {
-    backgroundColor: '#E0F2FE',
+    backgroundColor: '#FFE5D9',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -651,7 +648,7 @@ const styles = StyleSheet.create({
   specialtyText: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#0284C7',
+    color: '#FF6B35',
   },
   elderlyInfo: {
     backgroundColor: '#F8FAFC',
@@ -721,15 +718,15 @@ const styles = StyleSheet.create({
   chatButton: {
     backgroundColor: '#F0F9FF',
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   chatButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   callButton: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   callButtonText: {
     fontSize: 13,
@@ -747,7 +744,7 @@ const styles = StyleSheet.create({
     color: '#FFB648',
   },
   rehireButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#FFA07A',
   },
   rehireButtonText: {
     fontSize: 13,
@@ -762,7 +759,7 @@ const styles = StyleSheet.create({
   detailButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   emptyContainer: {
     flex: 1,
@@ -778,7 +775,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyButton: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,

@@ -13,6 +13,8 @@ export const API_CONFIG = {
       VERIFY_EMAIL: '/api/auth/verify-code',
       FORGOT_PASSWORD: '/api/auth/forgot-password',
       RESET_PASSWORD: '/api/auth/reset-password',
+      GET_ME: '/api/auth/me',
+      UPDATE_PROFILE: '/api/auth/profile',
     },
     // Profiles (User profile for all roles)
     PROFILES: {
@@ -37,6 +39,19 @@ export const API_CONFIG = {
       GET_BY_CAREGIVER: (caregiverId: string) => `/api/caregiver-availability/caregiver/${caregiverId}`,
       UPDATE: (id: string) => `/api/caregiver-availability/${id}`,
       DELETE: (id: string) => `/api/caregiver-availability/${id}`,
+    },
+    // Dashboard
+    DASHBOARD: {
+      GET_STATS: '/api/dashboard/stats',
+      GET_COUNTS: '/api/dashboard/counts',
+    },
+    // Family
+    FAMILY: {
+      GET_MEMBERS: '/api/family/members',
+      CREATE_MEMBER: '/api/family/members',
+      GET_BY_ID: (id: string) => `/api/family/members/${id}`,
+      UPDATE: (id: string) => `/api/family/members/${id}`,
+      DELETE: (id: string) => `/api/family/members/${id}`,
     },
     // Elderly
     ELDERLY: {

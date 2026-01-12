@@ -1,5 +1,5 @@
-import { SuccessModal } from '@/components/ui/SuccessModal';
 import { AddressSelector } from '@/components/ui/AddressSelector';
+import { SuccessModal } from '@/components/ui/SuccessModal';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';

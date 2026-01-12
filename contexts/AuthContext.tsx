@@ -1,5 +1,6 @@
 import { NavigationHelper } from "@/components/navigation/NavigationHelper";
 import { AuthService } from "@/services/auth.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface User {
@@ -81,7 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    NavigationHelper.goToLogin();
+    // Clear AsyncStorage
+    AsyncStorage.multiRemove(['auth_token', 'refresh_token', 'user_data']);
+    // Go to index page (landing page) instead of login
+    const { router } = require('expo-router');
+    router.replace('/');
   };
 
   const updateProfile = (profile: Partial<User>) => {

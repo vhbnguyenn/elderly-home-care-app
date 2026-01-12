@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -226,9 +226,9 @@ const styles = StyleSheet.create({
   activeNavItem: {
     backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     elevation: 2,
-    shadowColor: '#4ECDC4',
+    shadowColor: '#FF8E53',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

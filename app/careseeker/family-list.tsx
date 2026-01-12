@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -145,7 +145,7 @@ export default function FamilyListScreen() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin_family': return '#dc3545';
+      case 'admin_family': return '#FF6B35';
       case 'member': return '#6c757d';
       default: return '#6c757d';
     }
@@ -180,13 +180,13 @@ export default function FamilyListScreen() {
 
       <View style={styles.cardStats}>
         <View style={styles.statItem}>
-          <Ionicons name="people" size={16} color="#4ECDC4" />
+          <Ionicons name="people" size={16} color="#FF8E53" />
           <ThemedText style={styles.statText}>
             {family.memberCount} thành viên
           </ThemedText>
         </View>
         <View style={styles.statItem}>
-          <Ionicons name="person" size={16} color="#ff6b6b" />
+          <Ionicons name="person" size={16} color="#FF6B35" />
           <ThemedText style={styles.statText}>
             {family.elderlyCount} người già
           </ThemedText>
@@ -239,13 +239,13 @@ export default function FamilyListScreen() {
           <>
             <View style={styles.statsContainer}>
               <View style={styles.statCard}>
-                <Ionicons name="home" size={24} color="#4ECDC4" />
+                <Ionicons name="home" size={24} color="#FF8E53" />
                 <ThemedText style={styles.statNumber}>{families.length}</ThemedText>
                 <ThemedText style={styles.statLabel}>Gia đình</ThemedText>
               </View>
               
               <View style={styles.statCard}>
-                <Ionicons name="people" size={24} color="#ff6b6b" />
+                <Ionicons name="people" size={24} color="#FF6B35" />
                 <ThemedText style={styles.statNumber}>
                   {families.reduce((sum, family) => sum + family.memberCount, 0)}
                 </ThemedText>
@@ -307,7 +307,7 @@ export default function FamilyListScreen() {
               <View style={styles.sectionHeader}>
                 <ThemedText style={styles.inputLabel}>Thành viên</ThemedText>
                 <TouchableOpacity style={styles.addButton} onPress={handleAddMember}>
-                  <Ionicons name="add" size={20} color="#4ECDC4" />
+                  <Ionicons name="add" size={20} color="#FF8E53" />
                   <ThemedText style={styles.addButtonText}>Thêm</ThemedText>
                 </TouchableOpacity>
               </View>
@@ -315,7 +315,7 @@ export default function FamilyListScreen() {
               {/* Creator (Admin) */}
               <View style={styles.memberItem}>
                 <View style={styles.memberInfo}>
-                  <Ionicons name="person" size={20} color="#4ECDC4" />
+                  <Ionicons name="person" size={20} color="#FF8E53" />
                   <View style={styles.memberDetails}>
                     <ThemedText style={styles.memberName}>
                       {user?.name || user?.email || 'Bạn'}
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -577,7 +577,7 @@ const styles = StyleSheet.create({
   saveButton: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   modalContent: {
     flex: 1,
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   },
   memberRole: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   memberEmailInput: {
@@ -695,8 +695,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   roleOptionSelected: {
-    backgroundColor: '#4ECDC4',
-    borderColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   roleOptionText: {
     fontSize: 12,
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   elderlyItemSelected: {
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#f0fdfa',
   },
   elderlyInfo: {

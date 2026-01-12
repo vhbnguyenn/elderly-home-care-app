@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 
 import { formatCurrency } from "@/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
@@ -348,7 +348,7 @@ export default function CaregiverWithdrawScreen() {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Phí giao dịch</Text>
-            <Text style={[styles.summaryValue, { color: "#10B981" }]}>
+            <Text style={[styles.summaryValue, { color: "#FFA07A" }]}>
               Miễn phí
             </Text>
           </View>
@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
   },
   noteItem: {
     fontSize: 13,
-    color: "#1E40AF",
+    color: "#E85D2A",
     marginVertical: 4,
     fontWeight: "500",
   },
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   formInput: {
     backgroundColor: "#F9FAFB",

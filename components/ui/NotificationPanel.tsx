@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../themed-text';
@@ -87,15 +87,15 @@ export function NotificationPanel({
   const getNotificationColor = (type: string) => {
     switch (type) {
       case 'success':
-        return '#4ECDC4';
+        return '#FF8E53';
       case 'warning':
         return '#FECA57';
       case 'error':
-        return '#FF6B6B';
+        return '#FF6B35';
       case 'reminder':
         return '#FFD700';
       default:
-        return '#4ECDC4';
+        return '#FF8E53';
     }
   };
 
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   markAllText: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#FF8E53',
     fontWeight: '500',
   },
   scrollContainer: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
     marginTop: 6,
   },
 });

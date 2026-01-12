@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -104,9 +104,9 @@ export default function RequestDetailScreen() {
     switch (status) {
       case 'pending': return '#FECA57';
       case 'accepted': return '#48CAE4';
-      case 'rejected': return '#FF6B6B';
+      case 'rejected': return '#FF6B35';
       case 'cancelled': return '#6C757D';
-      case 'completed': return '#30A0E0';
+      case 'completed': return '#FF8E53';
       default: return '#6C757D';
     }
   };
@@ -124,9 +124,9 @@ export default function RequestDetailScreen() {
 
   const getPriorityColor = (priority: RequestPriority) => {
     switch (priority) {
-      case 'low': return '#30A0E0';
+      case 'low': return '#FF8E53';
       case 'medium': return '#FECA57';
-      case 'high': return '#FF6B6B';
+      case 'high': return '#FF6B35';
       case 'urgent': return '#E74C3C';
       default: return '#6C757D';
     }
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   totalAmount: {
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: 'bold',
   },
   messageItem: {
@@ -542,10 +542,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   acceptButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
   },
   rejectButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B35',
   },
   counterButton: {
     backgroundColor: '#FECA57',

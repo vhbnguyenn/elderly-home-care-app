@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -220,7 +220,7 @@ export default function CaregiverSearchScreen() {
               Tìm thấy {caregivers.length} người chăm sóc
             </ThemedText>
             <TouchableOpacity style={styles.sortButton}>
-              <Ionicons name="swap-vertical" size={16} color="#667eea" />
+              <Ionicons name="swap-vertical" size={16} color="#FF6B35" />
               <ThemedText style={styles.sortButtonText}>Sắp xếp</ThemedText>
             </TouchableOpacity>
           </View>

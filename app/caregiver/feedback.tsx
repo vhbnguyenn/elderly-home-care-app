@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -224,7 +224,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#DBEAFE" }]}>
-              <MaterialCommunityIcons name="cellphone" size={24} color="#2563EB" />
+              <MaterialCommunityIcons name="cellphone" size={24} color="#FF6B35" />
             </View>
             <Text style={styles.cardTitle}>Thiết bị chính</Text>
           </View>
@@ -261,7 +261,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#D1FAE5" }]}>
-              <MaterialCommunityIcons name="star-outline" size={24} color="#10B981" />
+              <MaterialCommunityIcons name="star-outline" size={24} color="#FFA07A" />
             </View>
             <Text style={styles.cardTitle}>Tính dễ sử dụng</Text>
           </View>
@@ -284,7 +284,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#FEF3C7" }]}>
-              <MaterialCommunityIcons name="lightning-bolt" size={24} color="#F59E0B" />
+              <MaterialCommunityIcons name="lightning-bolt" size={24} color="#FFA500" />
             </View>
             <Text style={styles.cardTitle}>Hiệu suất</Text>
           </View>
@@ -307,7 +307,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#DBEAFE" }]}>
-              <MaterialCommunityIcons name="shield-check" size={24} color="#2563EB" />
+              <MaterialCommunityIcons name="shield-check" size={24} color="#FF6B35" />
             </View>
             <Text style={styles.cardTitle}>Độ tin cậy</Text>
           </View>
@@ -330,7 +330,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#D1FAE5" }]}>
-              <MaterialCommunityIcons name="star-outline" size={24} color="#10B981" />
+              <MaterialCommunityIcons name="star-outline" size={24} color="#FFA07A" />
             </View>
             <Text style={styles.cardTitle}>Thiết kế giao diện</Text>
           </View>
@@ -353,7 +353,7 @@ export default function FeedbackScreen() {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: "#FEE2E2" }]}>
-              <MaterialCommunityIcons name="account-group" size={24} color="#EF4444" />
+              <MaterialCommunityIcons name="account-group" size={24} color="#FF6B35" />
             </View>
             <Text style={styles.cardTitle}>Chất lượng hỗ trợ</Text>
           </View>
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
@@ -660,13 +660,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   radioButtonSelected: {
-    borderColor: "#2563EB",
+    borderColor: "#FF6B35",
   },
   radioButtonInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#2563EB",
+    backgroundColor: "#FF6B35",
   },
   radioLabel: {
     fontSize: 14,
@@ -721,8 +721,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   checkboxSelected: {
-    backgroundColor: "#2563EB",
-    borderColor: "#2563EB",
+    backgroundColor: "#FF6B35",
+    borderColor: "#FF6B35",
   },
   checkboxLabel: {
     fontSize: 14,
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,

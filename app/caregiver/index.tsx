@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+﻿import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -407,7 +407,7 @@ export default function CaregiverHome() {
               {/* Find Caregiver Section */}
               <View style={styles.findCaregiverSection}>
                 <LinearGradient
-                  colors={["#4ECDC4", "#27AE60"]}
+                  colors={["#FF8E53", "#27AE60"]}
                   style={styles.findCaregiverCard}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
@@ -517,7 +517,7 @@ export default function CaregiverHome() {
             {/* App Info */}
             <View style={styles.appInfoSection}>
               <View style={styles.appInfoLogo}>
-                <Ionicons name="heart" size={32} color="#4ECDC4" />
+                <Ionicons name="heart" size={32} color="#FF8E53" />
               </View>
               <ThemedText style={styles.appInfoTitle}>
                 Elder Care Connect
@@ -530,21 +530,21 @@ export default function CaregiverHome() {
             {/* Quick Stats */}
             <View style={styles.appInfoStatsSection}>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="people" size={24} color="#4ECDC4" />
+                <Ionicons name="people" size={24} color="#FF8E53" />
                 <ThemedText style={styles.appInfoStatNumber}>1000+</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>
                   Người chăm sóc
                 </ThemedText>
               </View>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="home" size={24} color="#4ECDC4" />
+                <Ionicons name="home" size={24} color="#FF8E53" />
                 <ThemedText style={styles.appInfoStatNumber}>500+</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>
                   Gia đình
                 </ThemedText>
               </View>
               <View style={styles.appInfoStatItem}>
-                <Ionicons name="star" size={24} color="#4ECDC4" />
+                <Ionicons name="star" size={24} color="#FF8E53" />
                 <ThemedText style={styles.appInfoStatNumber}>4.9</ThemedText>
                 <ThemedText style={styles.appInfoStatLabel}>
                   Đánh giá
@@ -616,7 +616,7 @@ export default function CaregiverHome() {
             <TouchableOpacity activeOpacity={1}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalAvatar}>
-                  <Ionicons name="person" size={40} color="#4ECDC4" />
+                  <Ionicons name="person" size={40} color="#FF8E53" />
                 </View>
                 <ThemedText style={styles.modalName}>
                   {user?.name || "Người dùng"}
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for navigation bar
   },
   header: {
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -4,
     right: -2,
-    backgroundColor: "#FF6B6B",
+    backgroundColor: "#FF6B35",
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -845,7 +845,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   findNowButtonText: {
-    color: "#4ECDC4",
+    color: "#FF8E53",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -1003,7 +1003,7 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     fontSize: 12,
-    color: "#4ECDC4",
+    color: "#FF8E53",
     textDecorationLine: "underline",
   },
   modalOverlay: {
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
     borderWidth: 3,
-    borderColor: "#4ECDC4",
+    borderColor: "#FF8E53",
   },
   modalName: {
     fontSize: 20,
@@ -1202,7 +1202,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: "#4ECDC4",
+    borderColor: "#FF8E53",
   },
   bannerContent: {
     flex: 1,
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
   },
   // Duplicate styles - removed
   // findNowButton: {
-  //   backgroundColor: '#4ECDC4',
+  //   backgroundColor: '#FF8E53',
   //   borderRadius: 12,
   //   paddingVertical: 12,
   //   paddingHorizontal: 20,
@@ -1232,7 +1232,7 @@ const styles = StyleSheet.create({
   //   justifyContent: 'center',
   //   alignSelf: 'flex-start',
   //   elevation: 2,
-  //   shadowColor: '#4ECDC4',
+  //   shadowColor: '#FF8E53',
   //   shadowOffset: { width: 0, height: 2 },
   //   shadowOpacity: 0.3,
   //   shadowRadius: 4,
@@ -1255,7 +1255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
   },
   appInfoCloseButton: {
     width: 40,
@@ -1285,7 +1285,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FF8E53",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -1356,7 +1356,7 @@ const styles = StyleSheet.create({
   },
   appInfoLink: {
     fontSize: 12,
-    color: "#4ECDC4",
+    color: "#FF8E53",
     textDecorationLine: "underline",
   },
 });

@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -217,11 +217,11 @@ export default function AppointmentDetailScreen() {
   // Status helpers
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "#F59E0B";
-      case "confirmed": return "#3B82F6";
-      case "in-progress": return "#10B981";
+      case "pending": return "#FFA500";
+      case "confirmed": return "#FF6B35";
+      case "in-progress": return "#FFA07A";
       case "completed": return "#6B7280";
-      case "cancelled": return "#EF4444";
+      case "cancelled": return "#FF6B35";
       default: return "#9CA3AF";
     }
   };
@@ -493,7 +493,7 @@ export default function AppointmentDetailScreen() {
                 <Text style={styles.contactButtonText}>Gọi</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.messageButton} onPress={handleContact}>
-                <Ionicons name="chatbubble" size={20} color="#68C2E8" />
+                <Ionicons name="chatbubble" size={20} color="#FF6B35" />
                 <Text style={styles.messageButtonText}>Nhắn tin</Text>
               </TouchableOpacity>
             </View>
@@ -528,7 +528,7 @@ export default function AppointmentDetailScreen() {
           <View style={styles.card}>
             {appointmentData.services.map((service: string, index: number) => (
               <View key={index} style={styles.serviceItem}>
-                <Ionicons name="checkmark-circle" size={20} color="#68C2E8" />
+                <Ionicons name="checkmark-circle" size={20} color="#FF6B35" />
                 <Text style={styles.serviceText}>{service}</Text>
               </View>
             ))}
@@ -540,7 +540,7 @@ export default function AppointmentDetailScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Lưu ý đặc biệt</Text>
             <View style={[styles.card, styles.instructionsCard]}>
-              <Ionicons name="information-circle" size={20} color="#F59E0B" />
+              <Ionicons name="information-circle" size={20} color="#FFA500" />
               <Text style={styles.instructionsText}>{appointmentData.specialInstructions}</Text>
             </View>
           </View>
@@ -590,7 +590,7 @@ export default function AppointmentDetailScreen() {
               style={styles.addNoteButton}
               onPress={() => setIsNoteModalVisible(true)}
             >
-              <Ionicons name="add-circle" size={24} color="#68C2E8" />
+              <Ionicons name="add-circle" size={24} color="#FF6B35" />
             </TouchableOpacity>
           </View>
           <View style={styles.card}>
@@ -798,7 +798,7 @@ export default function AppointmentDetailScreen() {
                   reviewErrors.professionalism && styles.errorDetailItem
                 ]}>
                   <View style={styles.detailRatingHeader}>
-                    <Ionicons name="briefcase" size={20} color="#68C2E8" />
+                    <Ionicons name="briefcase" size={20} color="#FF6B35" />
                     <Text style={styles.detailRatingLabel}>Chuyên môn</Text>
                   </View>
                   <View style={styles.smallStarsContainer}>
@@ -826,7 +826,7 @@ export default function AppointmentDetailScreen() {
                   reviewErrors.attitude && styles.errorDetailItem
                 ]}>
                   <View style={styles.detailRatingHeader}>
-                    <Ionicons name="happy" size={20} color="#68C2E8" />
+                    <Ionicons name="happy" size={20} color="#FF6B35" />
                     <Text style={styles.detailRatingLabel}>Thái độ</Text>
                   </View>
                   <View style={styles.smallStarsContainer}>
@@ -854,7 +854,7 @@ export default function AppointmentDetailScreen() {
                   reviewErrors.punctuality && styles.errorDetailItem
                 ]}>
                   <View style={styles.detailRatingHeader}>
-                    <Ionicons name="time" size={20} color="#68C2E8" />
+                    <Ionicons name="time" size={20} color="#FF6B35" />
                     <Text style={styles.detailRatingLabel}>Đúng giờ</Text>
                   </View>
                   <View style={styles.smallStarsContainer}>
@@ -882,7 +882,7 @@ export default function AppointmentDetailScreen() {
                   reviewErrors.quality && styles.errorDetailItem
                 ]}>
                   <View style={styles.detailRatingHeader}>
-                    <Ionicons name="checkmark-circle" size={20} color="#68C2E8" />
+                    <Ionicons name="checkmark-circle" size={20} color="#FF6B35" />
                     <Text style={styles.detailRatingLabel}>Chất lượng</Text>
                   </View>
                   <View style={styles.smallStarsContainer}>
@@ -1082,7 +1082,7 @@ const styles = StyleSheet.create({
   },
   experienceText: {
     fontSize: 12,
-    color: "#68C2E8",
+    color: "#FF6B35",
     fontWeight: "500",
   },
   subsectionTitle: {
@@ -1100,14 +1100,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   specialtyTag: {
-    backgroundColor: "#E0F2FE",
+    backgroundColor: "#FFE5D9",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
   specialtyText: {
     fontSize: 12,
-    color: "#0284C7",
+    color: "#FF6B35",
     fontWeight: "500",
   },
   contactRow: {
@@ -1120,7 +1120,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#68C2E8",
+    backgroundColor: "#FF6B35",
     paddingVertical: 12,
     borderRadius: 12,
     gap: 8,
@@ -1139,11 +1139,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: "#68C2E8",
+    borderColor: "#FF6B35",
     gap: 8,
   },
   messageButtonText: {
-    color: "#68C2E8",
+    color: "#FF6B35",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -1190,7 +1190,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   amountText: {
-    color: "#68C2E8",
+    color: "#FF6B35",
     fontSize: 16,
   },
   paymentStatusBadge: {
@@ -1231,7 +1231,7 @@ const styles = StyleSheet.create({
   },
   noteAuthor: {
     fontSize: 12,
-    color: "#68C2E8",
+    color: "#FF6B35",
     fontWeight: "600",
   },
   noteContent: {
@@ -1253,7 +1253,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
     paddingVertical: 16,
     borderRadius: 16,
     gap: 8,
@@ -1296,7 +1296,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   saveButton: {
-    backgroundColor: "#68C2E8",
+    backgroundColor: "#FF6B35",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
@@ -1313,7 +1313,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   confirmCancelButton: {
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
   },
   reviewButton: {
     flexDirection: "row",
@@ -1349,7 +1349,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#68C2E8",
+    backgroundColor: "#FF6B35",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -1435,7 +1435,7 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
   },
   submitReviewButton: {
-    backgroundColor: "#68C2E8",
+    backgroundColor: "#FF6B35",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
@@ -1447,7 +1447,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   requiredStar: {
-    color: "#EF4444",
+    color: "#FF6B35",
     fontSize: 14,
   },
   optionalText: {
@@ -1457,18 +1457,18 @@ const styles = StyleSheet.create({
   },
   errorSection: {
     borderWidth: 2,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   errorDetailItem: {
     borderWidth: 1,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   errorInput: {
     borderWidth: 2,
-    borderColor: "#EF4444",
+    borderColor: "#FF6B35",
   },
   errorText: {
-    color: "#EF4444",
+    color: "#FF6B35",
     fontSize: 12,
     marginTop: 4,
     fontWeight: "500",

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -387,7 +387,7 @@ export default function HiredDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return '#30A0E0';
+      case 'active': return '#FF8E53';
       case 'paused': return '#FECA57';
       case 'completed': return '#6C757D';
       default: return '#6C757D';
@@ -412,7 +412,7 @@ export default function HiredDetailScreen() {
   const getStatusColorForDay = (status: string) => {
     switch (status) {
       case 'upcoming': return '#FECA57';
-      case 'in_progress': return '#30A0E0';
+      case 'in_progress': return '#FF8E53';
       case 'completed': return '#27AE60';
       case 'cancelled': return '#E74C3C';
       default: return '#6C757D';
@@ -543,7 +543,7 @@ export default function HiredDetailScreen() {
           <ThemedText style={styles.taskTitle}>{task.title}</ThemedText>
           <View style={styles.taskMeta}>
             <View style={styles.timeContainer}>
-              <Ionicons name="time-outline" size={14} color="#30A0E0" />
+              <Ionicons name="time-outline" size={14} color="#FF8E53" />
               <ThemedText style={styles.taskTime}>{formatTime(task.scheduledTime)}</ThemedText>
             </View>
           </View>
@@ -653,7 +653,7 @@ export default function HiredDetailScreen() {
           <View style={styles.dayDetailsContainer}>
             <View style={styles.detailRow}>
               <View style={styles.detailItem}>
-                <Ionicons name="location-outline" size={16} color="#30A0E0" />
+                <Ionicons name="location-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.detailLabel}>Địa chỉ</ThemedText>
                 <ThemedText style={styles.detailValue}>Nhà tôi (Quận 1, TP.HCM)</ThemedText>
               </View>
@@ -661,7 +661,7 @@ export default function HiredDetailScreen() {
             
             <View style={styles.detailRow}>
               <View style={styles.detailItem}>
-                <Ionicons name="time-outline" size={16} color="#30A0E0" />
+                <Ionicons name="time-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.detailLabel}>Giờ làm</ThemedText>
                 <ThemedText style={styles.detailValue}>08:00 - 17:00</ThemedText>
               </View>
@@ -669,7 +669,7 @@ export default function HiredDetailScreen() {
             
             <View style={styles.detailRow}>
               <View style={styles.detailItem}>
-                <Ionicons name="person-outline" size={16} color="#30A0E0" />
+                <Ionicons name="person-outline" size={16} color="#FF8E53" />
                 <ThemedText style={styles.detailLabel}>Chăm sóc</ThemedText>
                 <ThemedText style={styles.detailValue}>Bà Nguyễn Thị Lan</ThemedText>
               </View>
@@ -682,7 +682,7 @@ export default function HiredDetailScreen() {
           <View style={styles.statsHeader}>
             <ThemedText style={styles.sectionTitle}>Thống kê task</ThemedText>
             <View style={styles.dateBadge}>
-              <Ionicons name="calendar-outline" size={14} color="#30A0E0" />
+              <Ionicons name="calendar-outline" size={14} color="#FF8E53" />
               <ThemedText style={styles.dateBadgeText}>
                 {new Date(selectedDate).toLocaleDateString('vi-VN')}
               </ThemedText>
@@ -764,7 +764,7 @@ export default function HiredDetailScreen() {
           <View style={styles.statsHeader}>
             <ThemedText style={styles.sectionTitle}>Trạng thái ngày</ThemedText>
             <View style={styles.dateBadge}>
-              <Ionicons name="calendar-outline" size={14} color="#30A0E0" />
+              <Ionicons name="calendar-outline" size={14} color="#FF8E53" />
               <ThemedText style={styles.dateBadgeText}>
                 {new Date(selectedDate).toLocaleDateString('vi-VN')}
               </ThemedText>
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingTop: 50,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -991,7 +991,7 @@ const styles = StyleSheet.create({
   },
   caringForLabel: {
     fontSize: 12,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
     marginRight: 4,
   },
@@ -1000,7 +1000,7 @@ const styles = StyleSheet.create({
   },
   caringForName: {
     fontSize: 12,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
     marginBottom: 2,
   },
@@ -1022,7 +1022,7 @@ const styles = StyleSheet.create({
   },
   dateBadgeText: {
     fontSize: 12,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '500',
     marginLeft: 4,
   },
@@ -1056,7 +1056,7 @@ const styles = StyleSheet.create({
   },
   totalStatCard: {
     backgroundColor: '#f8f9fa',
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   completedStatCard: {
     backgroundColor: '#f0f9ff',
@@ -1113,8 +1113,8 @@ const styles = StyleSheet.create({
     minWidth: 60,
   },
   selectedDateButton: {
-    backgroundColor: '#30A0E0',
-    borderColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
+    borderColor: '#FF8E53',
   },
   dateDayName: {
     fontSize: 12,
@@ -1137,7 +1137,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#FF6B35',
   },
   statusIndicator: {
     position: 'absolute',
@@ -1188,7 +1188,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
   },
   rateButtonText: {
     fontSize: 12,
@@ -1200,7 +1200,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#30A0E0',
+    borderLeftColor: '#FF8E53',
   },
   noteText: {
     fontSize: 14,
@@ -1217,7 +1217,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     alignItems: 'center',
   },
   actionButtonPrimaryText: {
@@ -1230,12 +1230,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
     alignItems: 'center',
   },
   actionButtonSecondaryText: {
     fontSize: 16,
-    color: '#30A0E0',
+    color: '#FF8E53',
     fontWeight: '600',
   },
   dayStatusSection: {
@@ -1256,7 +1256,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#30A0E0',
+    borderLeftColor: '#FF8E53',
   },
   detailLabel: {
     fontSize: 12,
@@ -1283,7 +1283,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#30A0E0',
+    borderLeftColor: '#FF8E53',
   },
   taskLeft: {
     flexDirection: 'row',
@@ -1315,7 +1315,7 @@ const styles = StyleSheet.create({
   },
   taskTime: {
     fontSize: 12,
-    color: '#30A0E0',
+    color: '#FF8E53',
     marginLeft: 4,
   },
   taskRight: {
@@ -1327,7 +1327,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   taskCategoryBadgeText: {
     fontSize: 10,
@@ -1407,12 +1407,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   taskDetailCategoryText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#30A0E0',
+    color: '#FF8E53',
   },
   taskDetailTitle: {
     fontSize: 20,
@@ -1491,7 +1491,7 @@ const styles = StyleSheet.create({
   taskDetailListNumber: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#30A0E0',
+    color: '#FF8E53',
     marginRight: 8,
     minWidth: 20,
   },
@@ -1506,7 +1506,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#30A0E0',
+    borderLeftColor: '#FF8E53',
   },
   taskDetailNotesText: {
     fontSize: 14,

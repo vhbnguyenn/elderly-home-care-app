@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { CaregiverRequest, ScheduleRequest, VideoCallRequest } from '@/types/request';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -338,7 +338,7 @@ export function CaregiverRequests({ onChatPress, onBookPress }: CaregiverRequest
             </ThemedText>
             {request.caregiverResponse.newScheduledTime && (
               <View style={styles.infoRow}>
-                <Ionicons name="calendar" size={16} color="#4ECDC4" />
+                <Ionicons name="calendar" size={16} color="#FF8E53" />
                 <ThemedText style={styles.infoText}>
                   Thời gian mới: {formatDateTime(request.caregiverResponse.newScheduledTime)}
                 </ThemedText>
@@ -442,19 +442,19 @@ export function CaregiverRequests({ onChatPress, onBookPress }: CaregiverRequest
               <View style={styles.modifiedSchedule}>
                 <ThemedText style={styles.modifiedTitle}>Lịch đã chỉnh sửa:</ThemedText>
                 <View style={styles.infoRow}>
-                  <Ionicons name="calendar" size={16} color="#4ECDC4" />
+                  <Ionicons name="calendar" size={16} color="#FF8E53" />
                   <ThemedText style={styles.infoText}>
                     Ngày: {new Date(request.caregiverResponse.modifiedSchedule.date).toLocaleDateString('vi-VN')}
                   </ThemedText>
                 </View>
                 <View style={styles.infoRow}>
-                  <Ionicons name="time" size={16} color="#4ECDC4" />
+                  <Ionicons name="time" size={16} color="#FF8E53" />
                   <ThemedText style={styles.infoText}>
                     Khung giờ: {request.caregiverResponse.modifiedSchedule.timeSlots.join(', ')}
                   </ThemedText>
                 </View>
                 <View style={styles.infoRow}>
-                  <Ionicons name="list" size={16} color="#4ECDC4" />
+                  <Ionicons name="list" size={16} color="#FF8E53" />
                   <ThemedText style={styles.infoText}>
                     Nhiệm vụ: {request.caregiverResponse.modifiedSchedule.tasks.join(', ')}
                   </ThemedText>
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     borderColor: '#E9ECEF',
   },
   activeStatusTab: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#FF8E53',
   },
   statusTabText: {
     fontSize: 12,
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#FF8E53',
   },
   responseText: {
     fontSize: 14,
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
   modifiedTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
     marginBottom: 4,
   },
   actionButtons: {

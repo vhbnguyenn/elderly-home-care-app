@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Alert,
@@ -172,9 +172,9 @@ export function ElderlyProfileSelector({
 
   const getHealthStatusColor = (status: string) => {
     switch (status) {
-      case 'good': return '#28a745';
-      case 'fair': return '#ffc107';
-      case 'poor': return '#dc3545';
+      case 'good': return '#FFA07A';
+      case 'fair': return '#FFB84D';
+      case 'poor': return '#FF6B35';
       default: return '#6c757d';
     }
   };
@@ -210,7 +210,7 @@ export function ElderlyProfileSelector({
           
           <View style={styles.selectionIndicator}>
             {isSelected ? (
-              <Ionicons name="checkmark-circle" size={20} color="#4ECDC4" />
+              <Ionicons name="checkmark-circle" size={20} color="#FF8E53" />
             ) : (
               <View style={styles.unselectedCircle} />
             )}
@@ -219,7 +219,7 @@ export function ElderlyProfileSelector({
 
         <View style={styles.profileDetails}>
           <View style={styles.detailRow}>
-            <Ionicons name="home" size={16} color={isSelected ? '#4ECDC4' : '#6c757d'} />
+            <Ionicons name="home" size={16} color={isSelected ? '#FF8E53' : '#6c757d'} />
             <ThemedText style={[
               styles.detailText,
               isSelected && styles.detailTextSelected
@@ -229,7 +229,7 @@ export function ElderlyProfileSelector({
           </View>
 
           <View style={styles.detailRow}>
-            <Ionicons name="medical" size={16} color={isSelected ? '#4ECDC4' : '#6c757d'} />
+            <Ionicons name="medical" size={16} color={isSelected ? '#FF8E53' : '#6c757d'} />
             <ThemedText style={[
               styles.detailText,
               isSelected && styles.detailTextSelected
@@ -286,7 +286,7 @@ export function ElderlyProfileSelector({
             style={styles.addNewButton}
             onPress={() => setShowAddModal(true)}
           >
-            <Ionicons name="add-circle-outline" size={24} color="#68C2E8" />
+            <Ionicons name="add-circle-outline" size={24} color="#FF6B35" />
             <ThemedText style={styles.addNewButtonText}>
               Thêm người già mới
             </ThemedText>
@@ -474,9 +474,9 @@ export function ElderlyProfileSelector({
                 </ThemedText>
                 <View style={styles.healthStatusOptions}>
                   {[
-                    { value: 'good', label: 'Tốt', color: '#28a745' },
-                    { value: 'fair', label: 'Trung bình', color: '#ffc107' },
-                    { value: 'poor', label: 'Yếu', color: '#dc3545' }
+                    { value: 'good', label: 'Tốt', color: '#FFA07A' },
+                    { value: 'fair', label: 'Trung bình', color: '#FFB84D' },
+                    { value: 'poor', label: 'Yếu', color: '#FF6B35' }
                   ].map((option) => (
                     <TouchableOpacity
                       key={option.value}
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
   requiredMark: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#dc3545',
+    color: '#FF6B35',
     marginLeft: 4,
   },
   subtitle: {
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#dc3545',
+    color: '#FF6B35',
     marginBottom: 16,
     fontStyle: 'italic',
   },
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
   },
   profileCardSelected: {
-    borderColor: '#4ECDC4',
+    borderColor: '#FF8E53',
     backgroundColor: '#f0fdfa',
   },
   profileHeader: {
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileNameSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   profileAge: {
     fontSize: 13,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   profileAgeSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   selectionIndicator: {
     marginLeft: 10,
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   detailTextSelected: {
-    color: '#4ECDC4',
+    color: '#FF8E53',
   },
   healthStatus: {
     fontWeight: '600',
@@ -634,13 +634,13 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 12,
     borderWidth: 2,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     borderStyle: 'dashed',
   },
   addNewButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
     marginLeft: 8,
   },
   modalOverlay: {
@@ -706,12 +706,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   textInputError: {
-    borderColor: '#dc3545',
+    borderColor: '#FF6B35',
     borderWidth: 2,
   },
   errorText: {
     fontSize: 12,
-    color: '#dc3545',
+    color: '#FF6B35',
     marginTop: 4,
   },
   genderContainer: {
@@ -730,10 +730,10 @@ const styles = StyleSheet.create({
   },
   genderButtonActive: {
     backgroundColor: '#e8f6f3',
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   genderButtonError: {
-    borderColor: '#dc3545',
+    borderColor: '#FF6B35',
     borderWidth: 2,
   },
   genderText: {
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   genderTextActive: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   healthStatusOptions: {
     flexDirection: 'row',
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
   },
   saveButtonText: {

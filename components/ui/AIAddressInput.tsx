@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
@@ -199,7 +199,7 @@ export const AIAddressInput: React.FC<AIAddressInputProps> = ({
       {parsedAddress && parsedAddress.confidence >= 0.7 && (
         <View style={styles.parsedContainer}>
           <View style={styles.parsedHeader}>
-            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={20} color="#FFA07A" />
             <Text style={styles.parsedTitle}>Địa chỉ đã phân tích:</Text>
             <Text style={styles.confidenceText}>
               {Math.round(parsedAddress.confidence * 100)}%
@@ -263,12 +263,12 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   requiredStar: {
-    color: '#EF4444',
+    color: '#FF6B35',
   },
   aiBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#FF8E53',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   inputProcessing: {
-    borderColor: '#8B5CF6',
+    borderColor: '#FF8E53',
     backgroundColor: '#F5F3FF',
   },
   parseButton: {
@@ -330,13 +330,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   validationSuccess: {
-    color: '#10B981',
+    color: '#FFA07A',
   },
   validationWarning: {
-    color: '#F59E0B',
+    color: '#FFA500',
   },
   validationError: {
-    color: '#EF4444',
+    color: '#FF6B35',
   },
   suggestionsContainer: {
     marginTop: 12,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   confidenceText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#10B981',
+    color: '#FFA07A',
     backgroundColor: '#DCFCE7',
     paddingHorizontal: 8,
     paddingVertical: 2,

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
     Modal,
@@ -159,7 +159,7 @@ export function SimpleDatePicker({ visible, onClose, onDateSelect, selectedDate 
           
           {/* Selected Date Display */}
           <View style={styles.selectedDateContainer}>
-            <Ionicons name="calendar" size={20} color="#30A0E0" />
+            <Ionicons name="calendar" size={20} color="#FF8E53" />
             <ThemedText style={styles.selectedDateText}>
               {selectedDay}/{selectedMonth}/{selectedYear}
             </ThemedText>
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   header: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pickerItemSelected: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
   },
   pickerItemDisabled: {
     backgroundColor: '#f8f9fa',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#30A0E0',
+    borderColor: '#FF8E53',
   },
   selectedDateText: {
     fontSize: 16,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e9ecef',
   },
   confirmButton: {
-    backgroundColor: '#30A0E0',
+    backgroundColor: '#FF8E53',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,

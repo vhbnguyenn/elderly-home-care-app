@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+﻿import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -472,7 +472,7 @@ export default function CompleteProfileScreen() {
             <MaterialCommunityIcons
               name={personalInfo.idCardFront ? "check-circle" : "id-card"}
               size={24}
-              color={personalInfo.idCardFront ? "#10B981" : "#6B7280"}
+              color={personalInfo.idCardFront ? "#FFA07A" : "#6B7280"}
             />
             <Text
               style={[
@@ -502,7 +502,7 @@ export default function CompleteProfileScreen() {
             <MaterialCommunityIcons
               name={personalInfo.idCardBack ? "check-circle" : "id-card"}
               size={24}
-              color={personalInfo.idCardBack ? "#10B981" : "#6B7280"}
+              color={personalInfo.idCardBack ? "#FFA07A" : "#6B7280"}
             />
             <Text
               style={[
@@ -636,7 +636,7 @@ export default function CompleteProfileScreen() {
                 <MaterialCommunityIcons
                   name={professionalInfo.educationCertificate ? "check-circle" : "file-document-outline"}
                   size={24}
-                  color={professionalInfo.educationCertificate ? "#10B981" : "#6B7280"}
+                  color={professionalInfo.educationCertificate ? "#FFA07A" : "#6B7280"}
                 />
                 <Text
                   style={[
@@ -719,7 +719,7 @@ export default function CompleteProfileScreen() {
               <MaterialCommunityIcons
                 name={newCertificate.image ? "check-circle" : "file-image-outline"}
                 size={24}
-                color={newCertificate.image ? "#10B981" : "#6B7280"}
+                color={newCertificate.image ? "#FFA07A" : "#6B7280"}
               />
               <Text
                 style={[
@@ -754,7 +754,7 @@ export default function CompleteProfileScreen() {
                   <MaterialCommunityIcons
                     name="certificate"
                     size={20}
-                    color="#8B5CF6"
+                    color="#FF8E53"
                   />
                   <Text style={styles.certificateName}>{cert.name}</Text>
                   <TouchableOpacity
@@ -764,7 +764,7 @@ export default function CompleteProfileScreen() {
                     <MaterialCommunityIcons
                       name="close-circle"
                       size={20}
-                      color="#EF4444"
+                      color="#FF6B35"
                     />
                   </TouchableOpacity>
                 </View>
@@ -773,7 +773,7 @@ export default function CompleteProfileScreen() {
                 <Text style={styles.certificateDetail}>Loại: {cert.type}</Text>
                 {cert.image && (
                   <View style={styles.certificateImageContainer}>
-                    <MaterialCommunityIcons name="check-circle" size={16} color="#10B981" />
+                    <MaterialCommunityIcons name="check-circle" size={16} color="#FFA07A" />
                     <Text style={styles.certificateImageText}>Đã có ảnh</Text>
                   </View>
                 )}
@@ -919,7 +919,7 @@ export default function CompleteProfileScreen() {
             <MaterialCommunityIcons
               name={additionalInfo.profileImage ? "check-circle" : "image-outline"}
               size={24}
-              color={additionalInfo.profileImage ? "#10B981" : "#6B7280"}
+              color={additionalInfo.profileImage ? "#FFA07A" : "#6B7280"}
             />
             <Text
               style={[
@@ -1226,7 +1226,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   required: {
-    color: "#EF4444",
+    color: "#FF6B35",
   },
   input: {
     backgroundColor: "#F9FAFB",
@@ -1441,7 +1441,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   fileTextSuccess: {
-    color: "#10B981",
+    color: "#FFA07A",
     fontWeight: "600",
   },
   fileButton: {
@@ -1714,7 +1714,7 @@ const styles = StyleSheet.create({
   },
   certificateImageText: {
     fontSize: 13,
-    color: "#10B981",
+    color: "#FFA07A",
     fontWeight: "500",
   },
   modalOverlay: {

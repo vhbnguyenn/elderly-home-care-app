@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -158,7 +158,7 @@ export default function GuestHomeScreen() {
             <TouchableOpacity onPress={() => Alert.alert('Bộ lọc', 'Vui lòng đăng nhập')}>
               <View style={styles.filterButton}>
                 <ThemedText style={styles.filterText}>Bộ lọc</ThemedText>
-                <Ionicons name="filter" size={16} color="#FF6B6B" />
+                <Ionicons name="filter" size={16} color="#FF6B35" />
               </View>
             </TouchableOpacity>
           </View>
@@ -176,7 +176,7 @@ export default function GuestHomeScreen() {
         {/* Login CTA Section */}
         <View style={styles.ctaSection}>
           <View style={styles.ctaCard}>
-            <Ionicons name="heart-circle" size={48} color="#FF6B6B" />
+            <Ionicons name="heart-circle" size={48} color="#FF6B35" />
             <ThemedText style={styles.ctaTitle}>
               Bắt đầu chăm sóc ngay hôm nay
             </ThemedText>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 14,
-    color: '#FF6B6B',
+    color: '#FF6B35',
     fontWeight: '600',
     marginRight: 4,
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   ctaButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B35',
     paddingHorizontal: 48,
     paddingVertical: 16,
     borderRadius: 12,
@@ -295,12 +295,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FF6B6B',
+    borderColor: '#FF6B35',
   },
   ctaButtonSecondaryText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: '#FF6B35',
   },
   bottomSpacing: {
     height: 40,

@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { isLessonCompleted, markLessonCompleted, setCurrentLesson } from "@/data/trainingStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#8B5CF6",
+    backgroundColor: "#FF8E53",
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#8B5CF6",
+    backgroundColor: "#FF8E53",
     marginTop: 7,
     marginRight: 12,
   },
@@ -480,13 +480,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    backgroundColor: "#8B5CF6",
+    backgroundColor: "#FF8E53",
     paddingVertical: 14,
     borderRadius: 8,
     marginTop: 8,
   },
   completeButtonCompleted: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
   },
   completeButtonText: {
     color: "#fff",
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: "#8B5CF6",
+    backgroundColor: "#FF8E53",
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

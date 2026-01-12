@@ -5,10 +5,10 @@ import { router } from 'expo-router';
  */
 export class NavigationHelper {
   /**
-   * Navigate đến trang login
+   * Navigate đến trang index (landing page)
    */
   static goToLogin() {
-    router.replace('/login');
+    router.replace('/');
   }
 
   /**

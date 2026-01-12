@@ -42,10 +42,9 @@ function RootNavigator() {
     );
   }
 
-  // Logged in seeker - Show dashboard with tabs
+  // Logged in seeker - Show careseeker with tabs
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="careseeker" options={{ headerShown: false }} />
     </Stack>
   );

@@ -1,4 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
+﻿import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -22,7 +22,7 @@ export function RequestNotification({ requestCount, visible }: RequestNotificati
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Ionicons name="notifications" size={24} color="#4ECDC4" />
+          <Ionicons name="notifications" size={24} color="#FF8E53" />
         </View>
         
         <View style={styles.textContainer}>
@@ -37,7 +37,7 @@ export function RequestNotification({ requestCount, visible }: RequestNotificati
           activeOpacity={0.7}
         >
           <ThemedText style={styles.buttonText}>Xem yêu cầu</ThemedText>
-          <Ionicons name="chevron-forward" size={16} color="#4ECDC4" />
+          <Ionicons name="chevron-forward" size={16} color="#FF8E53" />
         </TouchableOpacity>
       </View>
     </View>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#FF8E53',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#4ECDC4',
+    color: '#FF8E53',
     marginRight: 4,
   },
 });

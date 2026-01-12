@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -65,7 +65,7 @@ export function AvailabilitySelector({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#68C2E8" />
+        <ActivityIndicator size="large" color="#FF6B35" />
         <ThemedText style={styles.loadingText}>Đang tải lịch trống...</ThemedText>
       </View>
     );
@@ -100,7 +100,7 @@ export function AvailabilitySelector({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="time-outline" size={20} color="#68C2E8" />
+        <Ionicons name="time-outline" size={20} color="#FF6B35" />
         <ThemedText style={styles.headerText}>
           Lịch trống trong 2 tuần tới
         </ThemedText>
@@ -204,7 +204,7 @@ export function AvailabilitySelector({
 
       {selectedDate && selectedTime && (
         <View style={styles.selectionSummary}>
-          <Ionicons name="information-circle" size={20} color="#68C2E8" />
+          <Ionicons name="information-circle" size={20} color="#FF6B35" />
           <ThemedText style={styles.summaryText}>
             Đã chọn: {selectedTime.start} - {selectedTime.end} ({packageDuration}h)
           </ThemedText>
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   retryButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 8,
   },
   retryText: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     borderColor: '#E74C3C',
   },
   selectedBox: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
   },
   legendText: {
     fontSize: 12,
@@ -353,8 +353,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   slotSelected: {
-    backgroundColor: '#68C2E8',
-    borderColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
     borderWidth: 2,
   },
   slotTime: {

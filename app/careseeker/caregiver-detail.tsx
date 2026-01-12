@@ -177,7 +177,7 @@ export default function CaregiverDetailScreen() {
             onPress={handleChat}
             activeOpacity={0.7}
           >
-            <Ionicons name="chatbubble-outline" size={20} color="#68C2E8" />
+            <Ionicons name="chatbubble-outline" size={20} color="#FF6B35" />
             <ThemedText style={styles.chatButtonText}>Chat</ThemedText>
           </TouchableOpacity>
           
@@ -246,7 +246,7 @@ export default function CaregiverDetailScreen() {
               <ThemedText style={styles.sectionTitle}>Há»c váº¥n</ThemedText>
               {caregiver.education.map((edu, index) => (
                 <View key={index} style={styles.educationItem}>
-                  <Ionicons name="school-outline" size={16} color="#68C2E8" />
+                  <Ionicons name="school-outline" size={16} color="#FF6B35" />
                   <ThemedText style={styles.educationText}>{edu}</ThemedText>
                 </View>
               ))}
@@ -257,7 +257,7 @@ export default function CaregiverDetailScreen() {
               <ThemedText style={styles.sectionTitle}>Chá»©ng chá»‰</ThemedText>
               {caregiver.certifications.map((cert, index) => (
                 <View key={index} style={styles.certificationItem}>
-                  <Ionicons name="ribbon-outline" size={16} color="#68C2E8" />
+                  <Ionicons name="ribbon-outline" size={16} color="#FF6B35" />
                   <ThemedText style={styles.certificationText}>{cert}</ThemedText>
                 </View>
               ))}
@@ -279,11 +279,11 @@ export default function CaregiverDetailScreen() {
             <View style={styles.section}>
               <ThemedText style={styles.sectionTitle}>LiÃªn há»‡</ThemedText>
               <View style={styles.contactItem}>
-                <Ionicons name="call-outline" size={16} color="#68C2E8" />
+                <Ionicons name="call-outline" size={16} color="#FF6B35" />
                 <ThemedText style={styles.contactText}>{caregiver.phone}</ThemedText>
               </View>
               <View style={styles.contactItem}>
-                <Ionicons name="mail-outline" size={16} color="#68C2E8" />
+                <Ionicons name="mail-outline" size={16} color="#FF6B35" />
                 <ThemedText style={styles.contactText}>{caregiver.email}</ThemedText>
               </View>
             </View>
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     paddingTop: 30,
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -413,20 +413,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
     gap: 8,
   },
   chatButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   callButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFA07A',
     borderRadius: 12,
     paddingVertical: 12,
     gap: 8,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     borderRadius: 12,
     paddingVertical: 12,
     gap: 8,
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomColor: '#68C2E8',
+    borderBottomColor: '#FF6B35',
   },
   tabText: {
     fontSize: 16,
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
   },
   activeTabText: {
-    color: '#68C2E8',
+    color: '#FF6B35',
   },
   infoContent: {
     backgroundColor: 'white',
@@ -505,11 +505,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   specialtyText: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   educationItem: {
@@ -545,11 +545,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: '#68C2E8',
+    borderColor: '#FF6B35',
   },
   languageText: {
     fontSize: 14,
-    color: '#68C2E8',
+    color: '#FF6B35',
     fontWeight: '500',
   },
   contactItem: {
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#68C2E8',
+    backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

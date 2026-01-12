@@ -1,4 +1,4 @@
-import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
+﻿import CaregiverBottomNav from "@/components/navigation/CaregiverBottomNav";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterTabActive: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#FF6B35",
   },
   filterTabText: {
     fontSize: 14,
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   filterBadgeUnread: {
-    backgroundColor: "#EF4444",
+    backgroundColor: "#FF6B35",
   },
   filterBadgeText: {
     fontSize: 12,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFA07A",
     borderWidth: 2,
     borderColor: "#fff",
   },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     color: "#6B7280",
   },
   chatMessageTyping: {
-    color: "#3B82F6",
+    color: "#FF6B35",
     fontStyle: "italic",
   },
   chatMessageUnread: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     color: "#1F2937",
   },
   unreadBadge: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#FF6B35",
     borderRadius: 10,
     minWidth: 20,
     height: 20,

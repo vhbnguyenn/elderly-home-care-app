@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
@@ -59,7 +59,7 @@ export const PostServicePrompt: React.FC<PostServicePromptProps> = ({
 
           {/* Description */}
           <View style={styles.descriptionCard}>
-            <Ionicons name="chatbubbles" size={24} color="#FF6B6B" />
+            <Ionicons name="chatbubbles" size={24} color="#FF6B35" />
             <ThemedText style={styles.description}>
               Đánh giá của bạn giúp chúng tôi cải thiện chất lượng dịch vụ và hỗ trợ các gia đình khác đưa ra quyết định tốt hơn
             </ThemedText>
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B35',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 32,
     width: '100%',
     marginBottom: 12,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

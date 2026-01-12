@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
@@ -45,11 +45,11 @@ export default function ElderlyList({
   const getHealthStatusColor = (status: ElderlyPerson['healthStatus']) => {
     switch (status) {
       case 'good':
-        return '#28a745';
+        return '#FFA07A';
       case 'fair':
-        return '#ffc107';
+        return '#FFB84D';
       case 'poor':
-        return '#dc3545';
+        return '#FF6B35';
       default:
         return '#6c757d';
     }
@@ -169,10 +169,10 @@ export default function ElderlyList({
     return (
       <View style={styles.statsContainer}>
         <View style={styles.statsGrid}>
-          <View style={[styles.statCard, { borderLeftColor: '#28a745' }]}>
+          <View style={[styles.statCard, { borderLeftColor: '#FFA07A' }]}>
             <View style={styles.statContent}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#28a74515' }]}>
-                <Ionicons name="checkmark-circle" size={24} color="#28a745" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#FFA07A15' }]}>
+                <Ionicons name="checkmark-circle" size={24} color="#FFA07A" />
               </View>
               <View style={styles.statTextContainer}>
                 <ThemedText style={styles.statValue}>{goodCount}</ThemedText>
@@ -181,10 +181,10 @@ export default function ElderlyList({
             </View>
           </View>
           
-          <View style={[styles.statCard, { borderLeftColor: '#ffc107' }]}>
+          <View style={[styles.statCard, { borderLeftColor: '#FFB84D' }]}>
             <View style={styles.statContent}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#ffc10715' }]}>
-                <Ionicons name="alert-circle-outline" size={24} color="#ffc107" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#FFB84D15' }]}>
+                <Ionicons name="alert-circle-outline" size={24} color="#FFB84D" />
               </View>
               <View style={styles.statTextContainer}>
                 <ThemedText style={styles.statValue}>{fairCount}</ThemedText>
@@ -193,10 +193,10 @@ export default function ElderlyList({
             </View>
           </View>
           
-          <View style={[styles.statCard, { borderLeftColor: '#dc3545' }]}>
+          <View style={[styles.statCard, { borderLeftColor: '#FF6B35' }]}>
             <View style={styles.statContent}>
-              <View style={[styles.statIconContainer, { backgroundColor: '#dc354515' }]}>
-                <Ionicons name="warning" size={24} color="#dc3545" />
+              <View style={[styles.statIconContainer, { backgroundColor: '#FF6B3515' }]}>
+                <Ionicons name="warning" size={24} color="#FF6B35" />
               </View>
               <View style={styles.statTextContainer}>
                 <ThemedText style={styles.statValue}>{poorCount}</ThemedText>
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#FF6B35',
     justifyContent: 'center',
     alignItems: 'center',
   },

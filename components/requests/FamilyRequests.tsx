@@ -1,4 +1,4 @@
-import { CaregiverCard } from '@/components/caregiver/CaregiverCard';
+﻿import { CaregiverCard } from '@/components/caregiver/CaregiverCard';
 import { ThemedText } from '@/components/themed-text';
 import { AddElderlyToFamilyRequest, FamilyRequest, HireCaregiverRequest, JoinFamilyRequest } from '@/types/request';
 import { Ionicons } from '@expo/vector-icons';
@@ -564,7 +564,7 @@ export function FamilyRequests({ onChatPress, onBookPress }: FamilyRequestsProps
         >
           <View style={styles.elderlyHeader}>
             <View style={styles.elderlyAvatar}>
-              <Ionicons name="person" size={24} color="#4ECDC4" />
+              <Ionicons name="person" size={24} color="#FF8E53" />
             </View>
             <View style={styles.elderlyDetails}>
               <ThemedText style={styles.elderlyName}>{request.elderly.name}</ThemedText>
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#FFB84D',
     marginBottom: 20,
   },
   waitingText: {
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#FF8E53',
   },
   commentText: {
     fontSize: 14,
